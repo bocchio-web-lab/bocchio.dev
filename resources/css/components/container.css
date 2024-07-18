@@ -1,0 +1,13 @@
+.container {
+    position: relative;
+    width: 60%;
+    text-align: justify;
+    margin: var(--Margin_Gap) auto;
+    color: var(--Color_Text);
+    background-color: var(--Color_Text_BG);
+    padding: var(--Padding_Wrap);
+    border: var(--Border_Settings_Wrap);
+    border-radius: var(--Border_Radius_Wrap);
+    transition: var(--Transition_Setting);
+    font-family: var(--Font_Base);
+}

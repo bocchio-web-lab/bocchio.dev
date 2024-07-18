@@ -1,0 +1,23 @@
+<svg id="private-lessons" xmlns="http://www.w3.org/2000/svg" viewBox="0 -10 450.14 382.82">
+
+    <g id="Black">
+        <text transform="translate(339.23 107.36)" style="font-size:50px;font-family:CambriaMath, Cambria Math">f</text>
+        <text transform="translate(415.79 345.63)" style="font-size:50px;font-family:CambriaMath, Cambria Math">x</text>
+        <text transform="translate(10.68 20.66)" style="font-size:50px;font-family:CambriaMath, Cambria Math">y</text>
+        <g id="Asse_x" data-name="Asse x">
+            <line y1="302.26" x2="406.79" y2="302.26"/>
+            <line y1="302.26" x2="406.79" y2="302.26" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:7px"/>
+            <polygon points="394.6 318.33 401.43 302.26 394.6 286.19 432.7 302.26 394.6 318.33"/>
+        </g>
+        <g id="Asse_y" data-name="Asse y">
+            <line x1="53.7" y1="354.73" x2="51.23" y2="29.42"/>
+            <line x1="53.7" y1="354.73" x2="51.23" y2="29.42" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:7px"/>
+            <polygon points="66.88 41.1 51.27 34.61 35.77 41.34 51.04 4.35 66.88 41.1"/>
+        </g>
+    </g>
+    <g id="Orange">
+        <path id="Curva_2" data-name="Curva 2" d="M217.6,450.71c5.56-100,69.94-93.14,85.19-94.45,43.21-3.7,43.21-3.7,142.53-156.17" transform="translate(-66.9 -107.83)" style="fill:none;stroke:var(--Color_Main, orange);stroke-miterlimit:10;stroke-width:4px"/>
+        <path id="Curva_1" data-name="Curva 1" d="M66.9,369.22c130.86,0,138.36-150,139-229" transform="translate(-66.9 -107.83)" style="fill:none;stroke:var(--Color_Main, orange);stroke-miterlimit:10;stroke-width:4px"/>
+    </g>
+
+</svg>

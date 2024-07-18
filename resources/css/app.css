@@ -1,0 +1,52 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+@layer base {
+
+    @font-face {
+        font-family: 'Bungee Shade';
+        font-style: normal;
+        font-weight: 800;
+        font-display: swap;
+        src: url('../fonts/BungeeShade_Regular.woff2') format('woff2');
+    }
+
+    @font-face {
+        font-family: 'Roboto Condensed';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('../fonts/Roboto_Condensed.woff2') format('woff2');
+    }
+
+    @font-face {
+        font-family: 'Catamaran', sans-serif;
+        font-style: normal;
+        font-weight: 900;
+        font-display: swap;
+        src: url('../fonts/Catamaran.woff2') format('woff2');
+    }
+
+    html {
+        font-family: 'Roboto Condensed', system-ui, sans-serif;
+    }
+
+    a:nth-child(2n)>.card {
+        @apply flex-row-reverse;
+    }
+
+    .text3D {
+        text-shadow: -5px 5px 5px hsla(0, 0%, 100%, .5);
+    }
+
+    #project-displayer h2 {
+        @apply font-heading;
+        @apply font-extrabold;
+        @apply text-3xl;
+        @apply w-full;
+        @apply underline;
+    }
+
+}
