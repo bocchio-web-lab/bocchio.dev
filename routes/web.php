@@ -2,18 +2,37 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Content\ContentController;
+use App\Http\Controllers\Content\ProjectController;
+use App\Http\Controllers\Content\MixController;
+use App\Http\Controllers\Content\AppController;
+use App\Http\Middleware\IsAdmin;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::resource('projects', ProjectController::class)->only(['index', 'create', 'show']);
+
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified', IsAdmin::class])->name('dashboard');
+
+// Contents
+Route::group(['middleware' => ['auth', IsAdmin::class]], function () {
+    Route::resource('contents', ContentController::class)->except(['index', 'show']);
+});
+
+Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('projects/{slug}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('mixes', [MixController::class, 'index'])->name('mixes.index');
+Route::get('mixes/{slug}', [MixController::class, 'show'])->name('mixes.show');
+Route::get('apps', [AppController::class, 'index'])->name('apps.index');
+Route::get('apps/{slug}', [AppController::class, 'show'])->name('apps.show');
 
 
-// Route::prefix('admin')->group(function () {
-//     Route::view('/', 'admin.dashboard');
-//     Route::view('/users', 'admin.users');
-//     Route::view('/settings', 'admin.settings');
-// });
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
-// Route::get('/products/{id}', function ($id) {
-//     // codice per recuperare il prodotto con l'ID specificato
-//     });
+
+require __DIR__ . '/auth.php';

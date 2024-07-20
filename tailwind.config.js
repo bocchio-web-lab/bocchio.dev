@@ -13,13 +13,13 @@ export default {
             },
             fontFamily: {
                 heading: ['Catamaran', 'sans-serif'],
-                body: ['Roboto Condensed', 'sans-serif'],
+                // body: ['Roboto Condensed', 'sans-serif'],
             },
             keyframes: {
                 'sloganReveal': {
-                    '0%': { opacity: 0, 'text-shadow': 'none'},
-                    '70%': { opacity: 1, 'text-shadow': 'none'},
-                    '100%': { opacity: 1, 'text-shadow': ' -5px 5px 5px hsla(0, 0%, 100%, .5)'}
+                    '0%': { opacity: 0, 'text-shadow': 'none' },
+                    '70%': { opacity: 1, 'text-shadow': 'none' },
+                    '100%': { opacity: 1, 'text-shadow': ' -5px 5px 5px hsla(0, 0%, 100%, .5)' }
                 },
                 'particleReveal': {
                     '0%': { opacity: 0 },

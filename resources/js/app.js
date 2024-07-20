@@ -1,4 +1,16 @@
 import './bootstrap';
 
-import './elements/header-menu-opener'
-import './elements/particles-animator'
+import './components/header-menu-opener'
+import './components/particles-animator'
+
+
+String.prototype.slugify = function (separator = "-") {
+    return this
+        .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9 ]/g, '')
+        .replace(/\s+/g, separator);
+};
