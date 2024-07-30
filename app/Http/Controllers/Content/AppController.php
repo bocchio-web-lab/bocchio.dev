@@ -42,6 +42,6 @@ class AppController extends Controller
 
         if (!$appPage) return abort(404);
 
-        return view('contents.show')->with('content', $appPage);
+        return view('apps.show')->with('content', $appPage);
     }
 }

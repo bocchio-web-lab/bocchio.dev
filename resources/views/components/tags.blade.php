@@ -1,3 +1,5 @@
+@props(['tags'])
+
 @isset($tags)
     <div class="flex flex-row flex-wrap w-10/12 justify-around m-auto gap-2 mt-4">
         @foreach ($tags as $tag)

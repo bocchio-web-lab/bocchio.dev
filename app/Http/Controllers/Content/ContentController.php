@@ -25,7 +25,7 @@ class ContentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:contents,mixes',
+            'type' => 'required|in:project,mix,app',
             'title' => 'required|string|max:255',
         ]);
 
@@ -47,17 +47,22 @@ class ContentController extends Controller
 
         if (!$content) return abort(404, 'Content to be edited not found.');
 
+        // print_r($content->tags);
+        // echo (gettype($content->tags));
+        // return;
+
         return view('contents.edit')->with('content', $content);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slug)
     {
         $request->validate([
             'published' => 'required|boolean',
-            'content_phase' => 'required|in:not_started,in_progress,completed',
+            'phase' => 'required|integer',
+            'type' => 'required|in:project,mix,app',
             'slug' => 'required|string',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -67,31 +72,31 @@ class ContentController extends Controller
             'tags' => 'nullable|json',
         ]);
 
-        $content = Content::find($id);
+        $content = Content::where('slug', $slug)->first();
 
         $content->published = $request->input('published');
-        $content->content_phase = $request->input('content_phase');
+        $content->phase = $request->input('phase');
         $content->slug = $request->input('slug');
         $content->title = $request->input('title');
         $content->description = $request->input('description');
         $content->img = $request->input('img');
         $content->content = $request->input('content');
-        $content->gallery = $request->input('gallery');
-        $content->tags = $request->input('tags');
+        $content->gallery = json_decode($request->input('gallery'));
+        $content->tags = json_decode($request->input('tags'));
 
         $content->save();
 
-        return redirect()->route('contents.edit', ['id' => $content->id]);
+        return redirect()->route('contents.edit', $content->slug);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($slug)
     {
-        $content = Content::find($id);
+        $content = Content::where('slug', $slug)->first();
         $content->delete();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('contents.dashboard');
     }
 }

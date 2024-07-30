@@ -1,6 +1,6 @@
 <x-layout-minimal :title="'Edit content'" :description="'Form page for edit an existing content'" class="max-w-full">
 
-    <form method="POST" action="{{ route('projects.update', ['id' => $content->id]) }}">
+    <form method="POST" action="{{ route('contents.update', $content->slug) }}">
         @csrf
         @method('PUT')
 
@@ -18,6 +18,19 @@
             <x-inputs.errorbox :messages="$errors->get('slug')" class="mt-2" />
         </div>
 
+        {{-- Type --}}
+        <div class="mt-4">
+            <x-inputs.label for="type" :value="'Type'" />
+            <x-inputs.select id="type" name="type" required>
+                @foreach (['project', 'mix', 'app'] as $type)
+                    <option value="{{ $type }}" {{ $content->type == $type ? 'selected' : '' }}>
+                        {{ ucfirst(str_replace('_', ' ', $type)) }}
+                    </option>
+                @endforeach
+            </x-inputs.select>
+            <x-inputs.errorbox :messages="$errors->get('type')" class="mt-2" />
+        </div>
+
         <!-- Published -->
         <div class="mt-4">
             <x-inputs.label for="published" :value="'Published'" />
@@ -30,15 +43,10 @@
 
         <!-- Project Phase -->
         <div class="mt-4">
-            <x-inputs.label for="project_phase" :value="'Phase'" />
-            <x-inputs.select id="project_phase" name="project_phase" required>
-                @foreach (['not_started', 'in_progress', 'completed'] as $phase)
-                    <option value="{{ $phase }}" {{ $content->project_phase == $phase ? 'selected' : '' }}>
-                        {{ ucfirst(str_replace('_', ' ', $phase)) }}
-                    </option>
-                @endforeach
-            </x-inputs.select>
-            <x-inputs.errorbox :messages="$errors->get('project_phase')" class="mt-2" />
+            <x-inputs.label for="phase" :value="'Phase'" />
+            <input type="range" id="phase" name="phase" min="0" max="100" class="w-full"
+                value="{{ $content->phase }}" />
+            <x-inputs.errorbox :messages="$errors->get('phase')" class="mt-2" />
         </div>
 
         <!-- Description -->
@@ -87,12 +95,28 @@
 
         <div class="flex items-center justify-end mt-4 gap-4">
             <x-buttons.primary type="submit">Save</x-buttons.primary>
-            <a href="{{ route('projects.show', ['slug' => $content->slug]) }}">
-                <x-buttons.primary role="link"
-                    onclick="alert('You are going to lose all your edits. Continue?')">Exit</x-buttons.primary>
-            </a>
+            <x-buttons.danger
+                onclick="document.getElementById('modal-exit-without-saving').classList.remove('hidden')">Exit</x-buttons.danger>
         </div>
     </form>
+
+    <x-modal :id="'modal-exit-without-saving'">
+        <div>
+            <h3 class="block mb-1 font-bold text-base text-gray-700">Exit without saving</h3>
+            <p class="mt-2 text-sm text-gray-500">
+                You are going to lose all your edits. Continue?
+            </p>
+        </div>
+
+        <div class="flex items-center justify-end mt-4 gap-4">
+
+            <x-buttons.primary
+                onclick="document.getElementById('modal-exit-without-saving').classList.add('hidden')">No</x-buttons.primary>
+            <a href="{{ route('contents.dashboard') }}">
+                <x-buttons.danger role="link">Yes</x-buttons.danger>
+            </a>
+        </div>
+    </x-modal>
 
 </x-layout-minimal>
 

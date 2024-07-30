@@ -1,7 +1,7 @@
 <x-layout-minimal :title="'Login'" :description="'Log in page'" class="max-w-lg">
 
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-inputs.successbox class="mb-4" :messages="session('status')" />
 
     <form method="POST" action="{{ route('login') }}">
         @csrf

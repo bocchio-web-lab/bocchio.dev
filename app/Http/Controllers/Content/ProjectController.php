@@ -16,7 +16,7 @@ class ProjectController extends Controller
     {
 
         $cards = Content::orderBy('created_at', 'DESC')
-                ->select('slug', 'title', 'description', 'img')
+                ->select('slug', 'title', 'description', 'img', 'tags')
                 ->where('type', 'project')
                 ->where('published', true)
                 ->get();

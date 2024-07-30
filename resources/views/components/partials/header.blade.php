@@ -15,7 +15,7 @@
 
             {{-- Left block --}}
             <a href="{{ route('home') }}" class="group flex items-center gap-4">
-                <x-application-logo class="h-9 sm:h-14" />
+                <x-icons.gear-bulb class="h-9 sm:h-14" />
                 <span
                     class="font-heading font-extrabold whitespace-nowrap group-hover:text-app-color group-hover:underline sm:text-xl">
                     Tommaso Bocchietti
@@ -23,7 +23,7 @@
             </a>
 
             {{-- Right block --}}
-            <div class="flex gap-4 self-center">
+            <div class="flex gap-6 self-center">
 
                 {{-- Large screen menu (Projects, Apps...) --}}
                 <div class="hidden justify-between items-center w-full lg:flex lg:w-auto">
@@ -61,9 +61,9 @@
 
                     {{-- Profile icon --}}
                     @auth
-                        <img class="h-9 sm:h-14 w-auto m-auto content-center" src="{{ auth()->user()->profile_photo_url }}"
-                            alt="{{ auth()->user()->name }}">
+                        <x-icons.profile-user class="h-9 sm:h-14" alt="{{ auth()->user()->name }}" />
                     @else
+                        {{-- <x-icons.profile-unknown class="h-9 sm:h-14" alt="Avatar"/> --}}
                         <img class="h-9 sm:h-14 w-auto m-auto content-center"
                             src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e" alt="">
                     @endauth
@@ -71,31 +71,51 @@
                     {{-- Profile menu --}}
                     <div class="hidden relative w-0 h-0 z-10 ml-auto focus:outline-none group-hover:block hover:block">
                         <ul
-                            class="flex flex-col absolute w-40 -left-40 bg-white origin-top-right rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                            class="flex flex-col absolute w-44 -left-44 bg-white origin-top-right rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                            <li class="text-right py-2 px-4 border-b border-gray-100">
+                                {{ auth()->user()->name ?? 'Guest' }}
+                            </li>
                             @auth
-                                <li>
-                                    <a href="{{ route('profile.edit') }}"
-                                        class="block text-right text-gray-500 p-2 pr-4 border-b border-gray-100 hover:bg-gray-50">
-                                        Your profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <a tabindex="0" role="button"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                                        class="block text-right text-gray-500 p-2 pr-4 hover:bg-gray-50">
+
+                                @if (auth()->user()->is_admin)
+                                    <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                        <a href="{{ route('contents.dashboard') }}" class="block">
+                                            Content dashboard
+                                        </a>
+                                    </li>
+                                @else
+                                    @if (auth()->user()->hasVerifiedEmail())
+                                        <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                            <a href="{{ route('profile.edit') }}" class="block">
+                                                Your profile
+                                            </a>
+                                        </li>
+                                    @else
+                                        <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                            <form action="{{ route('verification.send') }}" method="post">
+                                                @csrf
+                                                <button type="submit" class="block text-right justify-end w-full">
+                                                    Verify your email
+                                                </button>
+                                            </form>
+                                        </li>
+                                    @endif
+                                @endif
+
+                                <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                    <a tabindex="0" role="button" class="block"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                         Log out
                                     </a>
                                 </li>
                             @else
-                                <li>
-                                    <a href="{{ route('login') }}"
-                                        class="block text-right text-gray-500 p-2 pr-4 border-b border-gray-100 hover:bg-gray-50">
+                                <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                    <a href="{{ route('login') }}" class="block">
                                         Log in
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="{{ route('register') }}"
-                                        class="block text-right text-gray-500 p-2 pr-4 hover:bg-gray-50">
+                                <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                    <a href="{{ route('register') }}" class="block">
                                         Sign up
                                     </a>
                                 </li>

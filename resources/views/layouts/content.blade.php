@@ -11,7 +11,7 @@
     <x-slogan />
 
     @if (isset($slot) && $slot->hasActualContent())
-        <main {{ $attributes->merge(['class' => 'w-11/12 mx-auto my-4 max-w-4xl']) }}>
+        <main {{ $attributes->merge(['class' => 'w-11/12 mx-auto my-4']) }}>
             {{ $slot }}
         </main>
     @endif

@@ -1,6 +1,4 @@
-{{-- @extends('layouts.base', ['title' => 'Projects', 'description' => 'Index page for contents']) --}}
-
-<x-layout-content :title="$content->title" :description="$content->description">
+<x-layout-content :title="$content->title" :description="$content->description" class="max-w-4xl">
 
     {{-- @if (Auth::check() && Auth::user()->is_admin == 1)
         <div class="bg-white rounded-2xl p-4 my-4 mx-auto md:p-8 lg:px-14 lg:py-10">

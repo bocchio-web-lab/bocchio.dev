@@ -22,7 +22,7 @@
         </a>
     </footer>
 
-    <x-particles />
+    {{-- @include('components.particles') --}}
 
 </body>
 

@@ -35,8 +35,8 @@ class ContentFactory extends Factory
             'description' => $this->faker->paragraph(),
             'img' => $this->faker->imageUrl(200, 200),
             'content' => $this->faker->paragraphs($this->faker->numberBetween(0, 7), true),
-            'gallery' => json_encode($this->faker->randomElements([$this->faker->imageUrl(200, 200)], null)),
-            'tags' => json_encode($this->faker->randomElements(self::Tags, null)),
+            'gallery' => $this->faker->randomElements([$this->faker->imageUrl(200, 200)], null),
+            'tags' => $this->faker->randomElements(self::Tags, null),
         ];
     }
 }

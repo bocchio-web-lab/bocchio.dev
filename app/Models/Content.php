@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,8 +31,9 @@ class Content extends Model
     protected function casts(): array
     {
         return [
-            'gallery' => AsArrayObject::class,
+            'gallery' => 'array',
             'tags' => 'array',
         ];
     }
+
 }

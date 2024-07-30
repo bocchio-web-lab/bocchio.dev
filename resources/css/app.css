@@ -10,7 +10,7 @@
         font-style: normal;
         font-weight: 800;
         font-display: swap;
-        src: url('../fonts/BungeeShade_Regular.woff2') format('woff2');
+        src: url('/resources/css/fonts/BungeeShade_Regular.woff2') format('woff2');
     }
 
     @font-face {
@@ -18,7 +18,7 @@
         font-style: normal;
         font-weight: 400;
         font-display: swap;
-        src: url('../fonts/Roboto_Condensed.woff2') format('woff2');
+        src: url('/resources/css/fonts/Roboto_Condensed.woff2') format('woff2');
     }
 
     @font-face {
@@ -26,7 +26,7 @@
         font-style: normal;
         font-weight: 900;
         font-display: swap;
-        src: url('../fonts/Catamaran.woff2') format('woff2');
+        src: url('/resources/css/fonts/Catamaran.woff2') format('woff2');
     }
 
     html {

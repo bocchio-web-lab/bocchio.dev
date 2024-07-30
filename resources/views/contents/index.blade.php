@@ -1,27 +1,26 @@
-<x-layout-content :title="$title" :description="$description">
+<x-layout-content :title="$title" :description="$description" @class([
+    'max-w-4xl' => !Route::is('apps.index'),
+    'max-w-screen-xl' => Route::is('apps.index'),
+])>
 
-    {{-- @if (Auth::check() && Auth::user()->is_admin == 1)
-        <div class="bg-white rounded-2xl p-4 my-4 mx-auto md:p-8 lg:px-14 lg:py-10">
-            <div class="flex justify-center text-center m-auto gap-4">
+    <div @class([
+        'grid gap-6 mb-6',
+        'grid-cols-1 justify-stretch items-stretch md:grid-cols-2 lg:grid-cols-3' => Route::is(
+            'apps.index'),
+    ])>
 
-                <a href="{{ route('projects.create') }}">
-                    <x-buttons.primary>Create new project</x-buttons.primary>
-                </a>
-
+        @forelse ($cards as $card)
+            @if (Route::is('apps.index'))
+                <x-cards.app :card="$card" />
+            @else
+                <x-cards.content :card="$card" />
+            @endif
+        @empty
+            <div class="flex items-center justify-center w-full h-96 col-span-full">
+                <p class="text-lg text-gray-500">No content found.</p>
             </div>
-        </div>
-    @endif --}}
+        @endforelse
 
-    @isset($cards)
-
-        <div class="grid gap-6">
-
-            @foreach ($cards as $card)
-                @include('components.card', ['card' => $card])
-            @endforeach
-
-        </div>
-
-    @endisset
+    </div>
 
 </x-layout-content>
