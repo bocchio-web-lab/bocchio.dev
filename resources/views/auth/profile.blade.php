@@ -23,32 +23,6 @@
             <x-inputs.errorbox :messages="$errors->get('email')" />
         </div>
 
-        {{--
-        <!-- Avatar -->
-        <div class="mt-4">
-            <x-inputs.label for="avatar" :value="'Avatar'" />
-            <x-inputs.select id="avatar" name="avatar" required autofocus autocomplete="avatar">
-                <option value="1"> <img
-                        src="https://res.cloudinary.com/bocchio/image/upload/v1632947036/GitHub.png"
-                        class="h-8 md:h-10"></option>
-                <option value="2"> <img
-                        src="https://res.cloudinary.com/bocchio/image/upload/v1632947036/GitHub.png"
-                        class="h-8 md:h-10"></option>
-                <option value="3"> <img
-                        src="https://res.cloudinary.com/bocchio/image/upload/v1632947036/GitHub.png"
-                        class="h-8 md:h-10"></option>
-                <option value="4"> <img
-                        src="https://res.cloudinary.com/bocchio/image/upload/v1632947036/GitHub.png"
-                        class="h-8 md:h-10"></option>
-                <option value="5"> <img
-                        src="https://res.cloudinary.com/bocchio/image/upload/v1632947036/GitHub.png"
-                        class="h-8 md:h-10"></option>
-            </x-inputs.select>
-
-            <x-inputs.errorbox :messages="$errors->get('avatar')" />
-        </div>
-        --}}
-
         <div class="flex items-center justify-end mt-4 gap-4">
             <x-buttons.primary type="submit">Update profile</x-buttons.primary>
         </div>
@@ -102,9 +76,6 @@
             onclick="document.getElementById('modal-delete-profile').classList.remove('hidden')">Delete
             account</x-buttons.danger>
     </div>
-
-    {{-- route('verification.send') --}}
-
 
     <x-modal :id="'modal-delete-profile'">
         <div>

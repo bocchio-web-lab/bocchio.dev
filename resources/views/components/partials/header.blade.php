@@ -63,9 +63,7 @@
                     @auth
                         <x-icons.profile-user class="h-9 sm:h-14" alt="{{ auth()->user()->name }}" />
                     @else
-                        {{-- <x-icons.profile-unknown class="h-9 sm:h-14" alt="Avatar"/> --}}
-                        <img class="h-9 sm:h-14 w-auto m-auto content-center"
-                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e" alt="">
+                        <x-icons.guest class="h-8 md:h-10 w-auto m-auto content-center" />
                     @endauth
 
                     {{-- Profile menu --}}
@@ -83,23 +81,19 @@
                                             Content dashboard
                                         </a>
                                     </li>
+                                @endif
+                                @if (auth()->user()->hasVerifiedEmail())
+                                    <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                        <a href="{{ route('profile.edit') }}" class="block">
+                                            Your profile
+                                        </a>
+                                    </li>
                                 @else
-                                    @if (auth()->user()->hasVerifiedEmail())
-                                        <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
-                                            <a href="{{ route('profile.edit') }}" class="block">
-                                                Your profile
-                                            </a>
-                                        </li>
-                                    @else
-                                        <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
-                                            <form action="{{ route('verification.send') }}" method="post">
-                                                @csrf
-                                                <button type="submit" class="block text-right justify-end w-full">
-                                                    Verify your email
-                                                </button>
-                                            </form>
-                                        </li>
-                                    @endif
+                                    <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
+                                        <a href="{{ route('verification.notice') }}" class="block">
+                                            Verify your email
+                                        </a>
+                                    </li>
                                 @endif
 
                                 <li class="text-right text-gray-500 py-1 px-4 hover:bg-gray-50">
