@@ -33,7 +33,7 @@
         font-family: 'Roboto Condensed', system-ui, sans-serif;
     }
 
-    a:nth-child(2n)>.card {
+    .card-content:nth-child(2n) {
         @apply flex-row-reverse;
     }
 
@@ -79,12 +79,14 @@
         @apply border;
     }
 
+    /*
     .show-section img {
         @apply transition-transform;
         @apply hover:sm:scale-125;
         @apply hover:lg:scale-150;
         @apply hover:sm:border;
     }
+    */
 
     .show-section figcaption {
         @apply mt-2;

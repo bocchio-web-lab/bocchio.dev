@@ -6,19 +6,22 @@
             <ul class="flex flex-row justify-around gap-4 mx-4">
 
                 <li>
-                    <a href="https://t.me/Bocchio01" rel="nofollow noopener noreferrer" target="_blank">
+                    <a href="https://t.me/Bocchio01" rel="nofollow noopener noreferrer" target="_blank"
+                        aria-label="Message Bocchio via Telegram">
                         <x-icons.telegram class="rounded-full h-8 md:h-10" />
                     </a>
                 </li>
 
                 <li>
-                    <a href="https://github.com/Bocchio01" rel="nofollow noopener noreferrer" target="_blank">
+                    <a href="https://github.com/Bocchio01" rel="nofollow noopener noreferrer" target="_blank"
+                        aria-label="Open Bocchio's GitHub page">
                         <x-icons.github class="rounded-full h-8 md:h-10" />
                     </a>
                 </li>
 
                 <li>
-                    <a href="mailto:webmaster@bocchio.dev" rel="nofollow noopener noreferrer" target="_blank">
+                    <a href="mailto:webmaster@bocchio.dev" rel="nofollow noopener noreferrer" target="_blank"
+                        aria-label="Mail to Bocchio">
                         <x-icons.email class="rounded-full h-8 md:h-10" />
                     </a>
                 </li>

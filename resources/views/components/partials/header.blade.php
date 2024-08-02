@@ -2,7 +2,7 @@
 
     $menuItems = [
         ['name' => 'Projects', 'url' => '/projects'],
-        ['name' => 'Apps', 'url' => '/apps'],
+        // ['name' => 'Apps', 'url' => '/apps'],
         ['name' => 'Mixes', 'url' => '/mixes'],
     ];
 
@@ -23,7 +23,7 @@
             </a>
 
             {{-- Right block --}}
-            <div class="flex gap-6 self-center">
+            <div class="flex gap-4 self-center">
 
                 {{-- Large screen menu (Projects, Apps...) --}}
                 <div class="hidden justify-between items-center w-full lg:flex lg:w-auto">

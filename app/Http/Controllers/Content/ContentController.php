@@ -76,6 +76,7 @@ class ContentController extends Controller
 
         $content->published = $request->input('published');
         $content->phase = $request->input('phase');
+        $content->type = $request->input('type');
         $content->slug = $request->input('slug');
         $content->title = $request->input('title');
         $content->description = $request->input('description');
