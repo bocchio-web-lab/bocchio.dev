@@ -19,7 +19,18 @@
             @include('components.tags', ['tags' => $content->tags])
 
             {{-- Body of the content --}}
-            {!! $content->content !!}
+            @empty($content->content)
+                <div>
+                    <h2>
+                        Check back later...
+                    </h2>
+                    <p>
+                        This content is not available yet but I'm working on it and will be available soon.
+                    </p>
+                </div>
+            @else
+                {!! $content->content !!}
+            @endempty
 
             {{-- Gallery of the content --}}
             @isset($content->gallery)
