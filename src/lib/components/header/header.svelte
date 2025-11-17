@@ -9,8 +9,8 @@
 	<Card class="p-2 shadow-card-foreground/10">
 		<div class="m-auto flex w-full max-w-screen-xl items-center justify-between">
 			<HeaderLogo />
-			<!-- <HeaderMenuLinks /> -->
-			<div class="text-center text-lg font-bold sm:text-xl">Website is under construction...</div>
+			<HeaderMenuLinks />
+			<!-- <div class="text-center text-lg font-bold sm:text-xl">Website is under construction...</div> -->
 			<HeaderMenuProfile />
 		</div>
 	</Card>
