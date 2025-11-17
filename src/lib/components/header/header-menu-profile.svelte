@@ -21,18 +21,16 @@
 			<DropdownMenu.Separator />
 
 			<!-- Appearance Section -->
-			<DropdownMenu.Item>
-				<button
-					on:click={() => {
-						const current = document.documentElement.dataset.theme;
-						document.documentElement.dataset.theme = current === 'dark' ? 'light' : 'dark';
-						localStorage.setItem('theme', document.documentElement.dataset.theme);
-					}}
-					class="flex w-full items-center"
-				>
-					<SunMoonIcon class="mr-2 h-4 w-4" />
-					Toggle Theme
-				</button>
+			<DropdownMenu.Item
+				on:click={() => {
+					const current = document.documentElement.dataset.theme;
+					document.documentElement.dataset.theme = current === 'dark' ? 'light' : 'dark';
+					localStorage.setItem('theme', document.documentElement.dataset.theme);
+				}}
+				class="flex w-full cursor-pointer items-center"
+			>
+				<SunMoonIcon class="mr-2 h-4 w-4" />
+				Toggle Theme
 			</DropdownMenu.Item>
 
 			<!-- Authenticated User -->
@@ -40,24 +38,20 @@
 				<DropdownMenu.Separator />
 
 				<!-- Navigation -->
-				<DropdownMenu.Item>
-					<a
-						href="/dashboard/profile"
-						class="flex w-full items-center"
-					>
-						<User class="mr-2 h-4 w-4" />
-						Profile
-					</a>
+				<DropdownMenu.Item
+					href="/dashboard/profile"
+					class="flex w-full cursor-pointer items-center"
+				>
+					<User class="mr-2 h-4 w-4" />
+					Profile
 				</DropdownMenu.Item>
 
-				<DropdownMenu.Item>
-					<a
-						href="/dashboard"
-						class="flex w-full items-center"
-					>
-						<Cloud class="mr-2 h-4 w-4" />
-						API
-					</a>
+				<DropdownMenu.Item
+					href="/dashboard"
+					class="flex w-full cursor-pointer items-center"
+				>
+					<Cloud class="mr-2 h-4 w-4" />
+					API
 				</DropdownMenu.Item>
 
 				<DropdownMenu.Separator />
@@ -67,7 +61,7 @@
 					<form
 						action="/auth/logout"
 						method="POST"
-						class="flex w-full items-center"
+						class="flex w-full cursor-pointer items-center"
 					>
 						<LogOut class="mr-2 h-4 w-4" />
 						<button
@@ -80,24 +74,20 @@
 				<DropdownMenu.Separator />
 
 				<!-- Login / Register -->
-				<DropdownMenu.Item>
-					<a
-						href="/auth/login"
-						class="flex w-full items-center"
-					>
-						<LogIn class="mr-2 h-4 w-4" />
-						Login
-					</a>
+				<DropdownMenu.Item
+					href="/auth/login"
+					class="flex w-full cursor-pointer items-center"
+				>
+					<LogIn class="mr-2 h-4 w-4" />
+					Login
 				</DropdownMenu.Item>
 
-				<DropdownMenu.Item>
-					<a
-						href="/auth/register"
-						class="flex w-full items-center"
-					>
-						<UserPlus class="mr-2 h-4 w-4" />
-						Register
-					</a>
+				<DropdownMenu.Item
+					href="/auth/register"
+					class="flex w-full cursor-pointer items-center"
+				>
+					<UserPlus class="mr-2 h-4 w-4" />
+					Register
 				</DropdownMenu.Item>
 			{/if}
 		</DropdownMenu.Group>

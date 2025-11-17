@@ -30,7 +30,7 @@
 			<p>
 				I'm a passionate engineer with a strong background in system modeling, control theory, and
 				robotics. My work bridges mechanical design and intelligent systems, with experience across
-				embedded control, robotic manipulation, and autonomy.
+				modeling & simulation, control algorithms, and embedded systems.
 			</p>
 			<p class="location font-medium text-foreground">Currently based in Munich, Germany</p>
 		</div>
@@ -76,7 +76,7 @@
 	</div>
 
 	<!-- Right image -->
-	<div class="image-wrapper mt-10 md:mt-0">
+	<div class="image-wrapper mt-10 shrink-0 md:mt-0">
 		<!-- svelte-ignore a11y-img-redundant-alt -->
 		<img
 			src="https://avatars.githubusercontent.com/u/67842431"

@@ -11,6 +11,6 @@ export const load = (() => {
 export const actions = {
     default: async ({ cookies }) => {
         await logout(cookies);
-        throw redirect(302, '/auth/login');
+        throw redirect(302, '/');
     }
 } satisfies Actions;
