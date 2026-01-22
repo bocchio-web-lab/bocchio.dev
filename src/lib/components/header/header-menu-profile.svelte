@@ -39,7 +39,7 @@
 
 				<!-- Navigation -->
 				<DropdownMenu.Item
-					href="/dashboard/profile"
+					href="/user/profile"
 					class="flex w-full cursor-pointer items-center"
 				>
 					<User class="mr-2 h-4 w-4" />
@@ -47,11 +47,11 @@
 				</DropdownMenu.Item>
 
 				<DropdownMenu.Item
-					href="/dashboard"
+					href="/user/dashboard"
 					class="flex w-full cursor-pointer items-center"
 				>
 					<Cloud class="mr-2 h-4 w-4" />
-					API
+					Dashboard
 				</DropdownMenu.Item>
 
 				<DropdownMenu.Separator />

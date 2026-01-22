@@ -6,7 +6,7 @@ import { login, isAuthenticated } from '$lib/server/auth';
 export const load = (async ({ cookies }) => {
     // Redirect if already authenticated
     if (await isAuthenticated(cookies)) {
-        throw redirect(302, '/dashboard');
+        throw redirect(302, '/user/dashboard');
     }
     return {
         user: null
@@ -37,6 +37,6 @@ export const actions = {
         }
 
         // Redirect to dashboard on success
-        throw redirect(302, '/dashboard');
+        throw redirect(302, '/user/dashboard');
     }
 } satisfies Actions;

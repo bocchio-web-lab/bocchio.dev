@@ -1,0 +1,1376 @@
+{
+    "variable": [
+        {
+            "id": "baseUrl",
+            "key": "baseUrl",
+            "type": "string",
+            "name": "string",
+            "value": "http:\/\/localhost:8000"
+        }
+    ],
+    "info": {
+        "name": "Multi-Tenant Platform API Documentation",
+        "_postman_id": "2f0cde37-bf80-41b1-be8a-ad8a27d07dee",
+        "description": "A multi-service, multi-tenant platform with identity management, tenant isolation, and CMS capabilities. This API enables you to manage services, tenants, and content across isolated tenant contexts.",
+        "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
+    },
+    "item": [
+        {
+            "name": "Platform Management",
+            "description": "\nAPIs for managing platform services and tenants. These endpoints require authentication\nand allow users to list available services and manage their tenants.",
+            "item": [
+                {
+                    "name": "List all services",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/services",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/services"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns a list of all active services available on the platform.\nServices are logical groupings of functionality (e.g., CMS).\nYou'll need a service ID when creating a tenant."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"CMS\",\n      \"slug\": \"cms\",\n      \"description\": \"Content Management System\",\n      \"is_active\": true,\n      \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"updated_at\": \"2025-01-20T10:00:00.000000Z\"\n    }\n  ]\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "List your tenants",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/tenants",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/tenants"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns all tenants that the authenticated user owns or is a member of.\nThis includes both tenants you created and tenants you've been invited to."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"My CMS\",\n      \"service_id\": 1,\n      \"owner_id\": 1,\n      \"public_slug\": \"my-cms-abc123\",\n      \"access_level\": \"public\",\n      \"public_api_key\": \"pk_1234567890abcdef\",\n      \"settings\": {},\n      \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"updated_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"service\": {\n        \"id\": 1,\n        \"name\": \"CMS\",\n        \"slug\": \"cms\",\n        \"description\": \"Content Management System\",\n        \"is_active\": true\n      }\n    }\n  ]\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Create a tenant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/tenants",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/tenants"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"My Blog\",\"service_id\":1,\"public_slug\":\"my-blog\",\"access_level\":\"public\"}"
+                        },
+                        "description": "Creates a new tenant for a specific service. You become the owner and are\nautomatically added as an admin member. The tenant will have a unique public\nslug used for public content access."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\n  \"data\": {\n    \"id\": 2,\n    \"name\": \"My Blog\",\n    \"service_id\": 1,\n    \"owner_id\": 1,\n    \"public_slug\": \"my-blog\",\n    \"access_level\": \"public\",\n    \"public_api_key\": \"pk_abcdefghijklmnopqrstuvwxyz123456789\",\n    \"settings\": {},\n    \"created_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"updated_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"service\": {\n      \"id\": 1,\n      \"name\": \"CMS\",\n      \"slug\": \"cms\"\n    }\n  }\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Get tenant details",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/tenants\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/tenants\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the tenant."
+                                },
+                                {
+                                    "id": "tenant",
+                                    "key": "tenant",
+                                    "value": "1",
+                                    "description": "The ID of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns detailed information about a specific tenant, including its members.\nYou must be the owner or a member to access this endpoint."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"My CMS\",\n    \"service_id\": 1,\n    \"owner_id\": 1,\n    \"public_slug\": \"my-cms-abc123\",\n    \"access_level\": \"public\",\n    \"public_api_key\": \"pk_1234567890abcdef\",\n    \"settings\": {},\n    \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n    \"updated_at\": \"2025-01-20T10:00:00.000000Z\",\n    \"service\": {\n      \"id\": 1,\n      \"name\": \"CMS\",\n      \"slug\": \"cms\"\n    },\n    \"users\": [\n      {\n        \"id\": 1,\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"pivot\": {\n          \"role\": \"admin\"\n        }\n      }\n    ]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"You do not have access to this tenant.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Update a tenant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/tenants\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/tenants\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the tenant."
+                                },
+                                {
+                                    "id": "tenant",
+                                    "key": "tenant",
+                                    "value": "1",
+                                    "description": "The ID of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Updated Blog Name\",\"public_slug\":\"updated-blog\",\"access_level\":\"token_protected\",\"regenerate_api_key\":false}"
+                        },
+                        "description": "Updates tenant information such as name, public slug, or access level.\nOnly the tenant owner can perform updates. You can also regenerate the\npublic API key used for token-protected content access."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Updated Blog Name\",\n    \"service_id\": 1,\n    \"owner_id\": 1,\n    \"public_slug\": \"updated-blog\",\n    \"access_level\": \"token_protected\",\n    \"public_api_key\": \"pk_newgeneratedkey1234567890\",\n    \"settings\": {},\n    \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n    \"updated_at\": \"2025-01-22T11:00:00.000000Z\"\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"Only the tenant owner can perform this action.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete a tenant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/tenants\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/tenants\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the tenant."
+                                },
+                                {
+                                    "id": "tenant",
+                                    "key": "tenant",
+                                    "value": "1",
+                                    "description": "The ID of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Permanently deletes a tenant and all associated data. This action cannot be undone.\nOnly the tenant owner can delete a tenant."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Tenant deleted successfully\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"Only the tenant owner can delete this tenant.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CMS - Management",
+            "description": "\nManage content items (posts, pages, projects) within a CMS tenant.\nAll endpoints require authentication and the `X-Tenant-ID` header.\nContent is isolated by tenant - you can only manage content in tenants you own or are a member of.",
+            "item": [
+                {
+                    "name": "List content items",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/content",
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "post",
+                                    "description": "Filter by content type: post, page, or project.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "published",
+                                    "description": "Filter by status: draft, published, or archived.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/content?type=post&status=published"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns a paginated list of content items in the current tenant.\nYou can filter by type (post, page, project) and status (draft, published, archived)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"current_page\": 1,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"tenant_id\": 1,\n      \"type\": \"post\",\n      \"title\": \"My First Blog Post\",\n      \"slug\": \"my-first-blog-post\",\n      \"excerpt\": \"This is a short excerpt\",\n      \"body\": \"Full content goes here...\",\n      \"status\": \"published\",\n      \"author_id\": 1,\n      \"published_at\": \"2025-01-22T10:00:00.000000Z\",\n      \"meta\": {},\n      \"created_at\": \"2025-01-22T09:00:00.000000Z\",\n      \"updated_at\": \"2025-01-22T10:00:00.000000Z\",\n      \"author\": {\n        \"id\": 1,\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\"\n      },\n      \"tags\": [\n        {\n          \"id\": 1,\n          \"name\": \"Laravel\",\n          \"slug\": \"laravel\"\n        }\n      ]\n    }\n  ],\n  \"per_page\": 15,\n  \"total\": 25\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Create content item",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/content",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/content"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"type\":\"post\",\"title\":\"Getting Started with Laravel\",\"slug\":\"getting-started-with-laravel\",\"excerpt\":\"Learn the basics of Laravel\",\"body\":\"# Getting Started\\\\n\\\\nLaravel is amazing...\",\"status\":\"published\",\"published_at\":\"2025-01-22T10:00:00Z\",\"meta\":{\"featured\":true},\"tags\":[1,2,3]}"
+                        },
+                        "description": "Creates a new content item (post, page, or project). The authenticated user\nbecomes the author. You can optionally attach tags and set the status.\nIf no slug is provided, one will be auto-generated from the title."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\n  \"data\": {\n    \"id\": 5,\n    \"tenant_id\": 1,\n    \"type\": \"post\",\n    \"title\": \"Getting Started with Laravel\",\n    \"slug\": \"getting-started-with-laravel\",\n    \"excerpt\": \"Learn the basics of Laravel\",\n    \"body\": \"# Getting Started...\",\n    \"status\": \"published\",\n    \"author_id\": 1,\n    \"published_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"meta\": {\"featured\": true},\n    \"created_at\": \"2025-01-22T09:30:00.000000Z\",\n    \"updated_at\": \"2025-01-22T09:30:00.000000Z\",\n    \"author\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\"\n    },\n    \"tags\": [\n      {\"id\": 1, \"name\": \"Laravel\", \"slug\": \"laravel\"},\n      {\"id\": 2, \"name\": \"PHP\", \"slug\": \"php\"}\n    ]\n  }\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Get content item",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/content\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/content\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the content."
+                                },
+                                {
+                                    "id": "contentItem",
+                                    "key": "contentItem",
+                                    "value": "1",
+                                    "description": "The ID of the content item."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns detailed information about a specific content item, including\nauthor details, tags, and comments."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"tenant_id\": 1,\n    \"type\": \"post\",\n    \"title\": \"My First Blog Post\",\n    \"slug\": \"my-first-blog-post\",\n    \"excerpt\": \"This is a short excerpt\",\n    \"body\": \"Full content goes here...\",\n    \"status\": \"published\",\n    \"author_id\": 1,\n    \"published_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"meta\": {},\n    \"created_at\": \"2025-01-22T09:00:00.000000Z\",\n    \"updated_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"author\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\"\n    },\n    \"tags\": [],\n    \"comments\": []\n  }\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Update content item",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/content\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/content\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the content."
+                                },
+                                {
+                                    "id": "contentItem",
+                                    "key": "contentItem",
+                                    "value": "1",
+                                    "description": "The ID of the content item."
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"title\":\"Updated Title\",\"slug\":\"updated-title\",\"excerpt\":\"Updated excerpt\",\"body\":\"Updated content...\",\"status\":\"published\",\"published_at\":\"2025-01-22T10:00:00Z\",\"meta\":{\"featured\":false},\"tags\":[1,3]}"
+                        },
+                        "description": "Updates an existing content item. Only the author or tenant owner can update content.\nYou can update any field including title, body, status, and tags."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"title\": \"Updated Title\",\n    \"slug\": \"updated-title\",\n    \"status\": \"published\",\n    \"updated_at\": \"2025-01-22T11:00:00.000000Z\"\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"You do not have permission to update this content.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete content item",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/content\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/content\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the content."
+                                },
+                                {
+                                    "id": "contentItem",
+                                    "key": "contentItem",
+                                    "value": "1",
+                                    "description": "The ID of the content item."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Permanently deletes a content item. Only the author or tenant owner can delete content.\nThis action cannot be undone."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Content item deleted successfully\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"You do not have permission to delete this content.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "List comments",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/comments",
+                            "query": [
+                                {
+                                    "key": "approved",
+                                    "value": "",
+                                    "description": "Filter by approval status.",
+                                    "disabled": true
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/comments?approved="
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns a paginated list of comments with optional filtering by approval status.\nIncludes related content item and author information."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"current_page\": 1,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"content_item_id\": 1,\n      \"author_id\": 2,\n      \"body\": \"Great article!\",\n      \"approved\": true,\n      \"created_at\": \"2025-01-22T10:00:00.000000Z\",\n      \"updated_at\": \"2025-01-22T10:00:00.000000Z\",\n      \"content_item\": {\n        \"id\": 1,\n        \"title\": \"My First Blog Post\",\n        \"slug\": \"my-first-blog-post\"\n      },\n      \"author\": {\n        \"id\": 2,\n        \"name\": \"Jane Smith\",\n        \"email\": \"jane@example.com\"\n      }\n    }\n  ],\n  \"per_page\": 20,\n  \"total\": 45\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Approve comment",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/comments\/:comment_id\/approve",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/comments\/:comment_id\/approve",
+                            "variable": [
+                                {
+                                    "id": "comment_id",
+                                    "key": "comment_id",
+                                    "value": "16",
+                                    "description": "The ID of the comment."
+                                },
+                                {
+                                    "id": "comment",
+                                    "key": "comment",
+                                    "value": "1",
+                                    "description": "The ID of the comment."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Approves a comment, making it visible on the public content API."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"approved\": true,\n    \"updated_at\": \"2025-01-22T11:00:00.000000Z\"\n  },\n  \"message\": \"Comment approved successfully\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Reject comment",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/comments\/:comment_id\/reject",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/comments\/:comment_id\/reject",
+                            "variable": [
+                                {
+                                    "id": "comment_id",
+                                    "key": "comment_id",
+                                    "value": "16",
+                                    "description": "The ID of the comment."
+                                },
+                                {
+                                    "id": "comment",
+                                    "key": "comment",
+                                    "value": "1",
+                                    "description": "The ID of the comment."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Rejects a comment, hiding it from the public content API."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"approved\": false,\n    \"updated_at\": \"2025-01-22T11:00:00.000000Z\"\n  },\n  \"message\": \"Comment rejected successfully\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete comment",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/comments\/:comment_id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/comments\/:comment_id",
+                            "variable": [
+                                {
+                                    "id": "comment_id",
+                                    "key": "comment_id",
+                                    "value": "16",
+                                    "description": "The ID of the comment."
+                                },
+                                {
+                                    "id": "comment",
+                                    "key": "comment",
+                                    "value": "1",
+                                    "description": "The ID of the comment."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Permanently deletes a comment. This action cannot be undone."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Comment deleted successfully\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "List tags",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/tags",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/tags"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns all tags in the current tenant with content item counts."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"tenant_id\": 1,\n      \"name\": \"Laravel\",\n      \"slug\": \"laravel\",\n      \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"updated_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"content_items_count\": 12\n    },\n    {\n      \"id\": 2,\n      \"tenant_id\": 1,\n      \"name\": \"PHP\",\n      \"slug\": \"php\",\n      \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"updated_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"content_items_count\": 8\n    }\n  ]\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Create tag",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/tags",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/tags"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Vue.js\",\"slug\":\"vuejs\"}"
+                        },
+                        "description": "Creates a new tag. If no slug is provided, one will be auto-generated from the name."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\n  \"data\": {\n    \"id\": 3,\n    \"tenant_id\": 1,\n    \"name\": \"Vue.js\",\n    \"slug\": \"vuejs\",\n    \"created_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"updated_at\": \"2025-01-22T10:00:00.000000Z\"\n  }\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Get tag with content",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/tags\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/tags\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "16",
+                                    "description": "The ID of the tag."
+                                },
+                                {
+                                    "id": "tag",
+                                    "key": "tag",
+                                    "value": "1",
+                                    "description": "The ID of the tag."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns a specific tag with all associated content items."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"tenant_id\": 1,\n    \"name\": \"Laravel\",\n    \"slug\": \"laravel\",\n    \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n    \"updated_at\": \"2025-01-20T10:00:00.000000Z\",\n    \"content_items\": [\n      {\n        \"id\": 1,\n        \"title\": \"Getting Started with Laravel\",\n        \"slug\": \"getting-started-with-laravel\",\n        \"type\": \"post\",\n        \"status\": \"published\"\n      }\n    ]\n  }\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Update tag",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/tags\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/tags\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "16",
+                                    "description": "The ID of the tag."
+                                },
+                                {
+                                    "id": "tag",
+                                    "key": "tag",
+                                    "value": "1",
+                                    "description": "The ID of the tag."
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Laravel 11\",\"slug\":\"laravel-11\"}"
+                        },
+                        "description": "Updates a tag's name or slug."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Laravel 11\",\n    \"slug\": \"laravel-11\",\n    \"updated_at\": \"2025-01-22T11:00:00.000000Z\"\n  }\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete tag",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/manage\/cms\/tags\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/manage\/cms\/tags\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "16",
+                                    "description": "The ID of the tag."
+                                },
+                                {
+                                    "id": "tag",
+                                    "key": "tag",
+                                    "value": "1",
+                                    "description": "The ID of the tag."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Tenant-ID",
+                                "value": "required The ID of the tenant context. Example: 1"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Permanently deletes a tag. Content items associated with this tag will remain\nbut will no longer be tagged with it."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Tag deleted successfully\"\n}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CMS - Content Delivery",
+            "description": "\nPublic content delivery API for consuming published CMS content.\nAccess is controlled by tenant access level (public, private, or token_protected).\nNo authentication required for public tenants. Use the tenant's public slug in the URL.\n\n## Tenant Access Levels\n\n- **public**: Anyone can access content, no authentication needed\n- **private**: Content is completely inaccessible via this API\n- **token_protected**: Requires `Authorization: Bearer {tenant_public_api_key}` header\n\n## URL Structure\n\nAll endpoints use the pattern: `\/api\/content\/cms\/{tenant_slug}\/...`\nwhere `{tenant_slug}` is the tenant's public slug (e.g., \"my-blog-abc123\").",
+            "item": [
+                {
+                    "name": "Get tenant info",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns basic information about the tenant. Useful for verifying tenant\nslug and checking access.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"tenant\": {\n      \"name\": \"My Blog\",\n      \"slug\": \"my-blog-abc123\"\n    }\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\n  \"message\": \"Unauthorized.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"Access to this resource is private.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "List published posts",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug\/posts",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug\/posts",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns a paginated list of published blog posts, ordered by publish date (newest first).\nOnly published content is returned; drafts and archived posts are excluded.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"current_page\": 1,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"type\": \"post\",\n      \"title\": \"Getting Started with Laravel\",\n      \"slug\": \"getting-started-with-laravel\",\n      \"excerpt\": \"Learn the basics of Laravel\",\n      \"body\": \"# Getting Started...\",\n      \"status\": \"published\",\n      \"published_at\": \"2025-01-22T10:00:00.000000Z\",\n      \"created_at\": \"2025-01-22T09:00:00.000000Z\",\n      \"updated_at\": \"2025-01-22T10:00:00.000000Z\",\n      \"tags\": [\n        {\"id\": 1, \"name\": \"Laravel\", \"slug\": \"laravel\"}\n      ]\n    }\n  ],\n  \"per_page\": 15,\n  \"total\": 42\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Get a published post",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug\/posts\/:post_slug",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug\/posts\/:post_slug",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                },
+                                {
+                                    "id": "post_slug",
+                                    "key": "post_slug",
+                                    "value": "getting-started-with-laravel",
+                                    "description": "The slug of the post."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns a single published post by its slug, including tags and approved comments.\nComments are ordered by creation date (newest first).",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"type\": \"post\",\n    \"title\": \"Getting Started with Laravel\",\n    \"slug\": \"getting-started-with-laravel\",\n    \"excerpt\": \"Learn the basics of Laravel\",\n    \"body\": \"# Getting Started\\n\\nLaravel is...\",\n    \"status\": \"published\",\n    \"published_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"meta\": {},\n    \"created_at\": \"2025-01-22T09:00:00.000000Z\",\n    \"updated_at\": \"2025-01-22T10:00:00.000000Z\",\n    \"tags\": [\n      {\"id\": 1, \"name\": \"Laravel\", \"slug\": \"laravel\"}\n    ],\n    \"comments\": [\n      {\n        \"id\": 1,\n        \"body\": \"Great article!\",\n        \"approved\": true,\n        \"created_at\": \"2025-01-22T11:00:00.000000Z\"\n      }\n    ]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"message\": \"No query results for model [ContentItem].\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "List published pages",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug\/pages",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug\/pages",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns all published pages, ordered alphabetically by title.\nPages are typically static content like \"About\" or \"Contact\".",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": [\n    {\n      \"id\": 2,\n      \"type\": \"page\",\n      \"title\": \"About\",\n      \"slug\": \"about\",\n      \"body\": \"About us...\",\n      \"status\": \"published\",\n      \"published_at\": \"2025-01-20T10:00:00.000000Z\"\n    },\n    {\n      \"id\": 3,\n      \"type\": \"page\",\n      \"title\": \"Contact\",\n      \"slug\": \"contact\",\n      \"body\": \"Contact information...\",\n      \"status\": \"published\",\n      \"published_at\": \"2025-01-20T10:00:00.000000Z\"\n    }\n  ]\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Get a published page",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug\/pages\/:page_slug",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug\/pages\/:page_slug",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                },
+                                {
+                                    "id": "page_slug",
+                                    "key": "page_slug",
+                                    "value": "about",
+                                    "description": "The slug of the page."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns a single published page by its slug.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": {\n    \"id\": 2,\n    \"type\": \"page\",\n    \"title\": \"About\",\n    \"slug\": \"about\",\n    \"body\": \"About us content...\",\n    \"status\": \"published\",\n    \"published_at\": \"2025-01-20T10:00:00.000000Z\",\n    \"meta\": {},\n    \"created_at\": \"2025-01-20T09:00:00.000000Z\",\n    \"updated_at\": \"2025-01-20T10:00:00.000000Z\"\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"message\": \"No query results for model [ContentItem].\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "List published projects",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug\/projects",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug\/projects",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns all published projects with tags, ordered by publish date (newest first).\nProjects are portfolio items or case studies.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": [\n    {\n      \"id\": 4,\n      \"type\": \"project\",\n      \"title\": \"E-Commerce Platform\",\n      \"slug\": \"ecommerce-platform\",\n      \"excerpt\": \"A full-featured online store\",\n      \"body\": \"Project details...\",\n      \"status\": \"published\",\n      \"published_at\": \"2025-01-21T10:00:00.000000Z\",\n      \"tags\": [\n        {\"id\": 2, \"name\": \"Laravel\", \"slug\": \"laravel\"},\n        {\"id\": 3, \"name\": \"Vue.js\", \"slug\": \"vuejs\"}\n      ]\n    }\n  ]\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "List tags with published content",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug\/tags",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug\/tags",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns all tags that have at least one published content item,\nwith a count of published items per tag. Ordered alphabetically.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Laravel\",\n      \"slug\": \"laravel\",\n      \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"updated_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"content_items_count\": 8\n    },\n    {\n      \"id\": 2,\n      \"name\": \"PHP\",\n      \"slug\": \"php\",\n      \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"updated_at\": \"2025-01-20T10:00:00.000000Z\",\n      \"content_items_count\": 5\n    }\n  ]\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Get content by tag",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/content\/cms\/:tenant_slug\/tags\/:tag_slug",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/content\/cms\/:tenant_slug\/tags\/:tag_slug",
+                            "variable": [
+                                {
+                                    "id": "tenant_slug",
+                                    "key": "tenant_slug",
+                                    "value": "my-blog-abc123",
+                                    "description": "The public slug of the tenant."
+                                },
+                                {
+                                    "id": "tag_slug",
+                                    "key": "tag_slug",
+                                    "value": "laravel",
+                                    "description": "The slug of the tag."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns published content items for a specific tag, with pagination.\nOrdered by publish date (newest first).",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"tag\": {\n    \"id\": 1,\n    \"name\": \"Laravel\",\n    \"slug\": \"laravel\",\n    \"created_at\": \"2025-01-20T10:00:00.000000Z\",\n    \"updated_at\": \"2025-01-20T10:00:00.000000Z\"\n  },\n  \"content_items\": {\n    \"current_page\": 1,\n    \"data\": [\n      {\n        \"id\": 1,\n        \"type\": \"post\",\n        \"title\": \"Getting Started with Laravel\",\n        \"slug\": \"getting-started-with-laravel\",\n        \"excerpt\": \"Learn the basics\",\n        \"status\": \"published\",\n        \"published_at\": \"2025-01-22T10:00:00.000000Z\",\n        \"tags\": [\n          {\"id\": 1, \"name\": \"Laravel\", \"slug\": \"laravel\"}\n        ]\n      }\n    ],\n    \"per_page\": 15,\n    \"total\": 8\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"message\": \"No query results for model [Tag].\"\n}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "apikey",
+        "apikey": [
+            {
+                "key": "in",
+                "value": "header",
+                "type": "string"
+            },
+            {
+                "key": "key",
+                "value": "Authorization",
+                "type": "string"
+            }
+        ]
+    }
+}

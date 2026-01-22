@@ -1,19 +1,19 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
-	import type { PageData } from './$types';
+	import type { PageData } from '../dashboard/$types';
 
 	export let data: PageData;
 </script>
 
 <svelte:head>
-	<title>Dashboard</title>
+	<title>Profile</title>
 </svelte:head>
 
 <div class="container mx-auto py-8">
 	<Card.Root class="max-w-2xl">
 		<Card.Header>
-			<Card.Title>Welcome to your Dashboard</Card.Title>
+			<Card.Title>Welcome to your Profile</Card.Title>
 			<Card.Description>You are successfully logged in!</Card.Description>
 		</Card.Header>
 		<Card.Content>
