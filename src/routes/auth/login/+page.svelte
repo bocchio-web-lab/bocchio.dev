@@ -4,6 +4,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { enhance, applyAction } from '$app/forms';
+	import { page } from '$app/stores';
 
 	import type { ActionData } from './$types';
 
@@ -11,6 +12,9 @@
 
 	let loading = false;
 	let resultDump = '';
+
+	$: resetSuccess = $page.url.searchParams.get('reset') === 'success';
+	$: verified = $page.url.searchParams.get('verified') === '1';
 </script>
 
 <svelte:head>
@@ -18,22 +22,34 @@
 </svelte:head>
 
 <Card.Root class="mx-auto max-w-sm">
-	<form
-		method="POST"
-		use:enhance={() => {
-			loading = true;
-			return async ({ result }) => {
-				loading = false;
-				await applyAction(result);
-			};
-		}}
-	>
-		<Card.Header>
-			<Card.Title class="text-2xl">Login</Card.Title>
-			<Card.Description>Enter your email below to login to your account</Card.Description>
-		</Card.Header>
+    <Card.Header>
+        <Card.Title class="text-2xl">Login</Card.Title>
+        <Card.Description>Enter your email below to login to your account</Card.Description>
+    </Card.Header>
 
-		<Card.Content>
+    <Card.Content>
+            <form
+                method="POST"
+                use:enhance={() => {
+                    loading = true;
+                    return async ({ result }) => {
+                        loading = false;
+                        await applyAction(result);
+                    };
+                }}
+            >
+			{#if resetSuccess}
+				<div class="mb-4 rounded-lg border border-green-500 bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
+					Password reset successful! You can now login with your new password.
+				</div>
+			{/if}
+
+			{#if verified}
+				<div class="mb-4 rounded-lg border border-green-500 bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
+					Email verified successfully! You can now login to your account.
+				</div>
+			{/if}
+
 			{#if form?.error}
 				<div class="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
 					{form.error}
@@ -62,7 +78,7 @@
 					<div class="flex items-center">
 						<Label for="password">Password</Label>
 						<a
-							href="/auth/reset-password"
+							href="/auth/forgot-password"
 							class="ml-auto inline-block text-sm underline"
 						>
 							Forgot your password?
@@ -99,7 +115,7 @@
 					Sign up
 				</a>
 			</div>
-		</Card.Content>
-	</form>
+        </form>
+    </Card.Content>
 	<p>{resultDump}</p>
 </Card.Root>

@@ -275,3 +275,164 @@ export async function requireAuth(cookies: Cookies, redirectTo: string = '/auth/
         throw redirect(302, redirectTo);
     }
 }
+
+/**
+ * Send password reset link
+ */
+export async function forgotPassword(
+    email: string,
+    cookies: Cookies
+): Promise<AuthResponse> {
+    try {
+        const csrfSuccess = await getCsrfToken(cookies);
+        if (!csrfSuccess) {
+            return { success: false, message: 'Failed to initialize session' };
+        }
+
+        const formData = new FormData();
+        formData.append('email', email);
+
+        const response = await makeAuthRequest('/forgot-password', 'POST', cookies, formData);
+
+        if (response.ok) {
+            const data = await response.json();
+            return { success: true, message: data.message || 'Password reset link sent!' };
+        }
+
+        if (response.status === 422) {
+            const data = await response.json();
+            return {
+                success: false,
+                message: 'Validation failed',
+                errors: data.errors
+            };
+        }
+
+        return {
+            success: false,
+            message: response.statusText || 'Failed to send reset link'
+        };
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        return {
+            success: false,
+            message: 'An error occurred'
+        };
+    }
+}
+
+/**
+ * Reset password with token
+ */
+export async function resetPassword(
+    token: string,
+    email: string,
+    password: string,
+    password_confirmation: string,
+    cookies: Cookies
+): Promise<AuthResponse> {
+    try {
+        const csrfSuccess = await getCsrfToken(cookies);
+        if (!csrfSuccess) {
+            return { success: false, message: 'Failed to initialize session' };
+        }
+
+        const formData = new FormData();
+        formData.append('token', token);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('password_confirmation', password_confirmation);
+
+        const response = await makeAuthRequest('/reset-password', 'POST', cookies, formData);
+
+        if (response.ok) {
+            const data = await response.json();
+            return { success: true, message: data.message || 'Password reset successfully!' };
+        }
+
+        if (response.status === 422) {
+            const data = await response.json();
+            return {
+                success: false,
+                message: 'Validation failed',
+                errors: data.errors
+            };
+        }
+
+        return {
+            success: false,
+            message: response.statusText || 'Failed to reset password'
+        };
+    } catch (error) {
+        console.error('Reset password error:', error);
+        return {
+            success: false,
+            message: 'An error occurred'
+        };
+    }
+}
+
+/**
+ * Resend email verification
+ */
+export async function resendVerification(cookies: Cookies): Promise<AuthResponse> {
+    try {
+        const response = await makeAuthRequest('/email/verification-notification', 'POST', cookies);
+
+        if (response.ok) {
+            const data = await response.json();
+            return { success: true, message: data.message || 'Verification email sent!' };
+        }
+
+        return {
+            success: false,
+            message: response.statusText || 'Failed to send verification email'
+        };
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        return {
+            success: false,
+            message: 'An error occurred'
+        };
+    }
+}
+
+/**
+ * Verify email with token
+ */
+export async function verifyEmail(
+    id: string,
+    hash: string,
+    expires: string,
+    signature: string,
+    cookies: Cookies
+): Promise<AuthResponse> {
+    try {
+        const queryParams = new URLSearchParams({ expires, signature });
+        const endpoint = `/email/verify/${id}/${hash}?${queryParams.toString()}`;
+
+        const response = await makeAuthRequest(endpoint, 'GET', cookies);
+
+        if (response.ok) {
+            return { success: true, message: 'Email verified successfully!' };
+        }
+
+        if (response.status === 403) {
+            return {
+                success: false,
+                message: 'Invalid or expired verification link'
+            };
+        }
+
+        return {
+            success: false,
+            message: response.statusText || 'Failed to verify email'
+        };
+    } catch (error) {
+        console.error('Verify email error:', error);
+        return {
+            success: false,
+            message: 'An error occurred'
+        };
+    }
+}
