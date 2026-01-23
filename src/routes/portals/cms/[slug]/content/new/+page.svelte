@@ -9,13 +9,17 @@
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import type { PageData, ActionData } from './$types';
 
-	export let data: PageData;
-	export let form: ActionData;
+	interface Props {
+		data: PageData;
+		form: ActionData;
+	}
 
-	let selectedType = 'post';
-	let selectedStatus = 'draft';
-	let selectedTags: number[] = [];
-	let isSubmitting = false;
+	let { data, form }: Props = $props();
+
+	let selectedType = $state('post');
+	let selectedStatus = $state('draft');
+	let selectedTags: number[] = $state([]);
+	let isSubmitting = $state(false);
 </script>
 
 <svelte:head>

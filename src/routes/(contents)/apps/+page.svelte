@@ -11,7 +11,7 @@
 		url: string;
 	};
 
-	let apps: AppEntry[] = [];
+	let apps: AppEntry[] = $state([]);
 
 	onMount(async () => {
 		const res = await fetch('/api/apps');

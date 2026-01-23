@@ -4,7 +4,12 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import type { LayoutData } from './$types';
 
-	export let data: LayoutData;
+	interface Props {
+		data: LayoutData;
+		children?: import('svelte').Snippet;
+	}
+
+	let { data, children }: Props = $props();
 
 	const navItems = [
 		{ href: '', label: 'Dashboard', exact: true },
@@ -78,5 +83,5 @@
 </div>
 
 <div class="container mx-auto px-4 py-8">
-	<slot />
+	{@render children?.()}
 </div>

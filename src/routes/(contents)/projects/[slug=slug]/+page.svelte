@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 
-	export let data: {
+	interface Props {
+		data: {
 		project: {
 			name: string;
 			slug: string;
@@ -13,6 +14,9 @@
 			website_url?: string;
 		};
 	};
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <svelte:head>

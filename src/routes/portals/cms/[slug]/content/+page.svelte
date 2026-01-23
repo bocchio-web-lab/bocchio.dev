@@ -8,7 +8,11 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	function getStatusBadgeVariant(
 		status: string

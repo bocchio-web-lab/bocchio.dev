@@ -2,8 +2,12 @@
 	import type { BlogPost } from '$lib/types/blog';
 	import AtomicCard from '$lib/components/atomic/card.svelte';
 
-	export let data: { posts: BlogPost[] };
-	let expandedSlug: string | null = null;
+	interface Props {
+		data: { posts: BlogPost[] };
+	}
+
+	let { data }: Props = $props();
+	let expandedSlug: string | null = $state(null);
 
 	async function toggleExpand(slug: BlogPost['slug']) {
 		expandedSlug = expandedSlug === slug ? null : slug;

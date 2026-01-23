@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -9,19 +11,25 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { PageData, ActionData } from './$types';
 
-	export let data: PageData;
-	export let form: ActionData;
-
-	let showCreateDialog = false;
-	let editingTag: any = null;
-	let deletingTagId: number | null = null;
-	let isSubmitting = false;
-
-	$: if (form?.success) {
-		showCreateDialog = false;
-		editingTag = null;
-		deletingTagId = null;
+	interface Props {
+		data: PageData;
+		form: ActionData;
 	}
+
+	let { data, form }: Props = $props();
+
+	let showCreateDialog = $state(false);
+	let editingTag: any = $state(null);
+	let deletingTagId: number | null = $state(null);
+	let isSubmitting = $state(false);
+
+	run(() => {
+		if (form?.success) {
+			showCreateDialog = false;
+			editingTag = null;
+			deletingTagId = null;
+		}
+	});
 </script>
 
 <svelte:head>

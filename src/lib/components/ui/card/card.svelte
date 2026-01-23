@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';

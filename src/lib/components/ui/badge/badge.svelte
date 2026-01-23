@@ -5,11 +5,16 @@
 
 	type $$Props = Props & HTMLAttributes<HTMLSpanElement>;
 
-	let className: $$Props["class"] = undefined;
-	export { className as class };
-	export let variant: $$Props["variant"] = "default";
+	
+	interface Props_1 {
+		class?: $$Props["class"];
+		variant?: $$Props["variant"];
+		children?: import('svelte').Snippet;
+	}
+
+	let { class: className = undefined, variant = "default", children }: Props_1 = $props();
 </script>
 
 <span class={cn(badgeVariants({ variant, className }))}>
-	<slot />
+	{@render children?.()}
 </span>

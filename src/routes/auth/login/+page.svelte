@@ -8,13 +8,17 @@
 
 	import type { ActionData } from './$types';
 
-	export let form: ActionData;
+	interface Props {
+		form: ActionData;
+	}
 
-	let loading = false;
+	let { form }: Props = $props();
+
+	let loading = $state(false);
 	let resultDump = '';
 
-	$: resetSuccess = $page.url.searchParams.get('reset') === 'success';
-	$: verified = $page.url.searchParams.get('verified') === '1';
+	let resetSuccess = $derived($page.url.searchParams.get('reset') === 'success');
+	let verified = $derived($page.url.searchParams.get('verified') === '1');
 </script>
 
 <svelte:head>

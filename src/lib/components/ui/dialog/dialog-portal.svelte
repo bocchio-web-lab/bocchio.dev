@@ -3,9 +3,15 @@
 
 	type $$Props = DialogPrimitive.PortalProps;
 
-	export let el: $$Props["el"] = undefined;
+	interface Props {
+		el?: $$Props["el"];
+		children?: import('svelte').Snippet;
+		[key: string]: any
+	}
+
+	let { el = undefined, children, ...rest }: Props = $props();
 </script>
 
-<DialogPrimitive.Portal {el} {...$$restProps}>
-	<slot />
+<DialogPrimitive.Portal {el} {...rest}>
+	{@render children?.()}
 </DialogPrimitive.Portal>

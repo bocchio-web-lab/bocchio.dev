@@ -6,9 +6,13 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
 
-	export let form: ActionData;
+	interface Props {
+		form: ActionData;
+	}
 
-	let loading = false;
+	let { form }: Props = $props();
+
+	let loading = $state(false);
 </script>
 
 <svelte:head>

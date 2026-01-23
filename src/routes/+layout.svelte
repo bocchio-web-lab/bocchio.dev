@@ -2,6 +2,11 @@
 	import { onMount } from 'svelte';
 	import Footer from '$lib/components/footer/footer.svelte';
 	import '../app.css';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	onMount(() => {
 		const saved = localStorage.getItem('theme');
@@ -14,6 +19,6 @@
 	});
 </script>
 
-<slot />
+{@render children?.()}
 
 <Footer />

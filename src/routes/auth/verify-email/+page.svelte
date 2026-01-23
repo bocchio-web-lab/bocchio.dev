@@ -6,12 +6,16 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import type { PageData, ActionData } from './$types';
 
-	export let data: PageData;
-	export let form: ActionData;
+	interface Props {
+		data: PageData;
+		form: ActionData;
+	}
 
-	let isSubmitting = false;
+	let { data, form }: Props = $props();
 
-	$: urlError = $page.url.searchParams.get('error');
+	let isSubmitting = $state(false);
+
+	let urlError = $derived($page.url.searchParams.get('error'));
 </script>
 
 <svelte:head>

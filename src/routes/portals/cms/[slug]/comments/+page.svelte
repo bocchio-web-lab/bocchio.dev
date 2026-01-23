@@ -8,10 +8,14 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import type { PageData, ActionData } from './$types';
 
-	export let data: PageData;
-	export let form: ActionData;
+	interface Props {
+		data: PageData;
+		form: ActionData;
+	}
 
-	let deletingCommentId: number | null = null;
+	let { data, form }: Props = $props();
+
+	let deletingCommentId: number | null = $state(null);
 
 	function updateFilter(value: string) {
 		const url = new URL($page.url);

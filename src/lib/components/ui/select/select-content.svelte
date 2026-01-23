@@ -4,11 +4,24 @@
 
 	type $$Props = SelectPrimitive.ContentProps;
 
-	let className: $$Props["class"] = undefined;
-	export let sideOffset: $$Props["sideOffset"] = 4;
-	export let transition: $$Props["transition"] = flyAndScale;
-	export let transitionConfig: $$Props["transitionConfig"] = undefined;
-	export { className as class };
+	interface Props {
+		class?: $$Props["class"];
+		sideOffset?: $$Props["sideOffset"];
+		transition?: $$Props["transition"];
+		transitionConfig?: $$Props["transitionConfig"];
+		children?: import('svelte').Snippet;
+		[key: string]: any
+	}
+
+	let {
+		class: className = undefined,
+		sideOffset = 4,
+		transition = flyAndScale,
+		transitionConfig = undefined,
+		children,
+		...rest
+	}: Props = $props();
+	
 </script>
 
 <SelectPrimitive.Content
@@ -19,9 +32,9 @@
 		"relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
 		className
 	)}
-	{...$$restProps}
+	{...rest}
 >
 	<div class="w-full p-1">
-		<slot />
+		{@render children?.()}
 	</div>
 </SelectPrimitive.Content>

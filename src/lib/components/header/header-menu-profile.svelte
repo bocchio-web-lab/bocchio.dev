@@ -4,7 +4,7 @@
 	import IconRunningMan from '$lib/components/atomic/icon-running-man.svelte';
 	import { LogIn, SunMoonIcon, UserPlus, Cloud, LogOut, User } from 'lucide-svelte';
 
-	$: user = $page.data.user;
+	let user = $derived($page.data.user);
 </script>
 
 <DropdownMenu.Root>

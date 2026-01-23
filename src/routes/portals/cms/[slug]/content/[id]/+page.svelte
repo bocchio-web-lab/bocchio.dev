@@ -9,13 +9,17 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import type { PageData, ActionData } from './$types';
 
-	export let data: PageData;
-	export let form: ActionData;
+	interface Props {
+		data: PageData;
+		form: ActionData;
+	}
 
-	let selectedStatus = data.content.status;
-	let selectedTags: number[] = data.content.tags?.map((t) => t.id) || [];
-	let isSubmitting = false;
-	let showDeleteConfirm = false;
+	let { data, form }: Props = $props();
+
+	let selectedStatus = $state(data.content.status);
+	let selectedTags: number[] = $state(data.content.tags?.map((t) => t.id) || []);
+	let isSubmitting = $state(false);
+	let showDeleteConfirm = $state(false);
 
 	// Format datetime for input
 	function formatDatetimeLocal(dateString: string | undefined): string {

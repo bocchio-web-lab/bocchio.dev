@@ -77,7 +77,7 @@
 
 	<!-- Right image -->
 	<div class="image-wrapper mt-10 shrink-0 md:mt-0">
-		<!-- svelte-ignore a11y-img-redundant-alt -->
+		<!-- svelte-ignore a11y_img_redundant_alt -->
 		<img
 			src="https://avatars.githubusercontent.com/u/67842431"
 			alt="Profile picture of Tommaso Bocchietti"

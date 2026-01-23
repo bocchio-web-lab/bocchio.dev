@@ -11,7 +11,7 @@
 	import { goto } from '$app/navigation';
 	import AtomicCard from '$lib/components/atomic/card.svelte';
 
-	export let data;
+	let { data } = $props();
 </script>
 
 <svelte:head>
@@ -39,7 +39,7 @@
 
 			<TimelineSeparator>
 				<TimelineDot>
-					<button on:click={() => goto(`/projects/${project.slug}`)}>
+					<button onclick={() => goto(`/projects/${project.slug}`)}>
 						<img
 							src={project.image}
 							alt={project.name}

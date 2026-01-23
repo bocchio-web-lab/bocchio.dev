@@ -6,10 +6,14 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import type { PageData, ActionData } from './$types';
 
-	export let data: PageData;
-	export let form: ActionData;
+	interface Props {
+		data: PageData;
+		form: ActionData;
+	}
 
-	let isSubmitting = false;
+	let { data, form }: Props = $props();
+
+	let isSubmitting = $state(false);
 </script>
 
 <svelte:head>

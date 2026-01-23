@@ -3,9 +3,15 @@
 
 	type $$Props = SelectPrimitive.ItemIndicatorProps;
 
-	export let asChild: $$Props["asChild"] = undefined;
+	interface Props {
+		asChild?: $$Props["asChild"];
+		children?: import('svelte').Snippet;
+		[key: string]: any
+	}
+
+	let { asChild = undefined, children, ...rest }: Props = $props();
 </script>
 
-<SelectPrimitive.ItemIndicator {asChild} {...$$restProps}>
-	<slot />
+<SelectPrimitive.ItemIndicator {asChild} {...rest}>
+	{@render children?.()}
 </SelectPrimitive.ItemIndicator>

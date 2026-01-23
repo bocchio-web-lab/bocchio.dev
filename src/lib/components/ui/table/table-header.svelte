@@ -4,10 +4,16 @@
 
 	type $$Props = HTMLAttributes<HTMLTableSectionElement>;
 
-	let className: $$Props["class"] = undefined;
-	export { className as class };
+	interface Props {
+		class?: $$Props["class"];
+		children?: import('svelte').Snippet;
+		[key: string]: any
+	}
+
+	let { class: className = undefined, children, ...rest }: Props = $props();
+	
 </script>
 
-<thead class={cn("[&_tr]:border-b", className)} {...$$restProps}>
-	<slot />
+<thead class={cn("[&_tr]:border-b", className)} {...rest}>
+	{@render children?.()}
 </thead>
