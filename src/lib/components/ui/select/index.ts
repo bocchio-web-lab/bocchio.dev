@@ -1,37 +1,37 @@
-import { Select as SelectPrimitive } from "bits-ui";
-
-const Root = SelectPrimitive.Root;
-const Group = SelectPrimitive.Group;
-const Input = SelectPrimitive.Input;
-const Label = SelectPrimitive.Label;
-const Value = SelectPrimitive.Value;
-
-import Content from "./select-content.svelte";
+import Root from "./select.svelte";
+import Group from "./select-group.svelte";
+import Label from "./select-label.svelte";
 import Item from "./select-item.svelte";
-import ItemIndicator from "./select-item-indicator.svelte";
+import Content from "./select-content.svelte";
 import Trigger from "./select-trigger.svelte";
 import Separator from "./select-separator.svelte";
+import ScrollDownButton from "./select-scroll-down-button.svelte";
+import ScrollUpButton from "./select-scroll-up-button.svelte";
+import GroupHeading from "./select-group-heading.svelte";
+import Portal from "./select-portal.svelte";
 
 export {
-    Root,
-    Group,
-    Input,
-    Label,
-    Value,
-    Content,
-    Item,
-    ItemIndicator,
-    Trigger,
-    Separator,
-    //
-    Root as Select,
-    Content as SelectContent,
-    Group as SelectGroup,
-    Input as SelectInput,
-    Item as SelectItem,
-    ItemIndicator as SelectItemIndicator,
-    Label as SelectLabel,
-    Separator as SelectSeparator,
-    Trigger as SelectTrigger,
-    Value as SelectValue
+	Root,
+	Group,
+	Label,
+	Item,
+	Content,
+	Trigger,
+	Separator,
+	ScrollDownButton,
+	ScrollUpButton,
+	GroupHeading,
+	Portal,
+	//
+	Root as Select,
+	Group as SelectGroup,
+	Label as SelectLabel,
+	Item as SelectItem,
+	Content as SelectContent,
+	Trigger as SelectTrigger,
+	Separator as SelectSeparator,
+	ScrollDownButton as SelectScrollDownButton,
+	ScrollUpButton as SelectScrollUpButton,
+	GroupHeading as SelectGroupHeading,
+	Portal as SelectPortal,
 };

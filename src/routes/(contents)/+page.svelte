@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { MailIcon, GithubIcon, LinkedinIcon } from 'lucide-svelte';
+	import { MailIcon, GithubIcon, LinkedinIcon } from '@lucide/svelte';
 </script>
 
 <svelte:head>
@@ -16,23 +16,23 @@
 >
 	<!-- Left content -->
 	<div class="content-wrapper max-w-xl space-y-6 text-center md:text-left">
-		<h1 class="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
+		<h1 class="text-4xl leading-tight font-bold sm:text-5xl md:text-6xl">
 			Hey, I'm<br />
 			<span class="text-primary">Tommaso Bocchietti</span>
 		</h1>
 
-		<p class="subtitle text-lg leading-relaxed text-muted-foreground">
+		<p class="subtitle text-muted-foreground text-lg leading-relaxed">
 			M.Sc. Mechatronics & Robotics Engineering<br />
 			Robotics Research @ DLR | Control & Dynamics Enthusiast
 		</p>
 
-		<div class="bio-text space-y-4 text-muted-foreground">
+		<div class="bio-text text-muted-foreground space-y-4">
 			<p>
 				I'm a passionate engineer with a strong background in system modeling, control theory, and
 				robotics. My work bridges mechanical design and intelligent systems, with experience across
 				modeling & simulation, control algorithms, and embedded systems.
 			</p>
-			<p class="location font-medium text-foreground">Currently based in Munich, Germany</p>
+			<p class="location text-foreground font-medium">Currently based in Munich, Germany</p>
 		</div>
 
 		<!-- Social buttons -->

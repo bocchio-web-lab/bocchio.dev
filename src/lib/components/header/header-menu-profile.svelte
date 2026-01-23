@@ -2,7 +2,8 @@
 	import { page } from '$app/stores';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import IconRunningMan from '$lib/components/atomic/icon-running-man.svelte';
-	import { LogIn, SunMoonIcon, UserPlus, Cloud, LogOut, User } from 'lucide-svelte';
+	import { LogIn, SunMoonIcon, UserPlus, Cloud, LogOut, User } from '@lucide/svelte';
+	import { toggleMode } from 'mode-watcher';
 
 	let user = $derived($page.data.user);
 </script>
@@ -22,16 +23,21 @@
 
 			<!-- Appearance Section -->
 			<DropdownMenu.Item
-				on:click={() => {
-					const current = document.documentElement.dataset.theme;
-					document.documentElement.dataset.theme = current === 'dark' ? 'light' : 'dark';
-					localStorage.setItem('theme', document.documentElement.dataset.theme);
+				onclick={() => {
+					toggleMode();
 				}}
 				class="flex w-full cursor-pointer items-center"
 			>
 				<SunMoonIcon class="mr-2 h-4 w-4" />
 				Toggle Theme
 			</DropdownMenu.Item>
+
+			<!-- <DropdownMenu.Item onclick={() => setMode('light')}>Light</DropdownMenu.Item>
+			<DropdownMenu.Item onclick={() => setMode('dark')}>Dark</DropdownMenu.Item>
+			<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}>
+				<SunMoonIcon class="mr-2 h-4 w-4" />
+				Toggle Theme
+			</DropdownMenu.Trigger> -->
 
 			<!-- Authenticated User -->
 			{#if !!user}

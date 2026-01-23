@@ -17,6 +17,6 @@
 	<Slogan />
 {/if}
 
-<main class="m-auto mb-16 mt-8 w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
+<main class="m-auto mb-16 mt-8 w-full max-w-(--breakpoint-xl) px-4 sm:px-6 lg:px-8">
 	{@render children?.()}
 </main>

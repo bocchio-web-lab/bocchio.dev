@@ -15,7 +15,6 @@
 	let { form }: Props = $props();
 
 	let loading = $state(false);
-	let resultDump = '';
 
 	let resetSuccess = $derived($page.url.searchParams.get('reset') === 'success');
 	let verified = $derived($page.url.searchParams.get('verified') === '1');
@@ -26,36 +25,40 @@
 </svelte:head>
 
 <Card.Root class="mx-auto max-w-sm">
-    <Card.Header>
-        <Card.Title class="text-2xl">Login</Card.Title>
-        <Card.Description>Enter your email below to login to your account</Card.Description>
-    </Card.Header>
+	<Card.Header>
+		<Card.Title class="text-2xl">Login</Card.Title>
+		<Card.Description>Enter your email below to login to your account</Card.Description>
+	</Card.Header>
 
-    <Card.Content>
-            <form
-                method="POST"
-                use:enhance={() => {
-                    loading = true;
-                    return async ({ result }) => {
-                        loading = false;
-                        await applyAction(result);
-                    };
-                }}
-            >
+	<Card.Content>
+		<form
+			method="POST"
+			use:enhance={() => {
+				loading = true;
+				return async ({ result }) => {
+					loading = false;
+					await applyAction(result);
+				};
+			}}
+		>
 			{#if resetSuccess}
-				<div class="mb-4 rounded-lg border border-green-500 bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
+				<div
+					class="mb-4 rounded-lg border border-green-500 bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200"
+				>
 					Password reset successful! You can now login with your new password.
 				</div>
 			{/if}
 
 			{#if verified}
-				<div class="mb-4 rounded-lg border border-green-500 bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
+				<div
+					class="mb-4 rounded-lg border border-green-500 bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200"
+				>
 					Email verified successfully! You can now login to your account.
 				</div>
 			{/if}
 
 			{#if form?.error}
-				<div class="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+				<div class="bg-destructive/10 text-destructive mb-4 rounded-lg p-3 text-sm">
 					{form.error}
 				</div>
 			{/if}
@@ -74,7 +77,7 @@
 						class={form?.errors?.email ? 'border-destructive' : ''}
 					/>
 					{#if form?.errors?.email}
-						<p class="text-sm text-destructive">{form.errors.email[0]}</p>
+						<p class="text-destructive text-sm">{form.errors.email[0]}</p>
 					{/if}
 				</div>
 
@@ -97,7 +100,7 @@
 						class={form?.errors?.password ? 'border-destructive' : ''}
 					/>
 					{#if form?.errors?.password}
-						<p class="text-sm text-destructive">{form.errors.password[0]}</p>
+						<p class="text-destructive text-sm">{form.errors.password[0]}</p>
 					{/if}
 				</div>
 
@@ -119,7 +122,6 @@
 					Sign up
 				</a>
 			</div>
-        </form>
-    </Card.Content>
-	<p>{resultDump}</p>
+		</form>
+	</Card.Content>
 </Card.Root>

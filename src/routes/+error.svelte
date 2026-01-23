@@ -9,7 +9,7 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
-	import { Home, RefreshCw } from 'lucide-svelte';
+	import { Home, RefreshCw } from '@lucide/svelte';
 
 	let status = $derived($page.status);
 	let message = $derived($page.error?.message || 'An unexpected error occurred');
@@ -32,7 +32,7 @@
 			</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<p class="text-center text-muted-foreground">{message}</p>
+			<p class="text-muted-foreground text-center">{message}</p>
 		</CardContent>
 		<CardFooter class="flex justify-center gap-2">
 			<Button

@@ -6,7 +6,7 @@
 
 <footer class="mt-auto w-full border-t bg-background">
 	<Card class="rounded-none border-0 shadow-none">
-		<div class="mx-auto w-full max-w-screen-xl px-4 py-4">
+		<div class="mx-auto w-full max-w-(--breakpoint-xl) px-4 py-4">
 			<div class="flex flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
 				<div>
 					© {currentYear}

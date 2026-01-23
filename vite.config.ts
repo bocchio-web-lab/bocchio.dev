@@ -1,14 +1,15 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-    plugins: [sveltekit()],
+    plugins: [tailwindcss(), sveltekit()],
     test: {
         include: ['src/**/*.{test,spec}.{js,ts}']
     },
     server: {
         watch: {
-            ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/.svelte-kit/**', '**/.netlify/**']
+            ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/.svelte-kit/**', '**/.netlify/**', '**/.scribe/**']
         }
     }
 });
