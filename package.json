@@ -25,6 +25,7 @@
 		"@sveltejs/adapter-node": "^5.5.2",
 		"@sveltejs/kit": "^2.50.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
+		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.18",
 		"@types/eslint": "^9.6.1",
 		"@types/node": "^24",
@@ -45,6 +46,7 @@
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.48.1",
 		"vite": "^7.3.1",
+		"vite-plugin-devtools-json": "^1.0.0",
 		"vitest": "^4.0.18"
 	},
 	"type": "module",

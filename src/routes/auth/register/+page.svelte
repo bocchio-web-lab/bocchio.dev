@@ -2,8 +2,13 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { enhance } from '$app/forms';
+	import {
+		FieldGroup,
+		Field,
+		FieldLabel,
+		FieldDescription
+	} from '$lib/components/ui/field/index.js';
+	import { enhance, applyAction } from '$app/forms';
 	import type { ActionData } from './$types';
 
 	interface Props {
@@ -19,32 +24,32 @@
 	<title>Register</title>
 </svelte:head>
 
-<Card.Root class="mx-auto max-w-sm">
-	<form
-		method="POST"
-		use:enhance={() => {
-			loading = true;
-			return async ({ update }) => {
-				await update();
-				loading = false;
-			};
-		}}
-	>
-		<Card.Header>
-			<Card.Title class="text-xl">Sign Up</Card.Title>
-			<Card.Description>Enter your information to create an account</Card.Description>
-		</Card.Header>
+<Card.Root class="mx-auto w-full max-w-sm">
+	<Card.Header>
+		<Card.Title class="text-xl">Sign Up</Card.Title>
+		<Card.Description>Enter your information to create an account</Card.Description>
+	</Card.Header>
 
-		<Card.Content>
+	<Card.Content>
+		<form
+			method="POST"
+			use:enhance={() => {
+				loading = true;
+				return async ({ result }) => {
+					loading = false;
+					await applyAction(result);
+				};
+			}}
+		>
 			{#if form?.error}
 				<div class="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
 					{form.error}
 				</div>
 			{/if}
 
-			<div class="grid gap-4">
-				<div class="grid gap-2">
-					<Label for="name">Full Name</Label>
+			<FieldGroup class="grid gap-4">
+				<Field class="grid gap-2">
+					<FieldLabel for="name">Full Name</FieldLabel>
 					<Input
 						id="name"
 						name="name"
@@ -57,10 +62,10 @@
 					{#if form?.errors?.name}
 						<p class="text-sm text-destructive">{form.errors.name[0]}</p>
 					{/if}
-				</div>
+				</Field>
 
-				<div class="grid gap-2">
-					<Label for="email">Email</Label>
+				<Field class="grid gap-2">
+					<FieldLabel for="email">Email</FieldLabel>
 					<Input
 						id="email"
 						type="email"
@@ -74,10 +79,10 @@
 					{#if form?.errors?.email}
 						<p class="text-sm text-destructive">{form.errors.email[0]}</p>
 					{/if}
-				</div>
+				</Field>
 
-				<div class="grid gap-2">
-					<Label for="password">Password</Label>
+				<Field class="grid gap-2">
+					<FieldLabel for="password">Password</FieldLabel>
 					<Input
 						id="password"
 						type="password"
@@ -89,10 +94,10 @@
 					{#if form?.errors?.password}
 						<p class="text-sm text-destructive">{form.errors.password[0]}</p>
 					{/if}
-				</div>
+				</Field>
 
-				<div class="grid gap-2">
-					<Label for="password_confirmation">Confirm Password</Label>
+				<Field class="grid gap-2">
+					<FieldLabel for="password_confirmation">Confirm Password</FieldLabel>
 					<Input
 						id="password_confirmation"
 						type="password"
@@ -100,26 +105,22 @@
 						required
 						disabled={loading}
 					/>
-				</div>
+				</Field>
 
-				<Button
-					type="submit"
-					class="w-full"
-					disabled={loading}
-				>
-					{loading ? 'Creating account...' : 'Create an account'}
-				</Button>
-			</div>
-
-			<div class="mt-4 text-center text-sm">
-				Already have an account?
-				<a
-					href="/auth/login"
-					class="underline"
-				>
-					Sign in
-				</a>
-			</div>
-		</Card.Content>
-	</form>
+				<Field class="grid gap-2">
+					<Button
+						type="submit"
+						class="w-full"
+						size="lg"
+						disabled={loading}
+					>
+						{loading ? 'Creating account...' : 'Create an account'}
+					</Button>
+					<FieldDescription class="text-center">
+						Already have an account? <a href="/auth/login">Sign in</a>
+					</FieldDescription>
+				</Field>
+			</FieldGroup>
+		</form>
+	</Card.Content>
 </Card.Root>

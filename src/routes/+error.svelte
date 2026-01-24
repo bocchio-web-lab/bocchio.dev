@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Card,
@@ -11,8 +11,8 @@
 	} from '$lib/components/ui/card';
 	import { Home, RefreshCw } from '@lucide/svelte';
 
-	let status = $derived($page.status);
-	let message = $derived($page.error?.message || 'An unexpected error occurred');
+	let status = $derived(page.status);
+	let message = $derived(page.error?.message || 'An unexpected error occurred');
 </script>
 
 <main class="m-auto flex h-max w-full flex-col items-center justify-center px-4 py-8">

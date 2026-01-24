@@ -16,23 +16,25 @@
 >
 	<!-- Left content -->
 	<div class="content-wrapper max-w-xl space-y-6 text-center md:text-left">
-		<h1 class="text-4xl leading-tight font-bold sm:text-5xl md:text-6xl">
+		<h1 class="text-4xl font-bold sm:text-5xl md:text-6xl">
 			Hey, I'm<br />
 			<span class="text-primary">Tommaso Bocchietti</span>
 		</h1>
 
-		<p class="subtitle text-muted-foreground text-lg leading-relaxed">
-			M.Sc. Mechatronics & Robotics Engineering<br />
-			Robotics Research @ DLR | Control & Dynamics Enthusiast
+		<p class="subtitle text-lg leading-relaxed text-muted-foreground">
+			M.Sc. Mechatronics Engineering @ Politecnico di Milano<br />
+			Specialized in Dynamics, Control & Embedded Systems
 		</p>
 
-		<div class="bio-text text-muted-foreground space-y-4">
+		<div class="bio-text space-y-4 text-muted-foreground">
 			<p>
-				I'm a passionate engineer with a strong background in system modeling, control theory, and
-				robotics. My work bridges mechanical design and intelligent systems, with experience across
-				modeling & simulation, control algorithms, and embedded systems.
+				Mechatronics engineer working at the intersection of mechanics and intelligent systems, with
+				hands-on experience in modeling and simulation, control design, and embedded development. I
+				focus on building optimized, reliable systems designed to operate in real-world conditions.
 			</p>
-			<p class="location text-foreground font-medium">Currently based in Munich, Germany</p>
+			<p class="font-medium text-foreground">
+				Currently based in Como, Italy <span>🇮🇹</span>
+			</p>
 		</div>
 
 		<!-- Social buttons -->

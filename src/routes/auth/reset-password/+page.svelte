@@ -1,8 +1,13 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction } from '$app/forms';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import {
+		FieldGroup,
+		Field,
+		FieldLabel,
+		FieldDescription
+	} from '$lib/components/ui/field/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import type { PageData, ActionData } from './$types';
 
@@ -26,80 +31,98 @@
 			<Card.Title>Reset Password</Card.Title>
 			<Card.Description>Enter your new password below.</Card.Description>
 		</Card.Header>
-		<form
-			method="POST"
-			use:enhance={() => {
-				isSubmitting = true;
-				return async ({ update }) => {
-					await update();
-					isSubmitting = false;
-				};
-			}}
-		>
-			<input type="hidden" name="token" value={data.token} />
-			<input type="hidden" name="email" value={data.email} />
+		<Card.Content>
+			<form
+				method="POST"
+				use:enhance={() => {
+					isSubmitting = true;
+					return async ({ result }) => {
+						isSubmitting = false;
+						await applyAction(result);
+					};
+				}}
+			>
+				<input
+					type="hidden"
+					name="token"
+					value={data.token}
+				/>
+				<input
+					type="hidden"
+					name="email"
+					value={data.email}
+				/>
 
-			<Card.Content class="space-y-4">
 				{#if form?.error}
-					<div
-						class="rounded-md border border-destructive bg-destructive/10 p-4 text-sm text-destructive"
-					>
+					<div class="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
 						{form.error}
 					</div>
 				{/if}
 
-				<div class="space-y-2">
-					<Label for="email">Email</Label>
-					<Input
-						id="email"
-						type="email"
-						value={data.email}
-						disabled
-						class="bg-muted"
-					/>
-				</div>
+				<FieldGroup class="grid gap-4">
+					<Field class="grid gap-2">
+						<FieldLabel for="email">Email</FieldLabel>
+						<Input
+							id="email"
+							type="email"
+							value={data.email}
+							disabled
+							class="bg-muted"
+						/>
+					</Field>
 
-				<div class="space-y-2">
-					<Label for="password">New Password</Label>
-					<Input
-						id="password"
-						name="password"
-						type="password"
-						placeholder="••••••••"
-						required
-						minlength="8"
-						autocomplete="new-password"
-					/>
-					{#if form?.errors?.password}
-						<p class="text-sm text-destructive">{form.errors.password[0]}</p>
-					{/if}
-					<p class="text-xs text-muted-foreground">Must be at least 8 characters</p>
-				</div>
+					<Field class="grid gap-2">
+						<FieldLabel for="password">New Password</FieldLabel>
+						<Input
+							id="password"
+							name="password"
+							type="password"
+							placeholder="••••••••"
+							required
+							minlength="8"
+							autocomplete="new-password"
+							disabled={isSubmitting}
+							class={form?.errors?.password ? 'border-destructive' : ''}
+						/>
+						{#if form?.errors?.password}
+							<p class="text-sm text-destructive">{form.errors.password[0]}</p>
+						{/if}
+						<FieldDescription>Must be at least 8 characters</FieldDescription>
+					</Field>
 
-				<div class="space-y-2">
-					<Label for="password_confirmation">Confirm Password</Label>
-					<Input
-						id="password_confirmation"
-						name="password_confirmation"
-						type="password"
-						placeholder="••••••••"
-						required
-						minlength="8"
-						autocomplete="new-password"
-					/>
-					{#if form?.errors?.password_confirmation}
-						<p class="text-sm text-destructive">{form.errors.password_confirmation[0]}</p>
-					{/if}
-				</div>
-			</Card.Content>
-			<Card.Footer class="flex flex-col gap-4">
-				<Button type="submit" class="w-full" disabled={isSubmitting}>
-					{isSubmitting ? 'Resetting...' : 'Reset Password'}
-				</Button>
-				<a href="/auth/login" class="text-center text-sm text-primary hover:underline">
-					Back to Login
-				</a>
-			</Card.Footer>
-		</form>
+					<Field class="grid gap-2">
+						<FieldLabel for="password_confirmation">Confirm Password</FieldLabel>
+						<Input
+							id="password_confirmation"
+							name="password_confirmation"
+							type="password"
+							placeholder="••••••••"
+							required
+							minlength="8"
+							autocomplete="new-password"
+							disabled={isSubmitting}
+							class={form?.errors?.password_confirmation ? 'border-destructive' : ''}
+						/>
+						{#if form?.errors?.password_confirmation}
+							<p class="text-sm text-destructive">{form.errors.password_confirmation[0]}</p>
+						{/if}
+					</Field>
+
+					<Field class="grid gap-2">
+						<Button
+							type="submit"
+							class="w-full"
+							size="lg"
+							disabled={isSubmitting}
+						>
+							{isSubmitting ? 'Resetting...' : 'Reset Password'}
+						</Button>
+						<FieldDescription class="text-center">
+							<a href="/auth/login">Back to Login</a>
+						</FieldDescription>
+					</Field>
+				</FieldGroup>
+			</form>
+		</Card.Content>
 	</Card.Root>
 </div>

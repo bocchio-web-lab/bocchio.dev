@@ -4,8 +4,8 @@
 	const currentYear = new Date().getFullYear();
 </script>
 
-<footer class="mt-auto w-full border-t bg-background">
-	<Card class="rounded-none border-0 shadow-none">
+<footer class="sticky bottom-0 mt-auto w-full border-t bg-background">
+	<Card class="rounded-none border-0 py-0 shadow-none">
 		<div class="mx-auto w-full max-w-(--breakpoint-xl) px-4 py-4">
 			<div class="flex flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
 				<div>
@@ -22,12 +22,18 @@
 					>
 						Privacy
 					</a>
-					<a
+					<!-- <a
+						href="/cookies"
+						class="transition-colors hover:text-foreground"
+					>
+						Cookies
+					</a> -->
+					<!-- <a
 						href="/terms"
 						class="transition-colors hover:text-foreground"
 					>
 						Terms
-					</a>
+					</a> -->
 				</nav>
 			</div>
 		</div>

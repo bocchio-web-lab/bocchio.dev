@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -18,7 +18,7 @@
 	let deletingCommentId: number | null = $state(null);
 
 	function updateFilter(value: string) {
-		const url = new URL($page.url);
+		const url = new URL(page.url);
 		if (value === 'all') {
 			url.searchParams.delete('approved');
 		} else {
@@ -29,7 +29,7 @@
 	}
 
 	function changePage(newPage: number) {
-		const url = new URL($page.url);
+		const url = new URL(page.url);
 		url.searchParams.set('page', newPage.toString());
 		goto(url.toString());
 	}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -15,7 +15,7 @@
 
 	let isSubmitting = $state(false);
 
-	let urlError = $derived($page.url.searchParams.get('error'));
+	let urlError = $derived(page.url.searchParams.get('error'));
 </script>
 
 <svelte:head>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import type { LayoutData } from './$types';
@@ -20,7 +20,7 @@
 
 	function isActive(item: { href: string; exact?: boolean }) {
 		const basePath = `/portals/cms/${data.tenant.public_slug}`;
-		const currentPath = $page.url.pathname;
+		const currentPath = page.url.pathname;
 
 		if (item.exact) {
 			return currentPath === basePath || currentPath === basePath + '/';
