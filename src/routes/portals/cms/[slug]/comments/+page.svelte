@@ -53,8 +53,12 @@
 	{#if form?.success}
 		<Card.Root class="border-green-500">
 			<Card.Content class="pt-6">
-				<p class="text-green-600 text-sm">
-					Comment {form.action === 'approve' ? 'approved' : form.action === 'reject' ? 'rejected' : 'deleted'} successfully!
+				<p class="text-sm text-green-600">
+					Comment {form.action === 'approve'
+						? 'approved'
+						: form.action === 'reject'
+							? 'rejected'
+							: 'deleted'} successfully!
 				</p>
 			</Card.Content>
 		</Card.Root>
@@ -63,7 +67,7 @@
 	{#if form?.error}
 		<Card.Root class="border-destructive">
 			<Card.Content class="pt-6">
-				<p class="text-destructive text-sm">{form.error}</p>
+				<p class="text-sm text-destructive">{form.error}</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}
@@ -136,27 +140,64 @@
 					</Card.Content>
 					<Card.Footer class="flex gap-2">
 						{#if !comment.approved}
-							<form method="POST" action="?/approve" use:enhance>
-								<input type="hidden" name="comment_id" value={comment.id} />
-								<Button type="submit" size="sm" variant="default">Approve</Button>
+							<form
+								method="POST"
+								action="?/approve"
+								use:enhance
+							>
+								<input
+									type="hidden"
+									name="comment_id"
+									value={comment.id}
+								/>
+								<Button
+									type="submit"
+									size="sm"
+									variant="default">Approve</Button
+								>
 							</form>
 						{:else}
-							<form method="POST" action="?/reject" use:enhance>
-								<input type="hidden" name="comment_id" value={comment.id} />
-								<Button type="submit" size="sm" variant="outline">Unapprove</Button>
+							<form
+								method="POST"
+								action="?/reject"
+								use:enhance
+							>
+								<input
+									type="hidden"
+									name="comment_id"
+									value={comment.id}
+								/>
+								<Button
+									type="submit"
+									size="sm"
+									variant="outline">Unapprove</Button
+								>
 							</form>
 						{/if}
 
 						{#if deletingCommentId === comment.id}
-							<form method="POST" action="?/delete" use:enhance class="flex gap-2">
-								<input type="hidden" name="comment_id" value={comment.id} />
-								<span class="text-sm text-muted-foreground self-center">Are you sure?</span>
-								<Button type="submit" size="sm" variant="destructive">Yes, Delete</Button>
+							<form
+								method="POST"
+								action="?/delete"
+								use:enhance
+								class="flex gap-2"
+							>
+								<input
+									type="hidden"
+									name="comment_id"
+									value={comment.id}
+								/>
+								<span class="self-center text-sm text-muted-foreground">Are you sure?</span>
+								<Button
+									type="submit"
+									size="sm"
+									variant="destructive">Yes, Delete</Button
+								>
 								<Button
 									type="button"
 									size="sm"
 									variant="outline"
-									on:click={() => (deletingCommentId = null)}
+									onclick={() => (deletingCommentId = null)}
 								>
 									Cancel
 								</Button>
@@ -165,7 +206,7 @@
 							<Button
 								size="sm"
 								variant="destructive"
-								on:click={() => (deletingCommentId = comment.id)}
+								onclick={() => (deletingCommentId = comment.id)}
 							>
 								Delete
 							</Button>
@@ -188,7 +229,7 @@
 									variant="outline"
 									size="sm"
 									disabled={data.pagination.currentPage === 1}
-									on:click={() => changePage(data.pagination.currentPage - 1)}
+									onclick={() => changePage(data.pagination.currentPage - 1)}
 								>
 									Previous
 								</Button>
@@ -196,7 +237,7 @@
 									variant="outline"
 									size="sm"
 									disabled={data.pagination.currentPage >= data.pagination.lastPage}
-									on:click={() => changePage(data.pagination.currentPage + 1)}
+									onclick={() => changePage(data.pagination.currentPage + 1)}
 								>
 									Next
 								</Button>
@@ -209,7 +250,7 @@
 			<Card.Root>
 				<Card.Content class="pt-12 pb-12 text-center">
 					<p class="text-muted-foreground">No comments found</p>
-					<p class="text-sm text-muted-foreground mt-2">
+					<p class="mt-2 text-sm text-muted-foreground">
 						Comments will appear here when users interact with your content
 					</p>
 				</Card.Content>

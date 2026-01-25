@@ -1,19 +1,9 @@
 // src/routes/portals/cms/[slug]/content/+page.server.ts
 import type { PageServerLoad } from './$types';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { get } from '$lib/server/http-server';
 
-export const load: PageServerLoad = async ({ parent, cookies, fetch, url }) => {
+export const load: PageServerLoad = async ({ parent, cookies, url }) => {
     const { tenant } = await parent();
-
-    const xsrfToken = cookies.get('XSRF-TOKEN');
-    const sessionCookie = cookies.get('backend_bocchio_session');
-
-    const headers = {
-        'Accept': 'application/json',
-        'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-        'X-Tenant-ID': tenant.id.toString(),
-        'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-    };
 
     // Get filter params from URL
     const type = url.searchParams.get('type') || '';
@@ -31,12 +21,11 @@ export const load: PageServerLoad = async ({ parent, cookies, fetch, url }) => {
         ? `/api/manage/cms/content?${queryString}`
         : '/api/manage/cms/content';
 
-    const response = await fetch(`${PUBLIC_API_BASE_URL}${endpoint}`, {
-        credentials: 'include',
-        headers
+    const response = await get(endpoint, cookies, {
+        headers: { 'X-Tenant-ID': tenant.id.toString() }
     });
 
-    const contentData = response.ok ? await response.json() : { data: [], total: 0 };
+    const contentData = response.ok ? response.data : { data: [], total: 0 };
 
     return {
         content: contentData.data || [],

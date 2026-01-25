@@ -1,10 +1,9 @@
 // src/lib/server/auth.ts
 import { redirect, type Cookies } from '@sveltejs/kit';
-import * as setCookie from 'set-cookie-parser';
-import { PUBLIC_API_BASE_URL, PUBLIC_FRONTEND_URL } from '$env/static/public';
+import { getCsrfToken, post, get, type ServerHttpResponse } from './http-server';
 
-const SESSION_COOKIE_NAME: string = 'backend_bocchio_session';
-const XSRF_TOKEN_NAME: string = 'XSRF-TOKEN';
+const SESSION_COOKIE_NAME = 'backend_bocchio_session';
+const XSRF_TOKEN_NAME = 'XSRF-TOKEN';
 
 export interface AuthResponse {
     success: boolean;
@@ -13,110 +12,21 @@ export interface AuthResponse {
 }
 
 /**
- * Get CSRF token from Laravel Sanctum
+ * Convert ServerHttpResponse to AuthResponse
  */
-export async function getCsrfToken(cookies: Cookies): Promise<boolean> {
-    try {
-        const response = await fetch(`${PUBLIC_API_BASE_URL}/sanctum/csrf-cookie`, {
-            credentials: 'include'
-        });
-
-        if (!response.ok) {
-            return false;
-        }
-
-        // Handle multiple Set-Cookie headers
-        const setCookieHeaders = response.headers.getSetCookie?.() || [];
-
-        if (setCookieHeaders.length === 0) {
-            const singleHeader = response.headers.get('set-cookie');
-            if (singleHeader) {
-                setCookieHeaders.push(singleHeader);
-            }
-        }
-
-        if (setCookieHeaders.length === 0) {
-            console.error('No Set-Cookie headers received');
-            return false;
-        }
-
-        setCookieHeaders.forEach(headerValue => {
-            const parsedCookies = setCookie.parse(headerValue, {
-                decodeValues: true
-            });
-
-            parsedCookies.forEach((cookie) => {
-                cookies.set(cookie.name, cookie.value, {
-                    path: cookie.path || '/',
-                    httpOnly: false, // Cannot set httpOnly from server-side JS
-                    secure: cookie.secure ?? false,
-                    sameSite: (cookie.sameSite as 'strict' | 'lax' | 'none') ?? 'lax',
-                    maxAge: cookie.maxAge
-                });
-            });
-        });
-
-        return true;
-    } catch (error) {
-        console.error('Failed to get CSRF token:', error);
-        return false;
-    }
-}
-
-/**
- * Make authenticated request to Laravel backend
- */
-async function makeAuthRequest(
-    endpoint: string,
-    method: string,
-    cookies: Cookies,
-    body?: FormData
-): Promise<Response> {
-    const xsrfToken = cookies.get(XSRF_TOKEN_NAME);
-    const sessionCookie = cookies.get(SESSION_COOKIE_NAME);
-
-    if (!xsrfToken || !sessionCookie) {
-        return new Response(null, { status: 401 });
+function toAuthResponse(response: ServerHttpResponse, successMessage?: string): AuthResponse {
+    if (response.ok) {
+        return {
+            success: true,
+            message: successMessage || response.data?.message
+        };
     }
 
-    const response = await fetch(`${PUBLIC_API_BASE_URL}${endpoint}`, {
-        method,
-        body,
-        credentials: 'include',
-        headers: {
-            'X-XSRF-TOKEN': decodeURIComponent(xsrfToken),
-            'Accept': 'application/json',
-            'Cookie': `${SESSION_COOKIE_NAME}=${sessionCookie}; ${XSRF_TOKEN_NAME}=${xsrfToken}`,
-            'Referer': PUBLIC_FRONTEND_URL
-        }
-    });
-
-    // Update cookies from response
-    const setCookieHeaders = response.headers.getSetCookie?.() || [];
-    if (setCookieHeaders.length === 0) {
-        const singleHeader = response.headers.get('set-cookie');
-        if (singleHeader) {
-            setCookieHeaders.push(singleHeader);
-        }
-    }
-
-    setCookieHeaders.forEach(headerValue => {
-        const parsedCookies = setCookie.parse(headerValue, {
-            decodeValues: true
-        });
-
-        parsedCookies.forEach((cookie) => {
-            cookies.set(cookie.name, cookie.value, {
-                path: cookie.path || '/',
-                httpOnly: false,
-                secure: cookie.secure ?? false,
-                sameSite: (cookie.sameSite as 'strict' | 'lax' | 'none') ?? 'lax',
-                maxAge: cookie.maxAge
-            });
-        });
-    });
-
-    return response;
+    return {
+        success: false,
+        message: response.error?.message || 'An error occurred',
+        errors: response.error?.errors
+    };
 }
 
 /**
@@ -138,26 +48,8 @@ export async function login(
         formData.append('email', email);
         formData.append('password', password);
 
-        const response = await makeAuthRequest('/login', 'POST', cookies, formData);
-
-        if (response.ok) {
-            return { success: true };
-        }
-
-        // Handle validation errors
-        if (response.status === 422) {
-            const data = await response.json();
-            return {
-                success: false,
-                message: 'Validation failed',
-                errors: data.errors
-            };
-        }
-
-        return {
-            success: false,
-            message: response.statusText || 'Login failed'
-        };
+        const response = await post('/login', cookies, formData, { requireAuth: false });
+        return toAuthResponse(response);
     } catch (error) {
         console.error('Login error:', error);
         return {
@@ -191,26 +83,8 @@ export async function register(
             formData.append(key, value);
         });
 
-        const response = await makeAuthRequest('/register', 'POST', cookies, formData);
-
-        if (response.ok) {
-            return { success: true };
-        }
-
-        // Handle validation errors
-        if (response.status === 422) {
-            const data = await response.json();
-            return {
-                success: false,
-                message: 'Validation failed',
-                errors: data.errors
-            };
-        }
-
-        return {
-            success: false,
-            message: response.statusText || 'Registration failed'
-        };
+        const response = await post('/register', cookies, formData, { requireAuth: false });
+        return toAuthResponse(response);
     } catch (error) {
         console.error('Registration error:', error);
         return {
@@ -225,7 +99,7 @@ export async function register(
  */
 export async function logout(cookies: Cookies): Promise<void> {
     try {
-        await makeAuthRequest('/logout', 'POST', cookies);
+        await post('/logout', cookies, undefined, { requireAuth: false });
     } catch (error) {
         console.error('Logout error:', error);
     } finally {
@@ -240,13 +114,8 @@ export async function logout(cookies: Cookies): Promise<void> {
  */
 export async function getUser(cookies: Cookies): Promise<any | null> {
     try {
-        const response = await makeAuthRequest('/api/user', 'GET', cookies);
-
-        if (response.ok) {
-            return await response.json();
-        }
-
-        return null;
+        const response = await get('/api/user', cookies);
+        return response.ok ? response.data : null;
     } catch (error) {
         console.error('Get user error:', error);
         return null;
@@ -279,10 +148,7 @@ export async function requireAuth(cookies: Cookies, redirectTo: string = '/auth/
 /**
  * Send password reset link
  */
-export async function forgotPassword(
-    email: string,
-    cookies: Cookies
-): Promise<AuthResponse> {
+export async function forgotPassword(email: string, cookies: Cookies): Promise<AuthResponse> {
     try {
         const csrfSuccess = await getCsrfToken(cookies);
         if (!csrfSuccess) {
@@ -292,26 +158,8 @@ export async function forgotPassword(
         const formData = new FormData();
         formData.append('email', email);
 
-        const response = await makeAuthRequest('/forgot-password', 'POST', cookies, formData);
-
-        if (response.ok) {
-            const data = await response.json();
-            return { success: true, message: data.message || 'Password reset link sent!' };
-        }
-
-        if (response.status === 422) {
-            const data = await response.json();
-            return {
-                success: false,
-                message: 'Validation failed',
-                errors: data.errors
-            };
-        }
-
-        return {
-            success: false,
-            message: response.statusText || 'Failed to send reset link'
-        };
+        const response = await post('/forgot-password', cookies, formData, { requireAuth: false });
+        return toAuthResponse(response, 'Password reset link sent!');
     } catch (error) {
         console.error('Forgot password error:', error);
         return {
@@ -343,26 +191,8 @@ export async function resetPassword(
         formData.append('password', password);
         formData.append('password_confirmation', password_confirmation);
 
-        const response = await makeAuthRequest('/reset-password', 'POST', cookies, formData);
-
-        if (response.ok) {
-            const data = await response.json();
-            return { success: true, message: data.message || 'Password reset successfully!' };
-        }
-
-        if (response.status === 422) {
-            const data = await response.json();
-            return {
-                success: false,
-                message: 'Validation failed',
-                errors: data.errors
-            };
-        }
-
-        return {
-            success: false,
-            message: response.statusText || 'Failed to reset password'
-        };
+        const response = await post('/reset-password', cookies, formData, { requireAuth: false });
+        return toAuthResponse(response, 'Password reset successfully!');
     } catch (error) {
         console.error('Reset password error:', error);
         return {
@@ -377,17 +207,8 @@ export async function resetPassword(
  */
 export async function resendVerification(cookies: Cookies): Promise<AuthResponse> {
     try {
-        const response = await makeAuthRequest('/email/verification-notification', 'POST', cookies);
-
-        if (response.ok) {
-            const data = await response.json();
-            return { success: true, message: data.message || 'Verification email sent!' };
-        }
-
-        return {
-            success: false,
-            message: response.statusText || 'Failed to send verification email'
-        };
+        const response = await post('/email/verification-notification', cookies);
+        return toAuthResponse(response, 'Verification email sent!');
     } catch (error) {
         console.error('Resend verification error:', error);
         return {
@@ -411,7 +232,7 @@ export async function verifyEmail(
         const queryParams = new URLSearchParams({ expires, signature });
         const endpoint = `/email/verify/${id}/${hash}?${queryParams.toString()}`;
 
-        const response = await makeAuthRequest(endpoint, 'GET', cookies);
+        const response = await get(endpoint, cookies);
 
         if (response.ok) {
             return { success: true, message: 'Email verified successfully!' };
@@ -424,10 +245,7 @@ export async function verifyEmail(
             };
         }
 
-        return {
-            success: false,
-            message: response.statusText || 'Failed to verify email'
-        };
+        return toAuthResponse(response);
     } catch (error) {
         console.error('Verify email error:', error);
         return {
@@ -436,3 +254,6 @@ export async function verifyEmail(
         };
     }
 }
+
+// Re-export for backward compatibility
+export { getCsrfToken };

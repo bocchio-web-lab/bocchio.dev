@@ -1,58 +1,44 @@
 // src/routes/portals/cms/[slug]/+page.server.ts
 import type { PageServerLoad } from './$types';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { get } from '$lib/server/http-server';
 
-export const load: PageServerLoad = async ({ parent, cookies, fetch }) => {
+export const load: PageServerLoad = async ({ parent, cookies }) => {
     const { tenant } = await parent();
 
-    const xsrfToken = cookies.get('XSRF-TOKEN');
-    const sessionCookie = cookies.get('backend_bocchio_session');
-
-    const headers = {
-        'Accept': 'application/json',
-        'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-        'X-Tenant-ID': tenant.id.toString(),
-        'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-    };
+    const tenantId = tenant.id.toString();
 
     // Fetch content statistics
     const [postsRes, pagesRes, projectsRes, commentsRes, tagsRes] = await Promise.all([
-        fetch(`${PUBLIC_API_BASE_URL}/api/manage/cms/content?type=post&status=published`, {
-            credentials: 'include',
-            headers
+        get('/api/manage/cms/content?type=post&status=published', cookies, {
+            headers: { 'X-Tenant-ID': tenantId }
         }),
-        fetch(`${PUBLIC_API_BASE_URL}/api/manage/cms/content?type=page&status=published`, {
-            credentials: 'include',
-            headers
+        get('/api/manage/cms/content?type=page&status=published', cookies, {
+            headers: { 'X-Tenant-ID': tenantId }
         }),
-        fetch(`${PUBLIC_API_BASE_URL}/api/manage/cms/content?type=project&status=published`, {
-            credentials: 'include',
-            headers
+        get('/api/manage/cms/content?type=project&status=published', cookies, {
+            headers: { 'X-Tenant-ID': tenantId }
         }),
-        fetch(`${PUBLIC_API_BASE_URL}/api/manage/cms/comments?approved=false`, {
-            credentials: 'include',
-            headers
+        get('/api/manage/cms/comments?approved=false', cookies, {
+            headers: { 'X-Tenant-ID': tenantId }
         }),
-        fetch(`${PUBLIC_API_BASE_URL}/api/manage/cms/tags`, {
-            credentials: 'include',
-            headers
+        get('/api/manage/cms/tags', cookies, {
+            headers: { 'X-Tenant-ID': tenantId }
         })
     ]);
 
-    const posts = postsRes.ok ? await postsRes.json() : { total: 0 };
-    const pages = pagesRes.ok ? await pagesRes.json() : { total: 0 };
-    const projects = projectsRes.ok ? await projectsRes.json() : { total: 0 };
-    const pendingComments = commentsRes.ok ? await commentsRes.json() : { total: 0 };
-    const tags = tagsRes.ok ? await tagsRes.json() : { data: [] };
+    const posts = postsRes.ok ? postsRes.data : { total: 0 };
+    const pages = pagesRes.ok ? pagesRes.data : { total: 0 };
+    const projects = projectsRes.ok ? projectsRes.data : { total: 0 };
+    const pendingComments = commentsRes.ok ? commentsRes.data : { total: 0 };
+    const tags = tagsRes.ok ? tagsRes.data : { data: [] };
 
     // Fetch recent content
-    const recentContentRes = await fetch(`${PUBLIC_API_BASE_URL}/api/manage/cms/content`, {
-        credentials: 'include',
-        headers
+    const recentContentRes = await get('/api/manage/cms/content', cookies, {
+        headers: { 'X-Tenant-ID': tenantId }
     });
 
     const recentContent = recentContentRes.ok
-        ? (await recentContentRes.json()).data.slice(0, 5)
+        ? recentContentRes.data.data.slice(0, 5)
         : [];
 
     return {

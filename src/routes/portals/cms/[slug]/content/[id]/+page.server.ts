@@ -1,57 +1,49 @@
 // src/routes/portals/cms/[slug]/content/[id]/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { get, put, del } from '$lib/server/http-server';
 import { error, fail, redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ parent, cookies, fetch, params }) => {
+// Helper function to get tenant by slug
+async function getTenantBySlug(cookies: any, slug: string) {
+    const tenantsResponse = await get('/api/manage/tenants', cookies);
+    if (!tenantsResponse.ok) return null;
+    const tenants = tenantsResponse.data.data;
+    return tenants.find((t: any) => t.public_slug === slug);
+}
+
+export const load: PageServerLoad = async ({ parent, cookies, params }) => {
     const { tenant } = await parent();
 
-    const xsrfToken = cookies.get('XSRF-TOKEN');
-    const sessionCookie = cookies.get('backend_bocchio_session');
-
-    const headers = {
-        'Accept': 'application/json',
-        'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-        'X-Tenant-ID': tenant.id.toString(),
-        'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-    };
+    const tenantId = tenant.id.toString();
 
     // Fetch content item
-    const contentResponse = await fetch(
-        `${PUBLIC_API_BASE_URL}/api/manage/cms/content/${params.id}`,
-        {
-            credentials: 'include',
-            headers
-        }
-    );
+    const contentResponse = await get(`/api/manage/cms/content/${params.id}`, cookies, {
+        headers: { 'X-Tenant-ID': tenantId }
+    });
 
     if (!contentResponse.ok) {
         throw error(404, 'Content not found');
     }
 
-    const contentData = await contentResponse.json();
-
     // Fetch available tags
-    const tagsResponse = await fetch(`${PUBLIC_API_BASE_URL}/api/manage/cms/tags`, {
-        credentials: 'include',
-        headers
+    const tagsResponse = await get('/api/manage/cms/tags', cookies, {
+        headers: { 'X-Tenant-ID': tenantId }
     });
 
-    const tags = tagsResponse.ok ? (await tagsResponse.json()).data : [];
+    const tags = tagsResponse.ok ? tagsResponse.data.data : [];
 
     return {
-        content: contentData.data,
+        content: contentResponse.data.data,
         tags
     };
 };
 
 export const actions: Actions = {
-    update: async ({ request, cookies, params, parent }) => {
-        const { tenant } = await parent();
-        const formData = await request.formData();
+    update: async ({ request, cookies, params }) => {
+        const tenant = await getTenantBySlug(cookies, params.slug);
+        if (!tenant) return fail(404, { error: 'Tenant not found' });
 
-        const xsrfToken = cookies.get('XSRF-TOKEN');
-        const sessionCookie = cookies.get('backend_bocchio_session');
+        const formData = await request.formData();
 
         const title = formData.get('title') as string;
         const slug = formData.get('slug') as string;
@@ -72,53 +64,31 @@ export const actions: Actions = {
         if (published_at) payload.published_at = published_at;
         if (tags.length > 0) payload.tags = tags;
 
-        const response = await fetch(
-            `${PUBLIC_API_BASE_URL}/api/manage/cms/content/${params.id}`,
-            {
-                method: 'PUT',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-                    'X-Tenant-ID': tenant.id.toString(),
-                    'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-                },
-                body: JSON.stringify(payload)
-            }
-        );
+        const response = await put(`/api/manage/cms/content/${params.id}`, cookies, payload, {
+            headers: { 'X-Tenant-ID': tenant.id.toString() }
+        });
 
         if (!response.ok) {
-            const error = await response.json().catch(() => ({ message: 'Failed to update content' }));
-            return fail(response.status, { error: error.message || 'Failed to update content' });
+            return fail(response.status, {
+                error: response.error?.message || 'Failed to update content'
+            });
         }
 
         return { success: true };
     },
 
-    delete: async ({ cookies, params, parent }) => {
-        const { tenant } = await parent();
+    delete: async ({ cookies, params }) => {
+        const tenant = await getTenantBySlug(cookies, params.slug);
+        if (!tenant) return fail(404, { error: 'Tenant not found' });
 
-        const xsrfToken = cookies.get('XSRF-TOKEN');
-        const sessionCookie = cookies.get('backend_bocchio_session');
-
-        const response = await fetch(
-            `${PUBLIC_API_BASE_URL}/api/manage/cms/content/${params.id}`,
-            {
-                method: 'DELETE',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-                    'X-Tenant-ID': tenant.id.toString(),
-                    'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-                }
-            }
-        );
+        const response = await del(`/api/manage/cms/content/${params.id}`, cookies, {
+            headers: { 'X-Tenant-ID': tenant.id.toString() }
+        });
 
         if (!response.ok) {
-            const error = await response.json().catch(() => ({ message: 'Failed to delete content' }));
-            return fail(response.status, { error: error.message || 'Failed to delete content' });
+            return fail(response.status, {
+                error: response.error?.message || 'Failed to delete content'
+            });
         }
 
         throw redirect(303, `/portals/cms/${params.slug}/content`);

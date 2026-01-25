@@ -10,8 +10,12 @@
 	} from 'svelte-vertical-timeline';
 	import { goto } from '$app/navigation';
 	import AtomicCard from '$lib/components/atomic/card.svelte';
+	import * as Pagination from '$lib/components/ui/pagination';
 
-	let { data } = $props();
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+	const projects = $derived(data.pagination?.data || []);
 </script>
 
 <svelte:head>
@@ -22,60 +26,100 @@
 	/>
 </svelte:head>
 
-<Timeline position="right">
-	{#each data.projects as project, i}
-		<TimelineItem>
-			<TimelineOppositeContent>
-				<AtomicCard
-					data={{
-						title: project.name,
-						content: project.description
-					}}
-					clickable={true}
-					on:click={() => goto(`/projects/${project.slug}`)}
-					class="desktop-card"
-				/>
-			</TimelineOppositeContent>
-
-			<TimelineSeparator>
-				<TimelineDot>
-					<button onclick={() => goto(`/projects/${project.slug}`)}>
-						<img
-							src={project.image}
-							alt={project.name}
-							class="h-full w-full max-w-sm rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-						/>
-					</button>
+<div class="projects-container">
+	<Timeline position="right">
+		{#each projects as project, i}
+			<TimelineItem>
+				<TimelineOppositeContent>
 					<AtomicCard
 						data={{
-							title: project.name,
-							content: project.description
+							title: project.title,
+							content: project.excerpt || ''
 						}}
 						clickable={true}
 						on:click={() => goto(`/projects/${project.slug}`)}
-						class="mobile-card"
+						class="desktop-card"
 					/>
-				</TimelineDot>
+				</TimelineOppositeContent>
 
-				{#if i < data.projects.length - 1}
-					<TimelineConnector style="height: 100px;" />
-				{/if}
-			</TimelineSeparator>
+				<TimelineSeparator>
+					<TimelineDot>
+						<button onclick={() => goto(`/projects/${project.slug}`)}>
+							<img
+								src={(project.meta?.image as string) ||
+									'https://avatars.githubusercontent.com/u/67842431'}
+								alt={project.title}
+								class="h-full w-full max-w-sm rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+							/>
+						</button>
+						<AtomicCard
+							data={{
+								title: project.title,
+								content: project.excerpt || ''
+							}}
+							clickable={true}
+							on:click={() => goto(`/projects/${project.slug}`)}
+							class="mobile-card"
+						/>
+					</TimelineDot>
 
-			<TimelineContent>
-				<AtomicCard
-					data={{
-						title: project.name,
-						content: project.description
-					}}
-					clickable={true}
-					on:click={() => goto(`/projects/${project.slug}`)}
-					class="desktop-card"
-				/>
-			</TimelineContent>
-		</TimelineItem>
-	{/each}
-</Timeline>
+					{#if i < projects.length - 1}
+						<TimelineConnector style="height: 100px;" />
+					{/if}
+				</TimelineSeparator>
+
+				<TimelineContent>
+					<AtomicCard
+						data={{
+							title: project.title,
+							content: project.excerpt || ''
+						}}
+						clickable={true}
+						on:click={() => goto(`/projects/${project.slug}`)}
+						class="desktop-card"
+					/>
+				</TimelineContent>
+			</TimelineItem>
+		{/each}
+	</Timeline>
+
+	<div class="mt-12 flex justify-center">
+		<Pagination.Root
+			count={data.pagination?.total || 0}
+			perPage={data.pagination?.per_page || 10}
+		>
+			{#snippet children({ pages, currentPage })}
+				<Pagination.Content>
+					<Pagination.Item>
+						<Pagination.Previous onclick={() => goto(`?page=${currentPage - 1}`)} />
+					</Pagination.Item>
+
+					{#each pages as page (page.key)}
+						{#if page.type === 'ellipsis'}
+							<Pagination.Item>
+								<Pagination.Ellipsis />
+							</Pagination.Item>
+						{:else}
+							<Pagination.Item>
+								<Pagination.Link
+									{page}
+									isActive={currentPage === page.value}
+									onclick={() => goto(`?page=${page.value}`)}
+								>
+									{page.value}
+								</Pagination.Link>
+							</Pagination.Item>
+						{/if}
+					{/each}
+
+					<Pagination.Item>
+						<Pagination.Next onclick={() => goto(`?page=${currentPage + 1}`)} />
+					</Pagination.Item>
+				</Pagination.Content>
+			{/snippet}
+		</Pagination.Root>
+	</div>
+</div>
 
 <style>
 	:global(.opposite-block) {
@@ -88,11 +132,17 @@
 
 	:global(.timeline-dot) {
 		display: flex !important;
+
 		flex-direction: column !important;
+
 		align-items: center !important;
+
 		width: 100% !important;
+
 		background-color: transparent !important;
+
 		border: none !important;
+
 		margin: auto !important;
 	}
 
@@ -107,6 +157,7 @@
 	:global(.desktop-card) {
 		display: none;
 	}
+
 	:global(.timeline-opposite-content .desktop-card > div:first-child) {
 		flex-direction: row-reverse;
 	}
@@ -119,6 +170,7 @@
 		:global(.desktop-card) {
 			display: block;
 		}
+
 		:global(.timeline-content) {
 			display: block !important;
 		}

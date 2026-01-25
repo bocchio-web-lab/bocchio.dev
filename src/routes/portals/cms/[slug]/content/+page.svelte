@@ -14,6 +14,24 @@
 
 	let { data }: Props = $props();
 
+	const status_options = [
+		{ value: '', label: 'All Status' },
+		{ value: 'draft', label: 'Draft' },
+		{ value: 'published', label: 'Published' },
+		{ value: 'archived', label: 'Archived' }
+	];
+
+	// To be retrived from server (unique for each tenant)
+	const type_options = [
+		{ value: '', label: 'All Types' },
+		{ value: 'post', label: 'Posts' },
+		{ value: 'page', label: 'Pages' },
+		{ value: 'project', label: 'Projects' }
+	];
+
+	let status = $state('');
+	let type = $state('');
+
 	function getStatusBadgeVariant(
 		status: string
 	): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -57,9 +75,7 @@
 			<h2 class="text-2xl font-bold tracking-tight">Content Management</h2>
 			<p class="text-muted-foreground">Manage all your posts, pages, and projects</p>
 		</div>
-		<Button href={`/portals/cms/${data.tenant.public_slug}/content/new`}>
-			Create New Content
-		</Button>
+		<Button href={`/portals/cms/${data.tenant.public_slug}/content/new`}>Create New Content</Button>
 	</div>
 
 	<!-- Filters -->
@@ -71,37 +87,46 @@
 			<div class="flex gap-4">
 				<div class="w-48">
 					<Select.Root
-						onSelectedChange={(v) => updateFilter('type', v?.value || '')}
-						selected={{ value: data.filters.type, label: data.filters.type || 'All Types' }}
+						type="single"
+						name="type"
+						bind:value={type}
+						onValueChange={(val) => updateFilter('type', val)}
 					>
-						<Select.Trigger>
-							<Select.Value placeholder="Content Type" />
+						<Select.Trigger class="w-45">
+							{type_options.find((f) => f.value === type)?.label ?? 'Select a type'}
 						</Select.Trigger>
 						<Select.Content>
-							<Select.Item value="">All Types</Select.Item>
-							<Select.Item value="post">Posts</Select.Item>
-							<Select.Item value="page">Pages</Select.Item>
-							<Select.Item value="project">Projects</Select.Item>
+							{#each type_options as option (option.value)}
+								<Select.Item
+									value={option.value}
+									label={option.label}
+								>
+									{option.label}
+								</Select.Item>
+							{/each}
 						</Select.Content>
 					</Select.Root>
 				</div>
 
 				<div class="w-48">
 					<Select.Root
-						onSelectedChange={(v) => updateFilter('status', v?.value || '')}
-						selected={{
-							value: data.filters.status,
-							label: data.filters.status || 'All Status'
-						}}
+						type="single"
+						name="status"
+						bind:value={status}
+						onValueChange={(val) => updateFilter('status', val)}
 					>
-						<Select.Trigger>
-							<Select.Value placeholder="Status" />
+						<Select.Trigger class="w-45">
+							{status_options.find((f) => f.value === status)?.label ?? 'Select a status'}
 						</Select.Trigger>
 						<Select.Content>
-							<Select.Item value="">All Status</Select.Item>
-							<Select.Item value="draft">Draft</Select.Item>
-							<Select.Item value="published">Published</Select.Item>
-							<Select.Item value="archived">Archived</Select.Item>
+							{#each status_options as option (option.value)}
+								<Select.Item
+									value={option.value}
+									label={option.label}
+								>
+									{option.label}
+								</Select.Item>
+							{/each}
 						</Select.Content>
 					</Select.Root>
 				</div>
@@ -109,7 +134,11 @@
 				{#if data.filters.type || data.filters.status}
 					<Button
 						variant="outline"
-						on:click={() => goto(`/portals/cms/${data.tenant.public_slug}/content`)}
+						onclick={() => {
+							goto(`/portals/cms/${data.tenant.public_slug}/content`);
+							status = '';
+							type = '';
+						}}
 					>
 						Clear Filters
 					</Button>
@@ -123,7 +152,7 @@
 		<Card.Header>
 			<Card.Title>
 				Content Items
-				<span class="text-muted-foreground text-sm font-normal">
+				<span class="text-sm font-normal text-muted-foreground">
 					({data.pagination.total} total)
 				</span>
 			</Card.Title>
@@ -148,7 +177,7 @@
 									<div>
 										<div>{item.title}</div>
 										{#if item.excerpt}
-											<div class="text-xs text-muted-foreground line-clamp-1">
+											<div class="line-clamp-1 text-xs text-muted-foreground">
 												{item.excerpt}
 											</div>
 										{/if}
@@ -189,7 +218,7 @@
 								variant="outline"
 								size="sm"
 								disabled={data.pagination.currentPage === 1}
-								on:click={() => changePage(data.pagination.currentPage - 1)}
+								onclick={() => changePage(data.pagination.currentPage - 1)}
 							>
 								Previous
 							</Button>
@@ -197,7 +226,7 @@
 								variant="outline"
 								size="sm"
 								disabled={data.pagination.currentPage >= data.pagination.lastPage}
-								on:click={() => changePage(data.pagination.currentPage + 1)}
+								onclick={() => changePage(data.pagination.currentPage + 1)}
 							>
 								Next
 							</Button>
@@ -205,8 +234,8 @@
 					</div>
 				{/if}
 			{:else}
-				<div class="text-center py-12">
-					<p class="text-muted-foreground mb-4">No content found</p>
+				<div class="py-12 text-center">
+					<p class="mb-4 text-muted-foreground">No content found</p>
 					<Button href={`/portals/cms/${data.tenant.public_slug}/content/new`}>
 						Create Your First Content
 					</Button>

@@ -16,8 +16,8 @@
 
 	let { data, form }: Props = $props();
 
-	let selectedStatus = $state(data.content.status);
-	let selectedTags: number[] = $state(data.content.tags?.map((t) => t.id) || []);
+	let selectedStatus = $derived(data.content.status);
+	let selectedTags: number[] = $derived(data.content.tags?.map((t) => t.id) || []);
 	let isSubmitting = $state(false);
 	let showDeleteConfirm = $state(false);
 
@@ -40,7 +40,10 @@
 			<p class="text-muted-foreground">{data.content.title}</p>
 		</div>
 		<div class="flex gap-2">
-			<Button href={`/portals/cms/${data.tenant.public_slug}/content`} variant="outline">
+			<Button
+				href={`/portals/cms/${data.tenant.public_slug}/content`}
+				variant="outline"
+			>
 				Back to List
 			</Button>
 		</div>
@@ -49,7 +52,7 @@
 	{#if form?.success}
 		<Card.Root class="border-green-500">
 			<Card.Content class="pt-6">
-				<p class="text-green-600 text-sm">Content updated successfully!</p>
+				<p class="text-sm text-green-600">Content updated successfully!</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}
@@ -57,18 +60,22 @@
 	{#if form?.error}
 		<Card.Root class="border-destructive">
 			<Card.Content class="pt-6">
-				<p class="text-destructive text-sm">{form.error}</p>
+				<p class="text-sm text-destructive">{form.error}</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}
 
-	<form method="POST" action="?/update" use:enhance={() => {
-		isSubmitting = true;
-		return async ({ update }) => {
-			await update();
-			isSubmitting = false;
-		};
-	}}>
+	<form
+		method="POST"
+		action="?/update"
+		use:enhance={() => {
+			isSubmitting = true;
+			return async ({ update }) => {
+				await update();
+				isSubmitting = false;
+			};
+		}}
+	>
 		<div class="space-y-6">
 			<Card.Root>
 				<Card.Header>
@@ -82,13 +89,22 @@
 					<!-- Title -->
 					<div class="space-y-2">
 						<Label for="title">Title *</Label>
-						<Input id="title" name="title" value={data.content.title} required />
+						<Input
+							id="title"
+							name="title"
+							value={data.content.title}
+							required
+						/>
 					</div>
 
 					<!-- Slug -->
 					<div class="space-y-2">
 						<Label for="slug">Slug</Label>
-						<Input id="slug" name="slug" value={data.content.slug} />
+						<Input
+							id="slug"
+							name="slug"
+							value={data.content.slug}
+						/>
 					</div>
 
 					<!-- Excerpt -->
@@ -177,7 +193,7 @@
 										/>
 										<Label
 											for={`tag-${tag.id}`}
-											class="text-sm font-normal cursor-pointer"
+											class="cursor-pointer text-sm font-normal"
 										>
 											{tag.name}
 										</Label>
@@ -190,7 +206,7 @@
 					<!-- Metadata -->
 					<div class="space-y-2">
 						<Label class="text-muted-foreground">Metadata</Label>
-						<div class="text-sm space-y-1">
+						<div class="space-y-1 text-sm">
 							<p>
 								<span class="font-medium">Author:</span>
 								{data.content.author?.name || 'Unknown'}
@@ -214,12 +230,12 @@
 						<Button
 							type="button"
 							variant="destructive"
-							on:click={() => (showDeleteConfirm = true)}
+							onclick={() => (showDeleteConfirm = true)}
 						>
 							Delete Content
 						</Button>
 					{:else}
-						<div class="flex gap-2 items-center">
+						<div class="flex items-center gap-2">
 							<span class="text-sm text-muted-foreground">Are you sure?</span>
 							<Button
 								type="submit"
@@ -233,7 +249,7 @@
 								type="button"
 								variant="outline"
 								size="sm"
-								on:click={() => (showDeleteConfirm = false)}
+								onclick={() => (showDeleteConfirm = false)}
 							>
 								Cancel
 							</Button>
@@ -249,7 +265,10 @@
 					>
 						Cancel
 					</Button>
-					<Button type="submit" disabled={isSubmitting}>
+					<Button
+						type="submit"
+						disabled={isSubmitting}
+					>
 						{isSubmitting ? 'Saving...' : 'Save Changes'}
 					</Button>
 				</div>

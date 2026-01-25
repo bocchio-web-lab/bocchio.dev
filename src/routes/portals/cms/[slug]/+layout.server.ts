@@ -1,30 +1,20 @@
 // src/routes/portals/cms/[slug]/+layout.server.ts
 import type { LayoutServerLoad } from './$types';
 import { requireAuth } from '$lib/server/auth';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { get } from '$lib/server/http-server';
 import { error } from '@sveltejs/kit';
 
-export const load: LayoutServerLoad = async ({ cookies, locals, params, fetch }) => {
+export const load: LayoutServerLoad = async ({ cookies, locals, params }) => {
     await requireAuth(cookies);
 
-    const xsrfToken = cookies.get('XSRF-TOKEN');
-    const sessionCookie = cookies.get('backend_bocchio_session');
-
     // Fetch all user's tenants to find the one matching the slug
-    const tenantsResponse = await fetch(`${PUBLIC_API_BASE_URL}/api/manage/tenants`, {
-        credentials: 'include',
-        headers: {
-            'Accept': 'application/json',
-            'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-            'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-        }
-    });
+    const tenantsResponse = await get('/api/manage/tenants', cookies);
 
     if (!tenantsResponse.ok) {
         throw error(500, 'Failed to load tenants');
     }
 
-    const tenants = (await tenantsResponse.json()).data;
+    const tenants = tenantsResponse.data.data;
     const tenant = tenants.find((t: any) => t.public_slug === params.slug);
 
     if (!tenant) {
@@ -37,20 +27,10 @@ export const load: LayoutServerLoad = async ({ cookies, locals, params, fetch })
     }
 
     // Get detailed tenant information with members
-    const tenantDetailResponse = await fetch(
-        `${PUBLIC_API_BASE_URL}/api/manage/tenants/${tenant.id}`,
-        {
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-                'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-            }
-        }
-    );
+    const tenantDetailResponse = await get(`/api/manage/tenants/${tenant.id}`, cookies);
 
     const tenantDetail = tenantDetailResponse.ok
-        ? (await tenantDetailResponse.json()).data
+        ? tenantDetailResponse.data.data
         : tenant;
 
     // Determine user's role in this tenant

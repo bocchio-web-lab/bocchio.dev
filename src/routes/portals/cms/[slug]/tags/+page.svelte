@@ -42,14 +42,18 @@
 			<h2 class="text-2xl font-bold tracking-tight">Tag Management</h2>
 			<p class="text-muted-foreground">Organize your content with tags</p>
 		</div>
-		<Button on:click={() => (showCreateDialog = true)}>Create New Tag</Button>
+		<Button onclick={() => (showCreateDialog = true)}>Create New Tag</Button>
 	</div>
 
 	{#if form?.success}
 		<Card.Root class="border-green-500">
 			<Card.Content class="pt-6">
-				<p class="text-green-600 text-sm">
-					Tag {form.action === 'create' ? 'created' : form.action === 'update' ? 'updated' : 'deleted'} successfully!
+				<p class="text-sm text-green-600">
+					Tag {form.action === 'create'
+						? 'created'
+						: form.action === 'update'
+							? 'updated'
+							: 'deleted'} successfully!
 				</p>
 			</Card.Content>
 		</Card.Root>
@@ -58,7 +62,7 @@
 	{#if form?.error}
 		<Card.Root class="border-destructive">
 			<Card.Content class="pt-6">
-				<p class="text-destructive text-sm">{form.error}</p>
+				<p class="text-sm text-destructive">{form.error}</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}
@@ -67,7 +71,7 @@
 		<Card.Header>
 			<Card.Title>
 				All Tags
-				<span class="text-muted-foreground text-sm font-normal">
+				<span class="text-sm font-normal text-muted-foreground">
 					({data.tags?.length || 0} total)
 				</span>
 			</Card.Title>
@@ -91,25 +95,38 @@
 									<Badge variant="outline">{tag.slug}</Badge>
 								</Table.Cell>
 								<Table.Cell>{tag.content_items_count || 0} items</Table.Cell>
-								<Table.Cell class="text-right space-x-2">
+								<Table.Cell class="space-x-2 text-right">
 									<Button
 										size="sm"
 										variant="outline"
-										on:click={() => (editingTag = tag)}
+										onclick={() => (editingTag = tag)}
 									>
 										Edit
 									</Button>
 									{#if deletingTagId === tag.id}
-										<form method="POST" action="?/delete" use:enhance class="inline">
-											<input type="hidden" name="id" value={tag.id} />
-											<Button type="submit" size="sm" variant="destructive">
+										<form
+											method="POST"
+											action="?/delete"
+											use:enhance
+											class="inline"
+										>
+											<input
+												type="hidden"
+												name="id"
+												value={tag.id}
+											/>
+											<Button
+												type="submit"
+												size="sm"
+												variant="destructive"
+											>
 												Confirm Delete
 											</Button>
 											<Button
 												type="button"
 												size="sm"
 												variant="outline"
-												on:click={() => (deletingTagId = null)}
+												onclick={() => (deletingTagId = null)}
 											>
 												Cancel
 											</Button>
@@ -118,7 +135,7 @@
 										<Button
 											size="sm"
 											variant="destructive"
-											on:click={() => (deletingTagId = tag.id)}
+											onclick={() => (deletingTagId = tag.id)}
 										>
 											Delete
 										</Button>
@@ -129,9 +146,9 @@
 					</Table.Body>
 				</Table.Root>
 			{:else}
-				<div class="text-center py-12">
-					<p class="text-muted-foreground mb-4">No tags yet</p>
-					<Button on:click={() => (showCreateDialog = true)}>Create Your First Tag</Button>
+				<div class="py-12 text-center">
+					<p class="mb-4 text-muted-foreground">No tags yet</p>
+					<Button onclick={() => (showCreateDialog = true)}>Create Your First Tag</Button>
 				</div>
 			{/if}
 		</Card.Content>
@@ -145,29 +162,49 @@
 			<Dialog.Title>Create New Tag</Dialog.Title>
 			<Dialog.Description>Add a new tag to organize your content</Dialog.Description>
 		</Dialog.Header>
-		<form method="POST" action="?/create" use:enhance={() => {
-			isSubmitting = true;
-			return async ({ update }) => {
-				await update();
-				isSubmitting = false;
-			};
-		}}>
+		<form
+			method="POST"
+			action="?/create"
+			use:enhance={() => {
+				isSubmitting = true;
+				return async ({ update }) => {
+					await update();
+					isSubmitting = false;
+				};
+			}}
+		>
 			<div class="space-y-4 py-4">
 				<div class="space-y-2">
 					<Label for="create-name">Name *</Label>
-					<Input id="create-name" name="name" placeholder="e.g., Laravel" required />
+					<Input
+						id="create-name"
+						name="name"
+						placeholder="e.g., Laravel"
+						required
+					/>
 				</div>
 				<div class="space-y-2">
 					<Label for="create-slug">Slug (optional)</Label>
-					<Input id="create-slug" name="slug" placeholder="e.g., laravel" />
+					<Input
+						id="create-slug"
+						name="slug"
+						placeholder="e.g., laravel"
+					/>
 					<p class="text-xs text-muted-foreground">Leave empty to auto-generate</p>
 				</div>
 			</div>
 			<Dialog.Footer>
-				<Button type="button" variant="outline" on:click={() => (showCreateDialog = false)}>
+				<Button
+					type="button"
+					variant="outline"
+					onclick={() => (showCreateDialog = false)}
+				>
 					Cancel
 				</Button>
-				<Button type="submit" disabled={isSubmitting}>
+				<Button
+					type="submit"
+					disabled={isSubmitting}
+				>
 					{isSubmitting ? 'Creating...' : 'Create Tag'}
 				</Button>
 			</Dialog.Footer>
@@ -176,21 +213,32 @@
 </Dialog.Root>
 
 <!-- Edit Tag Dialog -->
-<Dialog.Root open={editingTag !== null} onOpenChange={(open) => !open && (editingTag = null)}>
+<Dialog.Root
+	open={editingTag !== null}
+	onOpenChange={(open) => !open && (editingTag = null)}
+>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Edit Tag</Dialog.Title>
 			<Dialog.Description>Update tag information</Dialog.Description>
 		</Dialog.Header>
 		{#if editingTag}
-			<form method="POST" action="?/update" use:enhance={() => {
-				isSubmitting = true;
-				return async ({ update }) => {
-					await update();
-					isSubmitting = false;
-				};
-			}}>
-				<input type="hidden" name="id" value={editingTag.id} />
+			<form
+				method="POST"
+				action="?/update"
+				use:enhance={() => {
+					isSubmitting = true;
+					return async ({ update }) => {
+						await update();
+						isSubmitting = false;
+					};
+				}}
+			>
+				<input
+					type="hidden"
+					name="id"
+					value={editingTag.id}
+				/>
 				<div class="space-y-4 py-4">
 					<div class="space-y-2">
 						<Label for="edit-name">Name *</Label>
@@ -203,14 +251,26 @@
 					</div>
 					<div class="space-y-2">
 						<Label for="edit-slug">Slug *</Label>
-						<Input id="edit-slug" name="slug" value={editingTag.slug} required />
+						<Input
+							id="edit-slug"
+							name="slug"
+							value={editingTag.slug}
+							required
+						/>
 					</div>
 				</div>
 				<Dialog.Footer>
-					<Button type="button" variant="outline" on:click={() => (editingTag = null)}>
+					<Button
+						type="button"
+						variant="outline"
+						onclick={() => (editingTag = null)}
+					>
 						Cancel
 					</Button>
-					<Button type="submit" disabled={isSubmitting}>
+					<Button
+						type="submit"
+						disabled={isSubmitting}
+					>
 						{isSubmitting ? 'Saving...' : 'Save Changes'}
 					</Button>
 				</Dialog.Footer>

@@ -1,20 +1,18 @@
 // src/routes/portals/cms/[slug]/comments/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { get, post, del } from '$lib/server/http-server';
 import { fail } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ parent, cookies, fetch, url }) => {
+// Helper function to get tenant by slug
+async function getTenantBySlug(cookies: any, slug: string) {
+    const tenantsResponse = await get('/api/manage/tenants', cookies);
+    if (!tenantsResponse.ok) return null;
+    const tenants = tenantsResponse.data.data;
+    return tenants.find((t: any) => t.public_slug === slug);
+}
+
+export const load: PageServerLoad = async ({ parent, cookies, url }) => {
     const { tenant } = await parent();
-
-    const xsrfToken = cookies.get('XSRF-TOKEN');
-    const sessionCookie = cookies.get('backend_bocchio_session');
-
-    const headers = {
-        'Accept': 'application/json',
-        'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-        'X-Tenant-ID': tenant.id.toString(),
-        'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-    };
 
     const approved = url.searchParams.get('approved');
     const page = url.searchParams.get('page') || '1';
@@ -28,12 +26,11 @@ export const load: PageServerLoad = async ({ parent, cookies, fetch, url }) => {
         ? `/api/manage/cms/comments?${queryString}`
         : '/api/manage/cms/comments';
 
-    const response = await fetch(`${PUBLIC_API_BASE_URL}${endpoint}`, {
-        credentials: 'include',
-        headers
+    const response = await get(endpoint, cookies, {
+        headers: { 'X-Tenant-ID': tenant.id.toString() }
     });
 
-    const commentsData = response.ok ? await response.json() : { data: [], total: 0 };
+    const commentsData = response.ok ? response.data : { data: [], total: 0 };
 
     return {
         comments: commentsData.data || [],
@@ -48,100 +45,72 @@ export const load: PageServerLoad = async ({ parent, cookies, fetch, url }) => {
 };
 
 export const actions: Actions = {
-    approve: async ({ request, cookies, parent }) => {
-        const { tenant } = await parent();
-        const formData = await request.formData();
+    approve: async ({ request, cookies, params }) => {
+        const tenant = await getTenantBySlug(cookies, params.slug);
+        if (!tenant) return fail(404, { error: 'Tenant not found' });
 
-        const xsrfToken = cookies.get('XSRF-TOKEN');
-        const sessionCookie = cookies.get('backend_bocchio_session');
+        const formData = await request.formData();
 
         const commentId = formData.get('comment_id') as string;
 
-        const response = await fetch(
-            `${PUBLIC_API_BASE_URL}/api/manage/cms/comments/${commentId}/approve`,
-            {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-                    'X-Tenant-ID': tenant.id.toString(),
-                    'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-                }
-            }
+        const response = await post(
+            `/api/manage/cms/comments/${commentId}/approve`,
+            cookies,
+            undefined,
+            { headers: { 'X-Tenant-ID': tenant.id.toString() } }
         );
 
         if (!response.ok) {
-            const error = await response
-                .json()
-                .catch(() => ({ message: 'Failed to approve comment' }));
-            return fail(response.status, { error: error.message || 'Failed to approve comment' });
+            return fail(response.status, {
+                error: response.error?.message || 'Failed to approve comment'
+            });
         }
 
         return { success: true, action: 'approve' };
     },
 
-    reject: async ({ request, cookies, parent }) => {
-        const { tenant } = await parent();
-        const formData = await request.formData();
+    reject: async ({ request, cookies, params }) => {
+        const tenant = await getTenantBySlug(cookies, params.slug);
+        if (!tenant) return fail(404, { error: 'Tenant not found' });
 
-        const xsrfToken = cookies.get('XSRF-TOKEN');
-        const sessionCookie = cookies.get('backend_bocchio_session');
+        const formData = await request.formData();
 
         const commentId = formData.get('comment_id') as string;
 
-        const response = await fetch(
-            `${PUBLIC_API_BASE_URL}/api/manage/cms/comments/${commentId}/reject`,
-            {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-                    'X-Tenant-ID': tenant.id.toString(),
-                    'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-                }
-            }
+        const response = await post(
+            `/api/manage/cms/comments/${commentId}/reject`,
+            cookies,
+            undefined,
+            { headers: { 'X-Tenant-ID': tenant.id.toString() } }
         );
 
         if (!response.ok) {
-            const error = await response
-                .json()
-                .catch(() => ({ message: 'Failed to reject comment' }));
-            return fail(response.status, { error: error.message || 'Failed to reject comment' });
+            return fail(response.status, {
+                error: response.error?.message || 'Failed to reject comment'
+            });
         }
 
         return { success: true, action: 'reject' };
     },
 
-    delete: async ({ request, cookies, parent }) => {
-        const { tenant } = await parent();
-        const formData = await request.formData();
+    delete: async ({ request, cookies, params }) => {
+        const tenant = await getTenantBySlug(cookies, params.slug);
+        if (!tenant) return fail(404, { error: 'Tenant not found' });
 
-        const xsrfToken = cookies.get('XSRF-TOKEN');
-        const sessionCookie = cookies.get('backend_bocchio_session');
+        const formData = await request.formData();
 
         const commentId = formData.get('comment_id') as string;
 
-        const response = await fetch(
-            `${PUBLIC_API_BASE_URL}/api/manage/cms/comments/${commentId}`,
-            {
-                method: 'DELETE',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-                    'X-Tenant-ID': tenant.id.toString(),
-                    'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-                }
-            }
+        const response = await del(
+            `/api/manage/cms/comments/${commentId}`,
+            cookies,
+            { headers: { 'X-Tenant-ID': tenant.id.toString() } }
         );
 
         if (!response.ok) {
-            const error = await response
-                .json()
-                .catch(() => ({ message: 'Failed to delete comment' }));
-            return fail(response.status, { error: error.message || 'Failed to delete comment' });
+            return fail(response.status, {
+                error: response.error?.message || 'Failed to delete comment'
+            });
         }
 
         return { success: true, action: 'delete' };

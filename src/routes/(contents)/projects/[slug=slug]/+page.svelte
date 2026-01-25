@@ -1,108 +1,94 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import type { PageData } from './$types';
 
-	interface Props {
-		data: {
-		project: {
-			name: string;
-			slug: string;
-			image?: string;
-			description?: string;
-			readme_html?: string;
-			year?: number;
-			repo_url?: string;
-			website_url?: string;
-		};
-	};
-	}
+	let { data }: { data: PageData } = $props();
 
-	let { data }: Props = $props();
+	// We use a simple alias for brevity in the template
+	const project = $derived(data.project);
 </script>
 
 <svelte:head>
-	<title>{data.project.name}</title>
+	<title>{project.title}</title>
 	<meta
 		name="description"
-		content={data.project.description ?? 'Project details'}
+		content={project.excerpt ?? 'Project details'}
 	/>
 	<meta
 		property="og:title"
-		content={data.project.name}
+		content={project.title}
 	/>
 	<meta
 		property="og:description"
-		content={data.project.description ?? ''}
+		content={project.excerpt ?? ''}
 	/>
-	{#if data.project.image}
-		<meta
-			property="og:image"
-			content={data.project.image}
-		/>
-	{/if}
+	<meta
+		property="og:image"
+		content={project.display_image}
+	/>
 </svelte:head>
 
 <article class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-	<!-- Header -->
 	<header class="mb-8">
 		<div class="mb-4 flex flex-wrap items-center justify-between gap-4">
-			<h1 class="text-4xl font-bold tracking-tight">{data.project.name}</h1>
-			{#if data.project.year}
-				<span class="text-sm text-muted-foreground">{data.project.year}</span>
+			<h1 class="text-4xl font-bold tracking-tight">{project.title}</h1>
+			{#if project.year}
+				<span class="text-sm text-muted-foreground">{project.year}</span>
 			{/if}
 		</div>
 
-		{#if data.project.description}
-			<p class="text-lg text-muted-foreground">{data.project.description}</p>
+		{#if project.excerpt}
+			<p class="text-lg text-muted-foreground">{project.excerpt}</p>
 		{/if}
 
-		{#if data.project.repo_url || data.project.website_url}
+		{#if project.repo_url || project.website_url}
 			<div class="mt-6 flex flex-wrap gap-3">
-				{#if data.project.website_url}
-					<Button asChild>
-						<a
-							href={data.project.website_url}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Visit Website
-						</a>
+				{#if project.website_url}
+					<Button
+						href={project.website_url}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Visit Website
 					</Button>
 				{/if}
-				{#if data.project.repo_url}
+				{#if project.repo_url}
 					<Button
-						asChild
+						href={project.repo_url}
 						variant="outline"
+						target="_blank"
+						rel="noopener noreferrer"
 					>
-						<a
-							href={data.project.repo_url}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							View Repository
-						</a>
+						View Repository
 					</Button>
 				{/if}
 			</div>
 		{/if}
 	</header>
 
-	<!-- Project Image -->
-	{#if data.project.image}
-		<div class="mb-10 overflow-hidden rounded-lg border border-border">
-			<img
-				src={data.project.image}
-				alt={data.project.name}
-				class="h-auto w-full object-cover"
-			/>
-		</div>
-	{/if}
+	<div class="mb-10 overflow-hidden rounded-lg border border-border">
+		<img
+			src={project.display_image}
+			alt={project.title}
+			class="h-auto w-full object-cover"
+		/>
+	</div>
 
-	<!-- README Content -->
-	<div class="prose prose-neutral dark:prose-invert max-w-none">
-		{#if data.project.readme_html}
-			{@html data.project.readme_html}
+	<div class="prose max-w-none prose-neutral dark:prose-invert">
+		{#if project.body}
+			{@html project.body}
 		{:else}
-			<p class="text-muted-foreground">No detailed information available for this project.</p>
+			<p class="text-muted-foreground">No detailed information available.</p>
 		{/if}
 	</div>
+
+	{#if project.tags?.length}
+		<div class="mt-8 flex flex-wrap gap-2">
+			{#each project.tags as tag}
+				<span class="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground">
+					{tag.name}
+				</span>
+			{/each}
+		</div>
+	{/if}
 </article>

@@ -32,7 +32,10 @@
 			<h2 class="text-2xl font-bold tracking-tight">Create New Content</h2>
 			<p class="text-muted-foreground">Add a new post, page, or project</p>
 		</div>
-		<Button href={`/portals/cms/${data.tenant.public_slug}/content`} variant="outline">
+		<Button
+			href={`/portals/cms/${data.tenant.public_slug}/content`}
+			variant="outline"
+		>
 			Cancel
 		</Button>
 	</div>
@@ -40,18 +43,21 @@
 	{#if form?.error}
 		<Card.Root class="border-destructive">
 			<Card.Content class="pt-6">
-				<p class="text-destructive text-sm">{form.error}</p>
+				<p class="text-sm text-destructive">{form.error}</p>
 			</Card.Content>
 		</Card.Root>
 	{/if}
 
-	<form method="POST" use:enhance={() => {
-		isSubmitting = true;
-		return async ({ update }) => {
-			await update();
-			isSubmitting = false;
-		};
-	}}>
+	<form
+		method="POST"
+		use:enhance={() => {
+			isSubmitting = true;
+			return async ({ update }) => {
+				await update();
+				isSubmitting = false;
+			};
+		}}
+	>
 		<div class="space-y-6">
 			<Card.Root>
 				<Card.Header>
@@ -60,24 +66,24 @@
 				<Card.Content class="space-y-4">
 					<!-- Content Type -->
 					<div class="space-y-2">
-						<Label for="type">Content Type *</Label>
-						<select
+						<Label for="type">Type *</Label>
+						<Input
 							id="type"
 							name="type"
-							bind:value={selectedType}
+							placeholder="e.g., post, page, project"
 							required
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-						>
-							<option value="post">Blog Post</option>
-							<option value="page">Page</option>
-							<option value="project">Project</option>
-						</select>
+						/>
 					</div>
 
 					<!-- Title -->
 					<div class="space-y-2">
 						<Label for="title">Title *</Label>
-						<Input id="title" name="title" placeholder="Enter title" required />
+						<Input
+							id="title"
+							name="title"
+							placeholder="Enter title"
+							required
+						/>
 					</div>
 
 					<!-- Slug -->
@@ -88,9 +94,7 @@
 							name="slug"
 							placeholder="auto-generated-from-title"
 						/>
-						<p class="text-xs text-muted-foreground">
-							Leave empty to auto-generate from title
-						</p>
+						<p class="text-xs text-muted-foreground">Leave empty to auto-generate from title</p>
 					</div>
 
 					<!-- Excerpt -->
@@ -153,9 +157,7 @@
 								name="published_at"
 								type="datetime-local"
 							/>
-							<p class="text-xs text-muted-foreground">
-								Leave empty to use current date/time
-							</p>
+							<p class="text-xs text-muted-foreground">Leave empty to use current date/time</p>
 						</div>
 					{/if}
 
@@ -181,7 +183,7 @@
 										/>
 										<Label
 											for={`tag-${tag.id}`}
-											class="text-sm font-normal cursor-pointer"
+											class="cursor-pointer text-sm font-normal"
 										>
 											{tag.name}
 										</Label>
@@ -201,7 +203,10 @@
 				>
 					Cancel
 				</Button>
-				<Button type="submit" disabled={isSubmitting}>
+				<Button
+					type="submit"
+					disabled={isSubmitting}
+				>
 					{isSubmitting ? 'Creating...' : 'Create Content'}
 				</Button>
 			</div>
