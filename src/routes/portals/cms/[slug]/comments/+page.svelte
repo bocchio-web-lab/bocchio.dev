@@ -79,7 +79,7 @@
 		</Card.Header>
 		<Card.Content>
 			<div class="w-48">
-				<Select.Root
+				<!-- <Select.Root
 					onSelectedChange={(v) => updateFilter(v?.value || 'all')}
 					selected={{
 						value: getFilterValue(),
@@ -99,7 +99,7 @@
 						<Select.Item value="false">Pending</Select.Item>
 						<Select.Item value="true">Approved</Select.Item>
 					</Select.Content>
-				</Select.Root>
+				</Select.Root> -->
 			</div>
 		</Card.Content>
 	</Card.Root>

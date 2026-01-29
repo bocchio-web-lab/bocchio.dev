@@ -1,37 +1,20 @@
 // src/routes/user/dashboard/+page.server.ts
 import type { PageServerLoad } from './$types';
-import { requireAuth } from '$lib/server/auth';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { requireAuth } from '$lib/api/auth.server';
+import { createServerHttpClient } from '$lib/api/http.server';
 
-export const load: PageServerLoad = async ({ cookies, locals, fetch }) => {
+export const load: PageServerLoad = async ({ cookies, locals }) => {
     await requireAuth(cookies);
 
-    const xsrfToken = cookies.get('XSRF-TOKEN');
-    const sessionCookie = cookies.get('backend_bocchio_session');
+    const httpClient = createServerHttpClient(cookies);
 
     // Fetch services
-    const servicesResponse = await fetch(`${PUBLIC_API_BASE_URL}/api/manage/services`, {
-        credentials: 'include',
-        headers: {
-            'Accept': 'application/json',
-            'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-            'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-        }
-    });
-
-    const services = servicesResponse.ok ? (await servicesResponse.json()).data : [];
+    const servicesResponse = await httpClient.get('/api/manage/services');
+    const services = servicesResponse.ok ? servicesResponse.data.data : [];
 
     // Fetch user's tenants
-    const tenantsResponse = await fetch(`${PUBLIC_API_BASE_URL}/api/manage/tenants`, {
-        credentials: 'include',
-        headers: {
-            'Accept': 'application/json',
-            'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-            'Cookie': `backend_bocchio_session=${sessionCookie}; XSRF-TOKEN=${xsrfToken}`
-        }
-    });
-
-    const tenants = tenantsResponse.ok ? (await tenantsResponse.json()).data : [];
+    const tenantsResponse = await httpClient.get('/api/manage/tenants');
+    const tenants = tenantsResponse.ok ? tenantsResponse.data.data : [];
 
     return {
         user: locals.user,

@@ -46,7 +46,7 @@
 					<TimelineDot>
 						<button onclick={() => goto(`/projects/${project.slug}`)}>
 							<img
-								src={(project.meta?.image as string) ||
+								src={(project.meta?.headerImages[0] as string) ||
 									'https://avatars.githubusercontent.com/u/67842431'}
 								alt={project.title}
 								class="h-full w-full max-w-sm rounded-lg object-cover transition-transform duration-300 hover:scale-105"

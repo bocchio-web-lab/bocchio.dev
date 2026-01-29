@@ -1,14 +1,16 @@
 // src/routes/portals/cms/[slug]/+layout.server.ts
 import type { LayoutServerLoad } from './$types';
-import { requireAuth } from '$lib/server/auth';
-import { get } from '$lib/server/http-server';
+import { requireAuth } from '$lib/api/auth.server';
+import { createServerHttpClient } from '$lib/api/http.server';
 import { error } from '@sveltejs/kit';
 
 export const load: LayoutServerLoad = async ({ cookies, locals, params }) => {
     await requireAuth(cookies);
 
+    const httpClient = createServerHttpClient(cookies);
+
     // Fetch all user's tenants to find the one matching the slug
-    const tenantsResponse = await get('/api/manage/tenants', cookies);
+    const tenantsResponse = await httpClient.get('/api/manage/tenants');
 
     if (!tenantsResponse.ok) {
         throw error(500, 'Failed to load tenants');
@@ -27,7 +29,7 @@ export const load: LayoutServerLoad = async ({ cookies, locals, params }) => {
     }
 
     // Get detailed tenant information with members
-    const tenantDetailResponse = await get(`/api/manage/tenants/${tenant.id}`, cookies);
+    const tenantDetailResponse = await httpClient.get(`/api/manage/tenants/${tenant.id}`);
 
     const tenantDetail = tenantDetailResponse.ok
         ? tenantDetailResponse.data.data

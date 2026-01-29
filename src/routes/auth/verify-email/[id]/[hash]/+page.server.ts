@@ -1,7 +1,7 @@
 // src/routes/auth/verify-email/[id]/[hash]/+page.server.ts
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { verifyEmail } from '$lib/server/auth';
+import { createAuthService } from '$lib/api/auth.server';
 
 export const load = (async ({ cookies, params, url }) => {
     const { id, hash } = params;
@@ -12,7 +12,8 @@ export const load = (async ({ cookies, params, url }) => {
         throw redirect(302, '/auth/verify-email?error=invalid');
     }
 
-    const result = await verifyEmail(id, hash, expires, signature, cookies);
+    const authService = createAuthService(cookies);
+    const result = await authService.verifyEmail(id, hash, expires, signature);
 
     if (result.success) {
         throw redirect(302, '/user/dashboard?verified=1');

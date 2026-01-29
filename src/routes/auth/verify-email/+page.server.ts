@@ -1,12 +1,13 @@
 // src/routes/auth/verify-email/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { requireAuth, resendVerification, getUser } from '$lib/server/auth';
+import { requireAuth, createAuthService } from '$lib/api/auth.server';
 
 export const load = (async ({ cookies }) => {
     await requireAuth(cookies);
 
-    const user = await getUser(cookies);
+    const authService = createAuthService(cookies);
+    const user = await authService.getUser();
 
     // If already verified, redirect to dashboard
     if (user?.email_verified_at) {
@@ -22,7 +23,8 @@ export const actions = {
     resend: async ({ cookies }) => {
         await requireAuth(cookies);
 
-        const result = await resendVerification(cookies);
+        const authService = createAuthService(cookies);
+        const result = await authService.resendVerification();
 
         if (!result.success) {
             return fail(422, {

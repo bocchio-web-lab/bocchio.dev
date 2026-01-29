@@ -1,9 +1,10 @@
 // src/routes/portals/cms/[slug]/content/+page.server.ts
 import type { PageServerLoad } from './$types';
-import { get } from '$lib/server/http-server';
+import { createServerHttpClient } from '$lib/api/http.server';
 
 export const load: PageServerLoad = async ({ parent, cookies, url }) => {
     const { tenant } = await parent();
+    const httpClient = createServerHttpClient(cookies);
 
     // Get filter params from URL
     const type = url.searchParams.get('type') || '';
@@ -21,7 +22,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
         ? `/api/manage/cms/content?${queryString}`
         : '/api/manage/cms/content';
 
-    const response = await get(endpoint, cookies, {
+    const response = await httpClient.get(endpoint, {
         headers: { 'X-Tenant-ID': tenant.id.toString() }
     });
 

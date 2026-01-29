@@ -9,7 +9,7 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
-	import { Home, RefreshCw } from '@lucide/svelte';
+	import { House, RefreshCw } from '@lucide/svelte';
 
 	let status = $derived(page.status);
 	let message = $derived(page.error?.message || 'An unexpected error occurred');
@@ -32,19 +32,19 @@
 			</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<p class="text-muted-foreground text-center">{message}</p>
+			<p class="text-center text-muted-foreground">{message}</p>
 		</CardContent>
 		<CardFooter class="flex justify-center gap-2">
 			<Button
 				variant="outline"
 				href="/"
 			>
-				<Home class="mr-2 h-4 w-4" />
+				<House class="mr-2 h-4 w-4" />
 				Go Home
 			</Button>
 			<Button
 				variant="default"
-				on:click={() => window.location.reload()}
+				onclick={() => window.location.reload()}
 			>
 				<RefreshCw class="mr-2 h-4 w-4" />
 				Retry

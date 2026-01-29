@@ -1,11 +1,12 @@
 // src/routes/portals/cms/[slug]/tags/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
-import { get, post, put, del } from '$lib/server/http-server';
+import { createServerHttpClient } from '$lib/api/http.server';
 import { fail } from '@sveltejs/kit';
 
 // Helper function to get tenant by slug
 async function getTenantBySlug(cookies: any, slug: string) {
-    const tenantsResponse = await get('/api/manage/tenants', cookies);
+    const httpClient = createServerHttpClient(cookies);
+    const tenantsResponse = await httpClient.get('/api/manage/tenants');
     if (!tenantsResponse.ok) return null;
     const tenants = tenantsResponse.data.data;
     return tenants.find((t: any) => t.public_slug === slug);
@@ -13,8 +14,9 @@ async function getTenantBySlug(cookies: any, slug: string) {
 
 export const load: PageServerLoad = async ({ parent, cookies }) => {
     const { tenant } = await parent();
+    const httpClient = createServerHttpClient(cookies);
 
-    const response = await get('/api/manage/cms/tags', cookies, {
+    const response = await httpClient.get('/api/manage/cms/tags', {
         headers: { 'X-Tenant-ID': tenant.id.toString() }
     });
 
@@ -28,6 +30,7 @@ export const actions: Actions = {
         const tenant = await getTenantBySlug(cookies, params.slug);
         if (!tenant) return fail(404, { error: 'Tenant not found' });
 
+        const httpClient = createServerHttpClient(cookies);
         const formData = await request.formData();
 
         const name = formData.get('name') as string;
@@ -36,7 +39,7 @@ export const actions: Actions = {
         const payload: any = { name };
         if (slug) payload.slug = slug;
 
-        const response = await post('/api/manage/cms/tags', cookies, payload, {
+        const response = await httpClient.post('/api/manage/cms/tags', payload, {
             headers: { 'X-Tenant-ID': tenant.id.toString() }
         });
 
@@ -53,6 +56,7 @@ export const actions: Actions = {
         const tenant = await getTenantBySlug(cookies, params.slug);
         if (!tenant) return fail(404, { error: 'Tenant not found' });
 
+        const httpClient = createServerHttpClient(cookies);
         const formData = await request.formData();
 
         const id = formData.get('id') as string;
@@ -61,7 +65,7 @@ export const actions: Actions = {
 
         const payload: any = { name, slug };
 
-        const response = await put(`/api/manage/cms/tags/${id}`, cookies, payload, {
+        const response = await httpClient.put(`/api/manage/cms/tags/${id}`, payload, {
             headers: { 'X-Tenant-ID': tenant.id.toString() }
         });
 
@@ -78,11 +82,12 @@ export const actions: Actions = {
         const tenant = await getTenantBySlug(cookies, params.slug);
         if (!tenant) return fail(404, { error: 'Tenant not found' });
 
+        const httpClient = createServerHttpClient(cookies);
         const formData = await request.formData();
 
         const id = formData.get('id') as string;
 
-        const response = await del(`/api/manage/cms/tags/${id}`, cookies, {
+        const response = await httpClient.delete(`/api/manage/cms/tags/${id}`, {
             headers: { 'X-Tenant-ID': tenant.id.toString() }
         });
 

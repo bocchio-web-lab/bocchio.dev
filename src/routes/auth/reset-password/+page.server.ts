@@ -1,11 +1,12 @@
 // src/routes/auth/reset-password/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { resetPassword, isAuthenticated } from '$lib/server/auth';
+import { createAuthService } from '$lib/api/auth.server';
 
 export const load = (async ({ cookies, url }) => {
+    const authService = createAuthService(cookies);
     // Redirect if already authenticated
-    if (await isAuthenticated(cookies)) {
+    if (await authService.isAuthenticated()) {
         throw redirect(302, '/user/dashboard');
     }
 
@@ -51,7 +52,8 @@ export const actions = {
             });
         }
 
-        const result = await resetPassword(token, email, password, password_confirmation, cookies);
+        const authService = createAuthService(cookies);
+        const result = await authService.resetPassword(token, email, password, password_confirmation);
 
         if (!result.success) {
             return fail(422, {

@@ -1,11 +1,12 @@
 // src/routes/auth/register/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { register, isAuthenticated } from '$lib/server/auth';
+import { createAuthService } from '$lib/api/auth.server';
 
 export const load = (async ({ cookies }) => {
+    const authService = createAuthService(cookies);
     // Redirect if already authenticated
-    if (await isAuthenticated(cookies)) {
+    if (await authService.isAuthenticated()) {
         throw redirect(302, '/user/dashboard');
     }
 }) satisfies PageServerLoad;
@@ -34,15 +35,13 @@ export const actions = {
             });
         }
 
-        const result = await register(
-            {
-                name,
-                email,
-                password,
-                password_confirmation
-            },
-            cookies
-        );
+        const authService = createAuthService(cookies);
+        const result = await authService.register({
+            name,
+            email,
+            password,
+            password_confirmation
+        });
 
         if (!result.success) {
             return fail(422, {

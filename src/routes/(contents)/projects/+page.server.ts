@@ -1,13 +1,11 @@
 import type { PageServerLoad } from './$types';
-import { PUBLIC_CMS_TENANT_SLUG } from '$env/static/public';
-import { HttpClient } from '$lib/api/http-client';
+import { httpClient } from '$lib/api/http';
+import { CMS_TENANT_SLUG } from '$lib/api/constants';
 import type { ContentItem, PaginatedResponse } from '$lib/types/cms';
 
 export const load: PageServerLoad = async () => {
-    const client = new HttpClient();
-
-    const response = await client.get<PaginatedResponse<ContentItem>>(
-        `/api/content/cms/${PUBLIC_CMS_TENANT_SLUG}/projects`
+    const response = await httpClient.get<PaginatedResponse<ContentItem>>(
+        `/api/content/cms/${CMS_TENANT_SLUG}/projects`
     );
 
     return {

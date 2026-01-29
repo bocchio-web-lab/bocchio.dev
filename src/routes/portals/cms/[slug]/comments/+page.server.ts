@@ -1,11 +1,12 @@
 // src/routes/portals/cms/[slug]/comments/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
-import { get, post, del } from '$lib/server/http-server';
+import { createServerHttpClient } from '$lib/api/http.server';
 import { fail } from '@sveltejs/kit';
 
 // Helper function to get tenant by slug
 async function getTenantBySlug(cookies: any, slug: string) {
-    const tenantsResponse = await get('/api/manage/tenants', cookies);
+    const httpClient = createServerHttpClient(cookies);
+    const tenantsResponse = await httpClient.get('/api/manage/tenants');
     if (!tenantsResponse.ok) return null;
     const tenants = tenantsResponse.data.data;
     return tenants.find((t: any) => t.public_slug === slug);
@@ -13,6 +14,7 @@ async function getTenantBySlug(cookies: any, slug: string) {
 
 export const load: PageServerLoad = async ({ parent, cookies, url }) => {
     const { tenant } = await parent();
+    const httpClient = createServerHttpClient(cookies);
 
     const approved = url.searchParams.get('approved');
     const page = url.searchParams.get('page') || '1';
@@ -26,7 +28,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
         ? `/api/manage/cms/comments?${queryString}`
         : '/api/manage/cms/comments';
 
-    const response = await get(endpoint, cookies, {
+    const response = await httpClient.get(endpoint, {
         headers: { 'X-Tenant-ID': tenant.id.toString() }
     });
 
@@ -49,13 +51,13 @@ export const actions: Actions = {
         const tenant = await getTenantBySlug(cookies, params.slug);
         if (!tenant) return fail(404, { error: 'Tenant not found' });
 
+        const httpClient = createServerHttpClient(cookies);
         const formData = await request.formData();
 
         const commentId = formData.get('comment_id') as string;
 
-        const response = await post(
+        const response = await httpClient.post(
             `/api/manage/cms/comments/${commentId}/approve`,
-            cookies,
             undefined,
             { headers: { 'X-Tenant-ID': tenant.id.toString() } }
         );
@@ -73,13 +75,13 @@ export const actions: Actions = {
         const tenant = await getTenantBySlug(cookies, params.slug);
         if (!tenant) return fail(404, { error: 'Tenant not found' });
 
+        const httpClient = createServerHttpClient(cookies);
         const formData = await request.formData();
 
         const commentId = formData.get('comment_id') as string;
 
-        const response = await post(
+        const response = await httpClient.post(
             `/api/manage/cms/comments/${commentId}/reject`,
-            cookies,
             undefined,
             { headers: { 'X-Tenant-ID': tenant.id.toString() } }
         );
@@ -97,13 +99,13 @@ export const actions: Actions = {
         const tenant = await getTenantBySlug(cookies, params.slug);
         if (!tenant) return fail(404, { error: 'Tenant not found' });
 
+        const httpClient = createServerHttpClient(cookies);
         const formData = await request.formData();
 
         const commentId = formData.get('comment_id') as string;
 
-        const response = await del(
+        const response = await httpClient.delete(
             `/api/manage/cms/comments/${commentId}`,
-            cookies,
             { headers: { 'X-Tenant-ID': tenant.id.toString() } }
         );
 

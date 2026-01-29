@@ -1,6 +1,12 @@
 // src/lib/api/tenant-api.ts
-import { httpClient, type HttpResponse } from './http-client';
-import type { Service, Tenant, CreateTenantRequest, UpdateTenantRequest } from '$lib/types/platform';
+import { httpClient } from './http';
+import type { HttpResponse } from '$lib/types/http';
+import type {
+    Service,
+    Tenant,
+    CreateTenantRequest,
+    UpdateTenantRequest,
+} from '$lib/types/platform';
 
 /**
  * Platform Management API - Services and Tenants
@@ -52,5 +58,5 @@ export class TenantApi {
     }
 }
 
-// Export a singleton instance
+// Export singleton instance
 export const tenantApi = new TenantApi();

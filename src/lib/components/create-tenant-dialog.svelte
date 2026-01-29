@@ -4,7 +4,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { tenantApi } from '$lib/api/tenant-api';
+	import { tenantApi } from '$lib/api/tenant';
 	import type { Service } from '$lib/types/platform';
 
 	interface Props {

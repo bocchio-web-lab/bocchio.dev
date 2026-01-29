@@ -1,27 +1,28 @@
 // src/routes/portals/cms/[slug]/+page.server.ts
 import type { PageServerLoad } from './$types';
-import { get } from '$lib/server/http-server';
+import { createServerHttpClient } from '$lib/api/http.server';
 
 export const load: PageServerLoad = async ({ parent, cookies }) => {
     const { tenant } = await parent();
+    const httpClient = createServerHttpClient(cookies);
 
     const tenantId = tenant.id.toString();
 
     // Fetch content statistics
     const [postsRes, pagesRes, projectsRes, commentsRes, tagsRes] = await Promise.all([
-        get('/api/manage/cms/content?type=post&status=published', cookies, {
+        httpClient.get('/api/manage/cms/content?type=post&status=published', {
             headers: { 'X-Tenant-ID': tenantId }
         }),
-        get('/api/manage/cms/content?type=page&status=published', cookies, {
+        httpClient.get('/api/manage/cms/content?type=page&status=published', {
             headers: { 'X-Tenant-ID': tenantId }
         }),
-        get('/api/manage/cms/content?type=project&status=published', cookies, {
+        httpClient.get('/api/manage/cms/content?type=project&status=published', {
             headers: { 'X-Tenant-ID': tenantId }
         }),
-        get('/api/manage/cms/comments?approved=false', cookies, {
+        httpClient.get('/api/manage/cms/comments?approved=false', {
             headers: { 'X-Tenant-ID': tenantId }
         }),
-        get('/api/manage/cms/tags', cookies, {
+        httpClient.get('/api/manage/cms/tags', {
             headers: { 'X-Tenant-ID': tenantId }
         })
     ]);
@@ -33,7 +34,7 @@ export const load: PageServerLoad = async ({ parent, cookies }) => {
     const tags = tagsRes.ok ? tagsRes.data : { data: [] };
 
     // Fetch recent content
-    const recentContentRes = await get('/api/manage/cms/content', cookies, {
+    const recentContentRes = await httpClient.get('/api/manage/cms/content', {
         headers: { 'X-Tenant-ID': tenantId }
     });
 

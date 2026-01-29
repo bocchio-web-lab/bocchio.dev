@@ -20,6 +20,36 @@
 	let selectedStatus = $state('draft');
 	let selectedTags: number[] = $state([]);
 	let isSubmitting = $state(false);
+
+	// Meta properties
+	let headerImages: string[] = $state(['']);
+	let externalLinks: { title: string; url: string }[] = $state([{ title: '', url: '' }]);
+	let customMetaEntries: { key: string; value: string }[] = $state([]);
+
+	// Functions to manage meta arrays
+	function addHeaderImage() {
+		headerImages = [...headerImages, ''];
+	}
+
+	function removeHeaderImage(index: number) {
+		headerImages = headerImages.filter((_, i) => i !== index);
+	}
+
+	function addExternalLink() {
+		externalLinks = [...externalLinks, { title: '', url: '' }];
+	}
+
+	function removeExternalLink(index: number) {
+		externalLinks = externalLinks.filter((_, i) => i !== index);
+	}
+
+	function addCustomMetaEntry() {
+		customMetaEntries = [...customMetaEntries, { key: '', value: '' }];
+	}
+
+	function removeCustomMetaEntry(index: number) {
+		customMetaEntries = customMetaEntries.filter((_, i) => i !== index);
+	}
 </script>
 
 <svelte:head>
@@ -192,6 +222,134 @@
 							</div>
 						</div>
 					{/if}
+				</Card.Content>
+			</Card.Root>
+
+			<Card.Root>
+				<Card.Header>
+					<Card.Title>Meta Properties</Card.Title>
+					<p class="text-sm text-muted-foreground">
+						Additional metadata for your content (all optional)
+					</p>
+				</Card.Header>
+				<Card.Content class="space-y-6">
+					<!-- Header Carousel Images -->
+					<div class="space-y-3">
+						<div class="flex items-center justify-between">
+							<Label>Header Carousel Images</Label>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onclick={addHeaderImage}
+							>
+								Add Image
+							</Button>
+						</div>
+						{#each headerImages as image, index}
+							<div class="flex gap-2">
+								<Input
+									name="meta_header_images"
+									bind:value={headerImages[index]}
+									placeholder="https://example.com/image.jpg"
+									type="url"
+								/>
+								{#if headerImages.length > 1}
+									<Button
+										type="button"
+										variant="destructive"
+										size="icon"
+										onclick={() => removeHeaderImage(index)}
+									>
+										×
+									</Button>
+								{/if}
+							</div>
+						{/each}
+					</div>
+
+					<!-- External Resource Links -->
+					<div class="space-y-3">
+						<div class="flex items-center justify-between">
+							<Label>External Resource Links</Label>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onclick={addExternalLink}
+							>
+								Add Link
+							</Button>
+						</div>
+						{#each externalLinks as link, index}
+							<div class="flex gap-2">
+								<Input
+									name="meta_external_links_title"
+									bind:value={externalLinks[index].title}
+									placeholder="Link title"
+									class="w-1/3"
+								/>
+								<Input
+									name="meta_external_links_url"
+									bind:value={externalLinks[index].url}
+									placeholder="https://example.com"
+									type="url"
+								/>
+								{#if externalLinks.length > 1}
+									<Button
+										type="button"
+										variant="destructive"
+										size="icon"
+										onclick={() => removeExternalLink(index)}
+									>
+										×
+									</Button>
+								{/if}
+							</div>
+						{/each}
+					</div>
+
+					<!-- Custom Meta Fields -->
+					<div class="space-y-3">
+						<div class="flex items-center justify-between">
+							<Label>Custom Meta Fields</Label>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onclick={addCustomMetaEntry}
+							>
+								Add Field
+							</Button>
+						</div>
+						{#if customMetaEntries.length > 0}
+							{#each customMetaEntries as entry, index}
+								<div class="flex gap-2">
+									<Input
+										name="meta_custom_keys"
+										bind:value={customMetaEntries[index].key}
+										placeholder="Key"
+										class="w-1/3"
+									/>
+									<Input
+										name="meta_custom_values"
+										bind:value={customMetaEntries[index].value}
+										placeholder="Value"
+									/>
+									<Button
+										type="button"
+										variant="destructive"
+										size="icon"
+										onclick={() => removeCustomMetaEntry(index)}
+									>
+										×
+									</Button>
+								</div>
+							{/each}
+						{:else}
+							<p class="text-sm text-muted-foreground">No custom fields added</p>
+						{/if}
+					</div>
 				</Card.Content>
 			</Card.Root>
 
