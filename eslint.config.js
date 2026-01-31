@@ -9,25 +9,18 @@ export default [
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs['flat/recommended'],
+	...svelte.configs.prettier,
 	prettier,
 	...svelte.configs['flat/prettier'],
+
 	{
-		languageOptions: {
-			globals: {
-				...globals.browser,
-				...globals.node
-			}
-		}
+		languageOptions: { globals: { ...globals.browser, ...globals.node } }
 	},
+
 	{
 		files: ['**/*.svelte'],
-		languageOptions: {
-			parserOptions: {
-				parser: ts.parser
-			}
-		}
+		languageOptions: { parserOptions: { parser: ts.parser } }
 	},
-	{
-		ignores: ['build/', '.svelte-kit/', 'dist/']
-	}
+
+	{ ignores: ['build/', '.svelte-kit/', 'dist/'] }
 ];

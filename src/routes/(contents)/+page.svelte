@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { MailIcon, GithubIcon, LinkedinIcon } from 'lucide-svelte';
+	import { MailIcon, GithubIcon, LinkedinIcon } from '@lucide/svelte';
 </script>
 
 <svelte:head>
@@ -16,23 +16,25 @@
 >
 	<!-- Left content -->
 	<div class="content-wrapper max-w-xl space-y-6 text-center md:text-left">
-		<h1 class="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
+		<h1 class="text-4xl font-bold sm:text-5xl md:text-6xl">
 			Hey, I'm<br />
 			<span class="text-primary">Tommaso Bocchietti</span>
 		</h1>
 
 		<p class="subtitle text-lg leading-relaxed text-muted-foreground">
-			M.Sc. Mechatronics & Robotics Engineering<br />
-			Robotics Research @ DLR | Control & Dynamics Enthusiast
+			M.Sc. Mechatronics Engineering @ Politecnico di Milano<br />
+			Specialized in Dynamics, Control & Embedded Systems
 		</p>
 
 		<div class="bio-text space-y-4 text-muted-foreground">
 			<p>
-				I'm a passionate engineer with a strong background in system modeling, control theory, and
-				robotics. My work bridges mechanical design and intelligent systems, with experience across
-				modeling & simulation, control algorithms, and embedded systems.
+				Mechatronics engineer working at the intersection of mechanics and intelligent systems, with
+				hands-on experience in modeling and simulation, control design, and embedded development. I
+				focus on building optimized, reliable systems designed to operate in real-world conditions.
 			</p>
-			<p class="location font-medium text-foreground">Currently based in Munich, Germany</p>
+			<p class="font-medium text-foreground">
+				Currently based in Como, Italy <span>🇮🇹</span>
+			</p>
 		</div>
 
 		<!-- Social buttons -->
@@ -77,7 +79,7 @@
 
 	<!-- Right image -->
 	<div class="image-wrapper mt-10 shrink-0 md:mt-0">
-		<!-- svelte-ignore a11y-img-redundant-alt -->
+		<!-- svelte-ignore a11y_img_redundant_alt -->
 		<img
 			src="https://avatars.githubusercontent.com/u/67842431"
 			alt="Profile picture of Tommaso Bocchietti"

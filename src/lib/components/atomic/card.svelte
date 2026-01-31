@@ -1,5 +1,5 @@
 <script
-	context="module"
+	module
 	lang="ts"
 >
 	export type AtomicCardData = {
@@ -21,15 +21,20 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { cn } from '$lib/utils';
 
-	export let data: AtomicCardData;
-	export let preview: boolean = false;
-	export let className: HTMLAttributes<HTMLDivElement>['class'] = undefined;
-	export { className as class };
+	interface Props {
+		data: AtomicCardData;
+		preview?: boolean;
+		class?: HTMLAttributes<HTMLDivElement>['class'];
+		[key: string]: any
+	}
+
+	let { data, preview = false, class: className = undefined, ...rest }: Props = $props();
+	
 </script>
 
 <Card
 	class={cn('group w-full', className)}
-	{...$$restProps}
+	{...rest}
 	on:click
 >
 	{#if data.image}

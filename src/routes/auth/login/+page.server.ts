@@ -1,12 +1,13 @@
 // src/routes/auth/login/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { login, isAuthenticated } from '$lib/server/auth';
+import { createAuthService } from '$lib/api/auth.server';
 
 export const load = (async ({ cookies }) => {
+    const authService = createAuthService(cookies);
     // Redirect if already authenticated
-    if (await isAuthenticated(cookies)) {
-        throw redirect(302, '/dashboard');
+    if (await authService.isAuthenticated()) {
+        throw redirect(302, '/user/dashboard');
     }
     return {
         user: null
@@ -26,7 +27,8 @@ export const actions = {
             });
         }
 
-        const result = await login(email, password, cookies);
+        const authService = createAuthService(cookies);
+        const result = await authService.login(email, password);
 
         if (!result.success) {
             return fail(401, {
@@ -37,6 +39,6 @@ export const actions = {
         }
 
         // Redirect to dashboard on success
-        throw redirect(302, '/dashboard');
+        throw redirect(302, '/user/dashboard');
     }
 } satisfies Actions;

@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import IconRunningMan from '$lib/components/atomic/icon-running-man.svelte';
-	import { LogIn, SunMoonIcon, UserPlus, Cloud, LogOut, User } from 'lucide-svelte';
+	import { LogIn, SunMoonIcon, UserPlus, Cloud, LogOut, User } from '@lucide/svelte';
+	import { toggleMode } from 'mode-watcher';
 
-	$: user = $page.data.user;
+	let user = $derived(page.data.user);
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger>
+	<DropdownMenu.Trigger class="cursor-pointer">
 		<IconRunningMan className="h-9 sm:h-14" />
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
@@ -22,10 +24,8 @@
 
 			<!-- Appearance Section -->
 			<DropdownMenu.Item
-				on:click={() => {
-					const current = document.documentElement.dataset.theme;
-					document.documentElement.dataset.theme = current === 'dark' ? 'light' : 'dark';
-					localStorage.setItem('theme', document.documentElement.dataset.theme);
+				onclick={() => {
+					toggleMode();
 				}}
 				class="flex w-full cursor-pointer items-center"
 			>
@@ -39,7 +39,7 @@
 
 				<!-- Navigation -->
 				<DropdownMenu.Item
-					href="/dashboard/profile"
+					onclick={() => goto('/user/profile')}
 					class="flex w-full cursor-pointer items-center"
 				>
 					<User class="mr-2 h-4 w-4" />
@@ -47,26 +47,26 @@
 				</DropdownMenu.Item>
 
 				<DropdownMenu.Item
-					href="/dashboard"
+					onclick={() => goto('/user/dashboard')}
 					class="flex w-full cursor-pointer items-center"
 				>
 					<Cloud class="mr-2 h-4 w-4" />
-					API
+					Dashboard
 				</DropdownMenu.Item>
 
 				<DropdownMenu.Separator />
 
 				<!-- Logout -->
-				<DropdownMenu.Item>
+				<DropdownMenu.Item class="cursor-pointer">
 					<form
 						action="/auth/logout"
 						method="POST"
-						class="flex w-full cursor-pointer items-center"
+						class="flex w-full items-center"
 					>
 						<LogOut class="mr-2 h-4 w-4" />
 						<button
 							type="submit"
-							class="w-full text-left">Log out</button
+							class="w-full cursor-pointer text-left">Log out</button
 						>
 					</form>
 				</DropdownMenu.Item>
@@ -75,7 +75,7 @@
 
 				<!-- Login / Register -->
 				<DropdownMenu.Item
-					href="/auth/login"
+					onclick={() => goto('/auth/login')}
 					class="flex w-full cursor-pointer items-center"
 				>
 					<LogIn class="mr-2 h-4 w-4" />
@@ -83,7 +83,7 @@
 				</DropdownMenu.Item>
 
 				<DropdownMenu.Item
-					href="/auth/register"
+					onclick={() => goto('/auth/register')}
 					class="flex w-full cursor-pointer items-center"
 				>
 					<UserPlus class="mr-2 h-4 w-4" />

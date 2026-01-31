@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Card,
@@ -9,10 +9,10 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
-	import { Home, RefreshCw } from 'lucide-svelte';
+	import { House, RefreshCw } from '@lucide/svelte';
 
-	$: status = $page.status;
-	$: message = $page.error?.message || 'An unexpected error occurred';
+	let status = $derived(page.status);
+	let message = $derived(page.error?.message || 'An unexpected error occurred');
 </script>
 
 <main class="m-auto flex h-max w-full flex-col items-center justify-center px-4 py-8">
@@ -39,12 +39,12 @@
 				variant="outline"
 				href="/"
 			>
-				<Home class="mr-2 h-4 w-4" />
+				<House class="mr-2 h-4 w-4" />
 				Go Home
 			</Button>
 			<Button
 				variant="default"
-				on:click={() => window.location.reload()}
+				onclick={() => window.location.reload()}
 			>
 				<RefreshCw class="mr-2 h-4 w-4" />
 				Retry

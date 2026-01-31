@@ -1,7 +1,7 @@
 // src/routes/auth/logout/+page.server.ts
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { logout } from '$lib/server/auth';
+import { createAuthService } from '$lib/api/auth.server';
 
 export const load = (() => {
     // This page should only be accessed via POST action
@@ -10,7 +10,8 @@ export const load = (() => {
 
 export const actions = {
     default: async ({ cookies }) => {
-        await logout(cookies);
+        const authService = createAuthService(cookies);
+        await authService.logout();
         throw redirect(302, '/');
     }
 } satisfies Actions;
