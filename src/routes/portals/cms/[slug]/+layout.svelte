@@ -12,19 +12,15 @@
 	let { data, children }: Props = $props();
 
 	const navItems = [
-		{ href: '', label: 'Dashboard', exact: true },
 		{ href: '/content', label: 'Content' },
-		{ href: '/tags', label: 'Tags' },
-		{ href: '/comments', label: 'Comments' }
+		{ href: '/tags', label: 'Tags' }
+		// { href: '/comments', label: 'Comments' }
 	];
 
-	function isActive(item: { href: string; exact?: boolean }) {
+	function isActive(item: { href: string }): boolean {
 		const basePath = `/portals/cms/${data.tenant.public_slug}`;
 		const currentPath = page.url.pathname;
 
-		if (item.exact) {
-			return currentPath === basePath || currentPath === basePath + '/';
-		}
 		return currentPath.startsWith(basePath + item.href);
 	}
 
@@ -58,7 +54,11 @@
 					{data.userRole}
 				</Badge>
 			</div>
-			<Button href="/user/dashboard" variant="outline" size="sm">Back to Dashboard</Button>
+			<Button
+				href="/user/dashboard"
+				variant="outline"
+				size="sm">Back to Dashboard</Button
+			>
 		</div>
 	</div>
 </div>
@@ -71,9 +71,7 @@
 					href={`/portals/cms/${data.tenant.public_slug}${item.href}`}
 					variant={isActive(item) ? 'default' : 'ghost'}
 					size="sm"
-					class="rounded-none border-b-2 {isActive(item)
-						? 'border-primary'
-						: 'border-transparent'}"
+					class="rounded-none border-b-2 {isActive(item) ? 'border-primary' : 'border-transparent'}"
 				>
 					{item.label}
 				</Button>

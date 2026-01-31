@@ -26,7 +26,6 @@
 	/>
 </svelte:head>
 
-<div class="projects-container">
 	<Timeline position="right">
 		{#each projects as project, i}
 			<TimelineItem>
@@ -37,7 +36,7 @@
 							content: project.excerpt || ''
 						}}
 						clickable={true}
-						on:click={() => goto(`/projects/${project.slug}`)}
+						onclick={() => goto(`/projects/${project.slug}`)}
 						class="desktop-card"
 					/>
 				</TimelineOppositeContent>
@@ -49,7 +48,7 @@
 								src={(project.meta?.headerImages[0] as string) ||
 									'https://avatars.githubusercontent.com/u/67842431'}
 								alt={project.title}
-								class="h-full w-full max-w-sm rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+								class="h-full w-full max-w-sm rounded-lg object-cover transition-transform duration-300 hover:scale-105 cursor-pointer"
 							/>
 						</button>
 						<AtomicCard
@@ -58,7 +57,7 @@
 								content: project.excerpt || ''
 							}}
 							clickable={true}
-							on:click={() => goto(`/projects/${project.slug}`)}
+							onclick={() => goto(`/projects/${project.slug}`)}
 							class="mobile-card"
 						/>
 					</TimelineDot>
@@ -75,7 +74,7 @@
 							content: project.excerpt || ''
 						}}
 						clickable={true}
-						on:click={() => goto(`/projects/${project.slug}`)}
+						onclick={() => goto(`/projects/${project.slug}`)}
 						class="desktop-card"
 					/>
 				</TimelineContent>
@@ -83,6 +82,7 @@
 		{/each}
 	</Timeline>
 
+    {#if data.pagination && data.pagination.total > data.pagination.per_page}
 	<div class="mt-12 flex justify-center">
 		<Pagination.Root
 			count={data.pagination?.total || 0}
@@ -119,7 +119,7 @@
 			{/snippet}
 		</Pagination.Root>
 	</div>
-</div>
+    {/if}
 
 <style>
 	:global(.opposite-block) {

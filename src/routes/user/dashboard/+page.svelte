@@ -20,7 +20,7 @@
 
 	function getPortalLink(tenant: any) {
 		if (tenant.service.slug === 'cms') {
-			return `/portals/cms/${tenant.public_slug}`;
+			return `/portals/cms/${tenant.public_slug}/content`;
 		}
 		return '#';
 	}
@@ -83,7 +83,7 @@
 						{#each data.tenants as tenant}
 							{@const userMembership = tenant.users?.find((u: any) => u.id === data.user?.id)}
 							<Table.Row>
-								<!-- <Table.Cell class="font-medium">{tenant.name}</Table.Cell> -->
+								<Table.Cell class="font-medium">{tenant.name}</Table.Cell>
 								<Table.Cell>
 									<Badge variant="outline">{tenant.service?.name || 'Unknown'}</Badge>
 								</Table.Cell>
@@ -151,7 +151,10 @@
 							</Card.Content>
 							<Card.Footer>
 								{#if service.is_active}
-									<CreateTenantDialog {service} onSuccess={handleTenantCreated} />
+									<CreateTenantDialog
+										{service}
+										onSuccess={handleTenantCreated}
+									/>
 								{/if}
 							</Card.Footer>
 						</Card.Root>

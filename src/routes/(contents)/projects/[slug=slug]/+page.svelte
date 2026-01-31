@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	// We use a simple alias for brevity in the template
 	const project = $derived(data.project);
 </script>
 
@@ -24,70 +24,95 @@
 	/>
 	<meta
 		property="og:image"
-		content={project.display_image}
+		content={project.meta.headerImages?.[0] ?? ''}
 	/>
 </svelte:head>
 
-<article class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-	<header class="mb-8">
-		<div class="mb-4 flex flex-wrap items-center justify-between gap-4">
-			<h1 class="text-4xl font-bold tracking-tight">{project.title}</h1>
-			{#if project.year}
-				<span class="text-sm text-muted-foreground">{project.year}</span>
-			{/if}
-		</div>
+<article class="mx-auto max-w-4xl px-4 py-8">
+	<!-- Title and Metadata -->
+	<div class="mb-8">
+		<h1 class="mb-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+			{project.title}
+		</h1>
 
 		{#if project.excerpt}
-			<p class="text-lg text-muted-foreground">{project.excerpt}</p>
+			<p class="mb-4 text-xl text-muted-foreground">
+				{project.excerpt}
+			</p>
 		{/if}
 
-		{#if project.repo_url || project.website_url}
-			<div class="mt-6 flex flex-wrap gap-3">
-				{#if project.website_url}
-					<Button
-						href={project.website_url}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Visit Website
-					</Button>
-				{/if}
-				{#if project.repo_url}
-					<Button
-						href={project.repo_url}
-						variant="outline"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						View Repository
-					</Button>
-				{/if}
-			</div>
-		{/if}
-	</header>
+		<div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+			{#if project.author}
+				<div class="flex items-center gap-2">
+					<span class="font-medium text-foreground">{project.author.name}</span>
+				</div>
+			{/if}
 
-	<div class="mb-10 overflow-hidden rounded-lg border border-border">
-		<img
-			src={project.display_image}
-			alt={project.title}
-			class="h-auto w-full object-cover"
-		/>
+			{#if project.published_at}
+				<time datetime={project.published_at}>
+					{new Date(project.published_at).toLocaleDateString('en-US', {
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric'
+					})}
+				</time>
+			{/if}
+		</div>
 	</div>
 
-	<div class="prose max-w-none prose-neutral dark:prose-invert">
-		{#if project.body}
-			{@html project.body}
-		{:else}
-			<p class="text-muted-foreground">No detailed information available.</p>
-		{/if}
+	<!-- Image Carousel -->
+	{#if project.meta.headerImages && project.meta.headerImages.length > 0}
+		<header class="mb-8">
+			<Carousel.Root class="w-full">
+				<Carousel.Content>
+					{#each project.meta.headerImages as image}
+						<Carousel.Item>
+							<div class="aspect-video w-full overflow-hidden rounded-lg bg-muted">
+								<img
+									src={image}
+									alt={project.title}
+									class="h-auto w-auto object-center"
+								/>
+							</div>
+						</Carousel.Item>
+					{/each}
+				</Carousel.Content>
+				{#if project.meta.headerImages.length > 1}
+					<Carousel.Previous />
+					<Carousel.Next />
+				{/if}
+			</Carousel.Root>
+		</header>
+	{/if}
+
+	<!-- Content Body -->
+	<div class="prose-custom">
+        {@html project.body}
 	</div>
 
-	{#if project.tags?.length}
-		<div class="mt-8 flex flex-wrap gap-2">
+
+	<!-- Tags -->
+	{#if project.tags && project.tags.length > 0}
+		<div class="mt-4 flex flex-wrap gap-2">
 			{#each project.tags as tag}
-				<span class="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground">
+				<span class="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
 					{tag.name}
 				</span>
+			{/each}
+		</div>
+	{/if}
+
+	<!-- Project URLs -->
+	{#if project.meta.externalLinks && project.meta.externalLinks.length > 0}
+		<div class="mt-6 flex flex-wrap gap-3">
+			{#each project.meta.externalLinks as link}
+				<Button
+					href={link.url}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{link.title}
+				</Button>
 			{/each}
 		</div>
 	{/if}

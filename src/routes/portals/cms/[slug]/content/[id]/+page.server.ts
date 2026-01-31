@@ -48,6 +48,7 @@ export const actions: Actions = {
         const httpClient = createServerHttpClient(cookies);
         const formData = await request.formData();
 
+        const type = formData.get('type') as string;
         const title = formData.get('title') as string;
         const slug = formData.get('slug') as string;
         const excerpt = formData.get('excerpt') as string;
@@ -94,6 +95,7 @@ export const actions: Actions = {
         }
 
         const payload: any = {
+            type,
             title,
             body,
             status

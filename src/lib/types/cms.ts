@@ -1,82 +1,167 @@
 // src/lib/types/cms.ts
-// Types for CMS Management API
+
+/* ============================================================
+   Core Enums
+============================================================ */
 
 export type ContentType = 'post' | 'page' | 'project';
 export type ContentStatus = 'draft' | 'published' | 'archived';
 
-export interface Author {
+
+/* ============================================================
+   Shared / Utility Types
+============================================================ */
+
+export interface Timestamped {
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Identifiable {
     id: number;
+}
+
+
+/* ============================================================
+   Author
+============================================================ */
+
+export interface Author extends Identifiable {
     name: string;
     email: string;
 }
 
-export interface Tag {
-    id: number;
+
+/* ============================================================
+   Tags
+============================================================ */
+
+export interface Tag extends Identifiable, Partial<Timestamped> {
     tenant_id?: number;
     name: string;
     slug: string;
-    created_at?: string;
-    updated_at?: string;
     content_items_count?: number;
 }
 
-export interface Comment {
-    id: number;
+
+/* ============================================================
+   Comments
+============================================================ */
+
+export interface Comment extends Identifiable, Timestamped {
     content_item_id: number;
     author_id: number;
     body: string;
     approved: boolean;
-    created_at: string;
-    updated_at: string;
-    content_item?: {
-        id: number;
-        title: string;
-        slug: string;
-    };
+
+    content_item?: Pick<ContentItemBase, 'id' | 'title' | 'slug'>;
     author?: Author;
 }
 
-export interface ContentItem {
-    id: number;
+
+/* ============================================================
+   Meta Models
+============================================================ */
+
+export interface ProjectMeta {
+    headerImages: string[];
+    externalLinks?: { title: string; url: string }[];
+}
+
+export interface AppMeta {
+    headerImages: string[];
+    externalLinks?: { title: string; url: string }[];
+}
+
+
+/* ============================================================
+   Content Items
+============================================================ */
+
+interface ContentItemBase extends Identifiable, Timestamped {
     tenant_id: number;
-    type: ContentType;
+
     title: string;
     slug: string;
     excerpt?: string;
     body: string;
+
     status: ContentStatus;
     author_id: number;
     published_at?: string;
-    meta?: Record<string, unknown>;
-    created_at: string;
-    updated_at: string;
+
     author?: Author;
     tags?: Tag[];
     comments?: Comment[];
 }
 
-export interface CreateContentRequest {
-    type: ContentType;
+
+/* ---------- Variants ---------- */
+
+export interface ProjectContentItem extends ContentItemBase {
+    type: 'project';
+    meta: ProjectMeta;
+}
+
+export interface AppContentItem extends ContentItemBase {
+    type: 'app';
+    meta: AppMeta;
+}
+
+export interface PostContentItem extends ContentItemBase {
+    type: 'post';
+    meta: null;
+}
+
+
+export type ContentItem =
+    | ProjectContentItem
+    | PostContentItem
+    | AppContentItem;
+
+
+/* ============================================================
+   Create / Update DTOs (Discriminated)
+============================================================ */
+
+interface BaseContentRequest {
     title: string;
     slug?: string;
     excerpt?: string;
     body: string;
     status?: ContentStatus;
     published_at?: string;
-    meta?: Record<string, unknown>;
     tags?: number[];
 }
 
-export interface UpdateContentRequest {
-    title?: string;
-    slug?: string;
-    excerpt?: string;
-    body?: string;
-    status?: ContentStatus;
-    published_at?: string;
-    meta?: Record<string, unknown>;
-    tags?: number[];
-}
+/* ---------- Create ---------- */
+
+export type CreateContentRequest =
+    | (BaseContentRequest & {
+        type: 'project';
+        meta: ProjectMeta;
+    })
+    | (BaseContentRequest & {
+        type: 'post' | 'app';
+        meta?: null;
+    });
+
+/* ---------- Update ---------- */
+
+export type UpdateContentRequest =
+    | (Partial<BaseContentRequest> & {
+        type: 'project';
+        meta?: ProjectMeta;
+    })
+    | (Partial<BaseContentRequest> & {
+        type: 'post' | 'page';
+        meta?: null;
+    });
+
+
+/* ============================================================
+   Tag DTOs
+============================================================ */
 
 export interface CreateTagRequest {
     name: string;
@@ -87,6 +172,11 @@ export interface UpdateTagRequest {
     name?: string;
     slug?: string;
 }
+
+
+/* ============================================================
+   Pagination
+============================================================ */
 
 export interface PaginatedResponse<T> {
     current_page: number;

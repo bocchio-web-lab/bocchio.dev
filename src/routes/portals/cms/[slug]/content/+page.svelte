@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import * as Pagination from '$lib/components/ui/pagination';
+
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -21,13 +23,16 @@
 		{ value: 'archived', label: 'Archived' }
 	];
 
-	// To be retrived from server (unique for each tenant)
-	const type_options = [
+	const type_options = $derived([
 		{ value: '', label: 'All Types' },
-		{ value: 'post', label: 'Posts' },
-		{ value: 'page', label: 'Pages' },
-		{ value: 'project', label: 'Projects' }
-	];
+		...data.content.map((item: { type: string }) => ({
+			value: item.type,
+			label:
+				item.type.charAt(0).toUpperCase() +
+				item.type.slice(1) +
+				(item.type.endsWith('s') ? '' : 's')
+		}))
+	]);
 
 	let status = $state('');
 	let type = $state('');
@@ -48,19 +53,13 @@
 	}
 
 	function updateFilter(param: string, value: string) {
-		const url = new URL($page.url);
+		const url = new URL(page.url);
 		if (value) {
 			url.searchParams.set(param, value);
 		} else {
 			url.searchParams.delete(param);
 		}
 		url.searchParams.delete('page'); // Reset to first page on filter change
-		goto(url.toString());
-	}
-
-	function changePage(newPage: number) {
-		const url = new URL($page.url);
-		url.searchParams.set('page', newPage.toString());
 		goto(url.toString());
 	}
 </script>
@@ -159,78 +158,91 @@
 		</Card.Header>
 		<Card.Content>
 			{#if data.content && data.content.length > 0}
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head>Title</Table.Head>
-							<Table.Head>Type</Table.Head>
-							<Table.Head>Status</Table.Head>
-							<Table.Head>Author</Table.Head>
-							<Table.Head>Updated</Table.Head>
-							<Table.Head class="text-right">Actions</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each data.content as item}
+				<div class="w-full overflow-x-auto">
+					<Table.Root class="w-full min-w-225 table-fixed">
+						<Table.Header>
 							<Table.Row>
-								<Table.Cell class="font-medium">
-									<div>
-										<div>{item.title}</div>
+								<Table.Head>Title</Table.Head>
+								<Table.Head class="w-25">Type</Table.Head>
+								<Table.Head class="w-25">Status</Table.Head>
+								<Table.Head class="w-40">Author</Table.Head>
+								<Table.Head class="w-25">Updated</Table.Head>
+								<Table.Head class="w-25 text-right">Actions</Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each data.content as item}
+								<Table.Row>
+									<Table.Cell class="font-medium">
+										<div class="truncate">{item.title}</div>
 										{#if item.excerpt}
-											<div class="line-clamp-1 text-xs text-muted-foreground">
+											<div class="truncate text-xs text-muted-foreground">
 												{item.excerpt}
 											</div>
 										{/if}
-									</div>
-								</Table.Cell>
-								<Table.Cell>
-									<Badge variant="outline">{item.type}</Badge>
-								</Table.Cell>
-								<Table.Cell>
-									<Badge variant={getStatusBadgeVariant(item.status)}>{item.status}</Badge>
-								</Table.Cell>
-								<Table.Cell>{item.author?.name || 'Unknown'}</Table.Cell>
-								<Table.Cell class="text-sm text-muted-foreground">
-									{new Date(item.updated_at).toLocaleDateString()}
-								</Table.Cell>
-								<Table.Cell class="text-right">
-									<Button
-										href={`/portals/cms/${data.tenant.public_slug}/content/${item.id}`}
-										size="sm"
-										variant="outline"
-									>
-										Edit
-									</Button>
-								</Table.Cell>
-							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
+									</Table.Cell>
+									<Table.Cell>
+										<Badge variant="outline">{item.type}</Badge>
+									</Table.Cell>
+									<Table.Cell>
+										<Badge variant={getStatusBadgeVariant(item.status)}>{item.status}</Badge>
+									</Table.Cell>
+									<Table.Cell>{item.author?.name || 'Unknown'}</Table.Cell>
+									<Table.Cell class="text-sm text-muted-foreground">
+										{new Date(item.updated_at).toLocaleDateString()}
+									</Table.Cell>
+									<Table.Cell class="text-right">
+										<Button
+											href={`/portals/cms/${data.tenant.public_slug}/content/${item.id}`}
+											size="sm"
+											variant="outline"
+										>
+											Edit
+										</Button>
+									</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				</div>
 
 				<!-- Pagination -->
 				{#if data.pagination.lastPage > 1}
-					<div class="flex items-center justify-between pt-4">
-						<div class="text-sm text-muted-foreground">
-							Page {data.pagination.currentPage} of {data.pagination.lastPage}
-						</div>
-						<div class="flex gap-2">
-							<Button
-								variant="outline"
-								size="sm"
-								disabled={data.pagination.currentPage === 1}
-								onclick={() => changePage(data.pagination.currentPage - 1)}
-							>
-								Previous
-							</Button>
-							<Button
-								variant="outline"
-								size="sm"
-								disabled={data.pagination.currentPage >= data.pagination.lastPage}
-								onclick={() => changePage(data.pagination.currentPage + 1)}
-							>
-								Next
-							</Button>
-						</div>
+					<div class="mt-12 flex justify-center">
+						<Pagination.Root
+							count={data.pagination?.total || 0}
+							perPage={data.pagination?.perPage || 10}
+						>
+							{#snippet children({ pages, currentPage })}
+								<Pagination.Content>
+									<Pagination.Item>
+										<Pagination.Previous onclick={() => goto(`?page=${currentPage - 1}`)} />
+									</Pagination.Item>
+
+									{#each pages as page (page.key)}
+										{#if page.type === 'ellipsis'}
+											<Pagination.Item>
+												<Pagination.Ellipsis />
+											</Pagination.Item>
+										{:else}
+											<Pagination.Item>
+												<Pagination.Link
+													{page}
+													isActive={currentPage === page.value}
+													onclick={() => goto(`?page=${page.value}`)}
+												>
+													{page.value}
+												</Pagination.Link>
+											</Pagination.Item>
+										{/if}
+									{/each}
+
+									<Pagination.Item>
+										<Pagination.Next onclick={() => goto(`?page=${currentPage + 1}`)} />
+									</Pagination.Item>
+								</Pagination.Content>
+							{/snippet}
+						</Pagination.Root>
 					</div>
 				{/if}
 			{:else}

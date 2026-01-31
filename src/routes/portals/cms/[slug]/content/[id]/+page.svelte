@@ -137,6 +137,17 @@
 					</div>
 				</Card.Header>
 				<Card.Content class="space-y-4">
+                    <!-- Type -->
+                    <div class="space-y-2">
+                        <Label for="type">Content Type *</Label>
+                        <Input
+                            id="type"
+                            name="type"
+                            value={data.content.type}
+                            required
+                        />
+                    </div>
+
 					<!-- Title -->
 					<div class="space-y-2">
 						<Label for="title">Title *</Label>

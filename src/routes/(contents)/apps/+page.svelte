@@ -1,22 +1,18 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { Card } from '$lib/components/ui/card';
 	import AtomicCard from '$lib/components/atomic/card.svelte';
+	import * as Pagination from '$lib/components/ui/pagination';
+	import { goto } from '$app/navigation';
 
-	type AppEntry = {
-		id: string;
-		title: string;
-		description: string;
-		image: string;
-		url: string;
-	};
+	import type { PageData } from './$types';
 
-	let apps: AppEntry[] = $state([]);
+	let { data }: { data: PageData } = $props();
+	const apps = $derived(data.pagination?.data || []);
 
-	onMount(async () => {
-		const res = await fetch('/api/apps');
-		apps = await res.json();
-	});
+	function handleAppClick(app: typeof apps[0]) {
+		if (app.meta?.externalLinks?.[0]?.url) {
+			window.open(app.meta.externalLinks[0].url, '_blank', 'noopener,noreferrer');
+		}
+	}
 </script>
 
 <svelte:head>
@@ -32,12 +28,51 @@
 		<AtomicCard
 			data={{
 				title: app.title,
-				content: app.description,
-				image: app.image
+				content: app.excerpt || '',
+				image: (app.meta?.headerImages?.[0] as string) || undefined
 			}}
 			class="cursor-pointer"
 			clickable={true}
-			on:click={() => console.log('App clicked:', app.id)}
+			on:click={() => handleAppClick(app)}
 		/>
 	{/each}
 </div>
+
+{#if data.pagination && data.pagination.total > data.pagination.per_page}
+<div class="mt-12 flex justify-center">
+	<Pagination.Root
+		count={data.pagination?.total || 0}
+		perPage={data.pagination?.per_page || 10}
+	>
+		{#snippet children({ pages, currentPage })}
+			<Pagination.Content>
+				<Pagination.Item>
+					<Pagination.Previous onclick={() => goto(`?page=${currentPage - 1}`)} />
+				</Pagination.Item>
+
+				{#each pages as page (page.key)}
+					{#if page.type === 'ellipsis'}
+						<Pagination.Item>
+							<Pagination.Ellipsis />
+						</Pagination.Item>
+					{:else}
+						<Pagination.Item>
+							<Pagination.Link
+								{page}
+								isActive={currentPage === page.value}
+								onclick={() => goto(`?page=${page.value}`)}
+							>
+								{page.value}
+							</Pagination.Link>
+						</Pagination.Item>
+					{/if}
+				{/each}
+
+				<Pagination.Item>
+					<Pagination.Next onclick={() => goto(`?page=${currentPage + 1}`)} />
+				</Pagination.Item>
+			</Pagination.Content>
+		{/snippet}
+	</Pagination.Root>
+</div>
+{/if}
