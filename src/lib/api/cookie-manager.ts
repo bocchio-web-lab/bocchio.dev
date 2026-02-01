@@ -63,10 +63,11 @@ export class CookieManager {
             parsedCookies.forEach((cookie) => {
                 this.cookies.set(cookie.name, cookie.value, {
                     path: cookie.path || '/',
-                    httpOnly: false,
+                    httpOnly: cookie.httpOnly ?? false,
                     secure: cookie.secure ?? false,
                     sameSite: (cookie.sameSite as 'strict' | 'lax' | 'none') ?? 'lax',
                     maxAge: cookie.maxAge,
+                    domain: cookie.domain,
                 });
             });
         });
