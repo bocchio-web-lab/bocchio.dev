@@ -123,6 +123,48 @@
     @apply prose-p:text-muted-foreground;
     @apply max-w-none;
 
+    & img {
+        @apply mx-auto block;        /* Centers the image horizontally */
+        @apply max-h-150;        /* Limits height to prevent huge images */
+        @apply w-auto;               /* Maintains aspect ratio */
+        @apply max-w-full;           /* Ensures it never overflows the container */
+        @apply object-contain;       /* Ensures the whole image is visible */
+        @apply rounded-lg;           /* Optional: Adds subtle rounding */
+        @apply my-8;                 /* Adds vertical breathing room */
+    }
+
+    /* Target any link to youtube/youtu.be that contains an image */
+    & a[href*="youtube.com"]:has(img),
+    & a[href*="youtu.be"]:has(img) {
+        @apply relative block w-fit mx-auto; /* Center the link container itself */
+        @apply my-8; /* Apply vertical spacing to the container */
+
+        /* Remove margin from the inner image so the Play button centers correctly */
+        & img {
+            @apply my-0;
+        }
+
+        /* The Play Button Overlay */
+        &::after {
+            content: "";
+            @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+            @apply w-16 h-16;
+            @apply bg-white/90 rounded-full shadow-lg;
+            @apply transition-transform duration-300 ease-out;
+
+            /* SVG Play Icon as a background image */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+            background-size: 50%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Hover Effect: Scale up the play button */
+        &:hover::after {
+            @apply scale-110 bg-white;
+        }
+    }
+
     &>* {
         --tw-prose-links: var(--primary);
         --tw-prose-invert-links: var(--primary);

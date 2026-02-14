@@ -1,4 +1,7 @@
 {
     "workbench.editor.labelFormat": "short",
     "explorer.compactFolders": false,
+    "files.associations": {
+        "*.css": "tailwindcss"
+    }
 }
