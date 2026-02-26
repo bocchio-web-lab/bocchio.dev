@@ -110,7 +110,7 @@ export interface AppContentItem extends ContentItemBase {
 
 export interface PostContentItem extends ContentItemBase {
     type: 'post';
-    meta: null;
+    meta: ProjectMeta;
 }
 
 

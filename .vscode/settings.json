@@ -1,6 +1,10 @@
 {
     "workbench.editor.labelFormat": "short",
     "explorer.compactFolders": false,
+    "files.exclude": {
+        ".svelte-kit": true,
+        "node_modules": true,
+    },
     "files.associations": {
         "*.css": "tailwindcss"
     }

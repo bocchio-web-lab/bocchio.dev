@@ -169,4 +169,29 @@
         --tw-prose-links: var(--primary);
         --tw-prose-invert-links: var(--primary);
     }
+
+    /* Handle long equations that exceed page width */
+    & .katex-display {
+        @apply overflow-x-auto;      /* Enable horizontal scrolling */
+        @apply overflow-y-hidden;    /* Prevent vertical scrolling */
+        @apply max-w-full;           /* Don't exceed container width */
+        @apply py-2;                 /* Add vertical padding for better UX */
+
+        /* Improve scrollbar appearance on webkit browsers */
+        &::-webkit-scrollbar {
+            @apply h-2;
+        }
+
+        &::-webkit-scrollbar-track {
+            @apply bg-muted/30 rounded;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            @apply bg-muted-foreground/30 rounded;
+
+            &:hover {
+                @apply bg-muted-foreground/50;
+            }
+        }
+    }
 }

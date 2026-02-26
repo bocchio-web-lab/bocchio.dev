@@ -60,6 +60,7 @@
                           day: "numeric",
                       })
                     : undefined,
+                tag: post.tags?.[0] ? { name: post.tags[0].name } : undefined,
             }}
             class="cursor-pointer"
             preview={expandedSlug !== post.slug}

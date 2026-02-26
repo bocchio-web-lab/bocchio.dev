@@ -4,6 +4,7 @@
         content: string;
         date?: string;
         image?: string;
+        tag?: { name: string };
     };
 </script>
 
@@ -46,11 +47,21 @@
         class="flex flex-row flex-wrap items-center justify-between gap-2 pb-2"
     >
         <CardTitle class="leading-tight">{data.title}</CardTitle>
-        {#if data.date}
+        {#if data.date || data.tag}
             <CardDescription
-                class="text-sm leading-tight text-muted-foreground"
+                class="text-sm leading-tight text-muted-foreground gap-2 flex items-center"
             >
-                {data.date}
+                {#if data.tag}
+                    <span
+                        class=" rounded-full bg-primary/10 px-2 py-0.5 text-sm font-medium text-primary"
+                    >
+                        {data.tag.name}
+                    </span>
+                {/if}
+
+                {#if data.date}
+                    {data.date}
+                {/if}
             </CardDescription>
         {/if}
     </CardHeader>
