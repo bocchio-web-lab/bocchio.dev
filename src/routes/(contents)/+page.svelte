@@ -28,11 +28,9 @@
 
         <div class="bio-text space-y-4 text-muted-foreground">
             <p>
-                Mechatronics engineer working at the intersection of mechanics
-                and intelligent systems, with hands-on experience in modeling
-                and simulation, control design, and embedded development. I
-                focus on building optimized, reliable systems designed to
-                operate in real-world conditions.
+                Currently deepening my technical foundation in superconductivity and
+                superconducting magnets, aiming to apply my control background to the
+                emerging large-scale applications of these technologies.
             </p>
             <p class="font-medium text-foreground">
                 Currently based in Como, Italy <span>🇮🇹</span>
