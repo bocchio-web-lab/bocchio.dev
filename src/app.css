@@ -123,7 +123,8 @@
     @apply prose-p:text-muted-foreground;
     @apply max-w-none;
 
-    & img {
+    & img,
+    & video {
         @apply mx-auto block;        /* Centers the image horizontally */
         @apply max-h-150;        /* Limits height to prevent huge images */
         @apply w-auto;               /* Maintains aspect ratio */
