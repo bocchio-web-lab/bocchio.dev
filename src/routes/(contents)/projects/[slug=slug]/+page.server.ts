@@ -5,7 +5,12 @@ import type { ProjectContentItem } from '$lib/types/cms';
 import { error } from '@sveltejs/kit';
 import { processMarkdown } from '$lib/markdown';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, setHeaders }) => {
+
+    setHeaders({
+        'Cache-Control': 'max-age=60, s-maxage=300'
+    });
+
     const response = await httpClient.get<{ data: ProjectContentItem }>(
         `/api/content/cms/${CMS_TENANT_SLUG}/projects/${params.slug}`
     );

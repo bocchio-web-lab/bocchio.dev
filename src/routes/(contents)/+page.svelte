@@ -1,14 +1,13 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+    import { preloadData } from "$app/navigation";
     import { Button } from "$lib/components/ui/button/index.js";
     import { MailIcon, GithubIcon, LinkedinIcon } from "@lucide/svelte";
+    import { CldImage } from "svelte-cloudinary";
 
-    const CLOUDINARY_BASE =
-        "https://res.cloudinary.com/bocchio/image/upload/f_auto,q_auto,dpr_auto";
-    const PROFILE_IMG = "profile_photo_tommaso_bocchietti_no_background.png";
-
-    function cld(transform: string) {
-        return `${CLOUDINARY_BASE}/${transform}/${PROFILE_IMG}`;
-    }
+    onMount(() => {
+        preloadData("/projects");
+    });
 </script>
 
 <svelte:head>
@@ -87,19 +86,11 @@
 
     <!-- Right image -->
     <div class="image-wrapper mt-10 shrink-0 md:mt-0">
-        <!-- svelte-ignore a11y_img_redundant_alt -->
-        <img
-            src={cld("c_fill,w_420,h_420")}
-            srcset={`
-                ${cld("c_fill,w_240,h_240")} 240w,
-                ${cld("c_fill,w_320,h_320")} 320w,
-                ${cld("c_fill,w_420,h_420")} 420w,
-                ${cld("c_fill,w_640,h_640")} 640w
-            `}
-            sizes="(min-width: 768px) 320px, 240px"
+        <CldImage
+            src="profile_photo_tommaso_bocchietti_no_background"
             alt="Profile picture of Tommaso Bocchietti"
-            width="420"
-            height="420"
+            width="320"
+            height="320"
             fetchpriority="high"
             decoding="async"
             class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80 scale-x-[-1]"

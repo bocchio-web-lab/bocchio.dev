@@ -1,200 +1,226 @@
 <script lang="ts">
-	import {
-		Timeline,
-		TimelineItem,
-		TimelineSeparator,
-		TimelineDot,
-		TimelineConnector,
-		TimelineContent,
-		TimelineOppositeContent
-	} from 'svelte-vertical-timeline';
-	import { goto } from '$app/navigation';
-	import AtomicCard from '$lib/components/atomic/card.svelte';
-	import * as Pagination from '$lib/components/ui/pagination';
+    import {
+        Timeline,
+        TimelineItem,
+        TimelineSeparator,
+        TimelineDot,
+        TimelineConnector,
+        TimelineContent,
+        TimelineOppositeContent,
+    } from "svelte-vertical-timeline";
+    import { goto } from "$app/navigation";
+    import AtomicCard from "$lib/components/atomic/card.svelte";
+    import * as Pagination from "$lib/components/ui/pagination";
+    import { CldImage } from "svelte-cloudinary";
 
-	import type { PageData } from './$types';
+    import type { PageData } from "./$types";
 
-	let { data }: { data: PageData } = $props();
-	const projects = $derived(data.pagination?.data || []);
+    let { data }: { data: PageData } = $props();
 </script>
 
 <svelte:head>
-	<title>Projects</title>
-	<meta
-		name="description"
-		content="A showcase of my mechatronics and robotics projects."
-	/>
+    <title>Projects</title>
+    <meta
+        name="description"
+        content="A showcase of my mechatronics and robotics projects."
+    />
 </svelte:head>
 
-	<Timeline position="right">
-		{#each projects as project, i}
-			<TimelineItem>
-				<TimelineOppositeContent>
-					<AtomicCard
-						data={{
-							title: project.title,
-							content: project.excerpt || ''
-						}}
-						clickable={true}
-						onclick={() => goto(`/projects/${project.slug}`)}
-						class="desktop-card"
-					/>
-				</TimelineOppositeContent>
+<Timeline position="right">
+    {#each data.pagination.data as project, index}
+        <TimelineItem>
+            <TimelineOppositeContent>
+                <AtomicCard
+                    data={{
+                        title: project.title,
+                        content: project.excerpt || "",
+                    }}
+                    clickable={true}
+                    onclick={() => goto(`/projects/${project.slug}`)}
+                    class="desktop-card"
+                />
+            </TimelineOppositeContent>
 
-				<TimelineSeparator>
-					<TimelineDot>
-						<button onclick={() => goto(`/projects/${project.slug}`)}>
-							<img
-								src={(project.meta?.headerImages[0] as string) ||
-									'https://avatars.githubusercontent.com/u/67842431'}
-								alt={project.title}
-								class="h-full w-full max-w-sm rounded-lg object-cover transition-transform duration-300 hover:scale-105 cursor-pointer"
-							/>
-						</button>
-						<AtomicCard
-							data={{
-								title: project.title,
-								content: project.excerpt || ''
-							}}
-							clickable={true}
-							onclick={() => goto(`/projects/${project.slug}`)}
-							class="mobile-card"
-						/>
-					</TimelineDot>
+            <TimelineSeparator>
+                <TimelineDot>
+                    <button onclick={() => goto(`/projects/${project.slug}`)}>
+                        {#if (project.meta?.headerImages[0] || "").includes("res.cloudinary.com")}
+                            <CldImage
+                                src={project.meta?.headerImages[0] as string}
+                                alt={project.title}
+                                width="420"
+                                height="420"
+                                crop="pad"
+                                loading={index < 3 ? "eager" : "lazy"}
+                                decoding="async"
+                                fetchpriority={index < 3 ? "high" : "low"}
+                                class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+                            />
+                        {:else}
+                            <img
+                                src={(project.meta
+                                    ?.headerImages[0] as string) ||
+                                    "https://avatars.githubusercontent.com/u/67842431"}
+                                alt={project.title}
+                                loading={index < 3 ? "eager" : "lazy"}
+                                decoding="async"
+                                fetchpriority={index < 3 ? "high" : "low"}
+                                class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+                            />
+                        {/if}
+                    </button>
+                    <AtomicCard
+                        data={{
+                            title: project.title,
+                            content: project.excerpt || "",
+                        }}
+                        clickable={true}
+                        onclick={() => goto(`/projects/${project.slug}`)}
+                        class="mobile-card"
+                    />
+                </TimelineDot>
 
-					{#if i < projects.length - 1}
-						<TimelineConnector style="height: 100px;" />
-					{/if}
-				</TimelineSeparator>
+                {#if index < data.pagination.data.length - 1}
+                    <TimelineConnector style="height: 100px;" />
+                {/if}
+            </TimelineSeparator>
 
-				<TimelineContent>
-					<AtomicCard
-						data={{
-							title: project.title,
-							content: project.excerpt || ''
-						}}
-						clickable={true}
-						onclick={() => goto(`/projects/${project.slug}`)}
-						class="desktop-card"
-					/>
-				</TimelineContent>
-			</TimelineItem>
-		{/each}
-	</Timeline>
+            <TimelineContent>
+                <AtomicCard
+                    data={{
+                        title: project.title,
+                        content: project.excerpt || "",
+                    }}
+                    clickable={true}
+                    onclick={() => goto(`/projects/${project.slug}`)}
+                    class="desktop-card"
+                />
+            </TimelineContent>
+        </TimelineItem>
+    {/each}
+</Timeline>
 
-    {#if data.pagination && data.pagination.total > data.pagination.per_page}
-	<div class="mt-12 flex justify-center">
-		<Pagination.Root
-			count={data.pagination?.total || 0}
-			perPage={data.pagination?.per_page || 10}
-		>
-			{#snippet children({ pages, currentPage })}
-				<Pagination.Content>
-					<Pagination.Item>
-						<Pagination.Previous onclick={() => goto(`?page=${currentPage - 1}`)} />
-					</Pagination.Item>
+{#if data.pagination.total > data.pagination.per_page}
+    <div class="mt-12 flex justify-center">
+        <Pagination.Root
+            count={data.pagination.total || 0}
+            perPage={data.pagination.per_page || 10}
+        >
+            {#snippet children({ pages, currentPage })}
+                <Pagination.Content>
+                    <Pagination.Item>
+                        <Pagination.Previous
+                            onclick={() => goto(`?page=${currentPage - 1}`)}
+                        />
+                    </Pagination.Item>
 
-					{#each pages as page (page.key)}
-						{#if page.type === 'ellipsis'}
-							<Pagination.Item>
-								<Pagination.Ellipsis />
-							</Pagination.Item>
-						{:else}
-							<Pagination.Item>
-								<Pagination.Link
-									{page}
-									isActive={currentPage === page.value}
-									onclick={() => goto(`?page=${page.value}`)}
-								>
-									{page.value}
-								</Pagination.Link>
-							</Pagination.Item>
-						{/if}
-					{/each}
+                    {#each pages as page (page.key)}
+                        {#if page.type === "ellipsis"}
+                            <Pagination.Item>
+                                <Pagination.Ellipsis />
+                            </Pagination.Item>
+                        {:else}
+                            <Pagination.Item>
+                                <Pagination.Link
+                                    {page}
+                                    isActive={currentPage === page.value}
+                                    onclick={() => goto(`?page=${page.value}`)}
+                                >
+                                    {page.value}
+                                </Pagination.Link>
+                            </Pagination.Item>
+                        {/if}
+                    {/each}
 
-					<Pagination.Item>
-						<Pagination.Next onclick={() => goto(`?page=${currentPage + 1}`)} />
-					</Pagination.Item>
-				</Pagination.Content>
-			{/snippet}
-		</Pagination.Root>
-	</div>
-    {/if}
+                    <Pagination.Item>
+                        <Pagination.Next
+                            onclick={() => goto(`?page=${currentPage + 1}`)}
+                        />
+                    </Pagination.Item>
+                </Pagination.Content>
+            {/snippet}
+        </Pagination.Root>
+    </div>
+{/if}
 
 <style>
-	:global(.opposite-block) {
-		display: none !important;
-	}
+    :global(.opposite-block) {
+        display: none !important;
+    }
 
-	:global(.timeline-opposite-content, .timeline-content) {
-		display: none !important;
-	}
+    :global(.timeline-opposite-content, .timeline-content) {
+        display: none !important;
+    }
 
-	:global(.timeline-dot) {
-		display: flex !important;
+    :global(.timeline-dot) {
+        display: flex !important;
 
-		flex-direction: column !important;
+        flex-direction: column !important;
 
-		align-items: center !important;
+        align-items: center !important;
 
-		width: 100% !important;
+        width: 100% !important;
 
-		background-color: transparent !important;
+        background-color: transparent !important;
 
-		border: none !important;
+        border: none !important;
 
-		margin: auto !important;
-	}
+        margin: auto !important;
+    }
 
-	:global(.timeline-separator) {
-		flex: 1 !important;
-	}
+    :global(.timeline-separator) {
+        flex: 1 !important;
+    }
 
-	:global(.mobile-card) {
-		margin-top: 1rem;
-	}
+    :global(.mobile-card) {
+        margin-top: 1rem;
+    }
 
-	:global(.desktop-card) {
-		display: none;
-	}
+    :global(.desktop-card) {
+        display: none;
+    }
 
-	:global(.timeline-opposite-content .desktop-card > div:first-child) {
-		flex-direction: row-reverse;
-	}
+    :global(.timeline-opposite-content .desktop-card > div:first-child) {
+        flex-direction: row-reverse;
+    }
 
-	@media (min-width: 768px) {
-		:global(.mobile-card) {
-			display: none;
-		}
+    @media (min-width: 768px) {
+        :global(.mobile-card) {
+            display: none;
+        }
 
-		:global(.desktop-card) {
-			display: block;
-		}
+        :global(.desktop-card) {
+            display: block;
+        }
 
-		:global(.timeline-content) {
-			display: block !important;
-		}
-	}
+        :global(.timeline-content) {
+            display: block !important;
+        }
+    }
 
-	@media (min-width: 1024px) {
-		:global(.timeline-opposite-content) {
-			display: block !important;
-		}
+    @media (min-width: 1024px) {
+        :global(.timeline-opposite-content) {
+            display: block !important;
+        }
 
-		:global(.timeline-item:nth-child(even) .timeline-opposite-content > div) {
-			display: block !important;
-		}
+        :global(
+                .timeline-item:nth-child(even) .timeline-opposite-content > div
+            ) {
+            display: block !important;
+        }
 
-		:global(.timeline-item:nth-child(even) .timeline-content > div) {
-			display: none !important;
-		}
+        :global(.timeline-item:nth-child(even) .timeline-content > div) {
+            display: none !important;
+        }
 
-		:global(.timeline-item:nth-child(odd) .timeline-opposite-content > div) {
-			display: none !important;
-		}
+        :global(
+                .timeline-item:nth-child(odd) .timeline-opposite-content > div
+            ) {
+            display: none !important;
+        }
 
-		:global(.timeline-item:nth-child(odd) .timeline-content > div) {
-			display: block !important;
-		}
-	}
+        :global(.timeline-item:nth-child(odd) .timeline-content > div) {
+            display: block !important;
+        }
+    }
 </style>

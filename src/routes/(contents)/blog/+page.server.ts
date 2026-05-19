@@ -4,7 +4,12 @@ import { CMS_TENANT_SLUG } from '$lib/api/constants';
 import type { ContentItem, PaginatedResponse } from '$lib/types/cms';
 import { processMarkdown } from '$lib/markdown';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ setHeaders }) => {
+
+    setHeaders({
+        'Cache-Control': 'max-age=60, s-maxage=300'
+    });
+
     const response = await httpClient.get<PaginatedResponse<ContentItem>>(
         `/api/content/cms/${CMS_TENANT_SLUG}/posts`
     );

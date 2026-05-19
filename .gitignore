@@ -1,4 +1,5 @@
-.scribe
+.private
+src/lib/api/generated
 node_modules
 
 # Output
