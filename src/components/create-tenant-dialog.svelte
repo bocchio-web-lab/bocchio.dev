@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { enhance } from "$app/forms";
+    import type { SubmitFunction } from "@sveltejs/kit";
     import { Button, buttonVariants } from "$components/ui/button/index.js";
     import * as Dialog from "$components/ui/dialog/index.js";
     import * as Select from "$components/ui/select/index.js";
     import { Input } from "$components/ui/input/index.js";
     import { Label } from "$components/ui/label/index.js";
-    import type { Service } from "$lib/types/platform";
+    import type { Service } from "$lib/sdk/platform";
 
     interface Props {
         service: Service;
@@ -19,7 +21,6 @@
 
     // Form state
     let name = $state("");
-    let publicSlug = $state("");
     let accessLevelValue = $state("public");
 
     const accessLevelOptions = [
@@ -40,58 +41,6 @@
         },
     ];
 
-    const getAccessLevelLabel = (value: string) => {
-        return (
-            accessLevelOptions.find((opt) => opt.value === value)?.label ||
-            value
-        );
-    };
-
-    const getAccessLevelDescription = (value: string) => {
-        return (
-            accessLevelOptions.find((opt) => opt.value === value)
-                ?.description || ""
-        );
-    };
-
-    async function handleSubmit(e: SubmitEvent) {
-        e.preventDefault();
-        loading = true;
-        error = null;
-
-        try {
-            // const result = await tenantApi.createTenant({
-            //     name,
-            //     service_id: service.id,
-            //     public_slug: publicSlug || undefined,
-            //     access_level: accessLevelValue as
-            //         | "public"
-            //         | "private"
-            //         | "token_protected",
-            // });
-
-            const result = { error: null } as any; // Replace with actual API call
-            if (result.error) {
-                error = result.error.message;
-            } else {
-                // Success - reset form and close dialog
-                name = "";
-                publicSlug = "";
-                accessLevelValue = "public";
-                open = false;
-
-                // Call success callback
-                if (onSuccess) {
-                    onSuccess();
-                }
-            }
-        } catch (err) {
-            error = err instanceof Error ? err.message : "An error occurred";
-        } finally {
-            loading = false;
-        }
-    }
-
     function handleOpenChange(newOpen: boolean) {
         open = newOpen;
         if (!newOpen) {
@@ -99,6 +48,36 @@
             error = null;
         }
     }
+
+    const createTenantEnhance: SubmitFunction = () => {
+        loading = true;
+        error = null;
+
+        return async ({ result, update }) => {
+            loading = false;
+
+            if (result.type === "failure") {
+                error =
+                    (result.data?.error as string | undefined) ??
+                    "Failed to create tenant";
+                return;
+            }
+
+            if (result.type === "error") {
+                error = "Unexpected error while creating tenant";
+                return;
+            }
+
+            if (result.type === "success") {
+                name = "";
+                accessLevelValue = "public";
+                open = false;
+                onSuccess?.();
+            }
+
+            await update();
+        };
+    };
 </script>
 
 <Dialog.Root {open} onOpenChange={handleOpenChange}>
@@ -106,13 +85,19 @@
         Create Tenant
     </Dialog.Trigger>
     <Dialog.Content class="sm:max-w-125">
-        <form onsubmit={handleSubmit}>
+        <form
+            method="POST"
+            action="?/createTenant"
+            use:enhance={createTenantEnhance}
+        >
             <Dialog.Header>
                 <Dialog.Title>Create New Tenant</Dialog.Title>
                 <Dialog.Description>
                     Create a new tenant for <strong>{service.name}</strong>. {service.description}
                 </Dialog.Description>
             </Dialog.Header>
+
+            <input type="hidden" name="service_id" value={service.id} />
 
             <div class="grid gap-4 py-4">
                 {#if error}
@@ -124,10 +109,9 @@
                 {/if}
 
                 <div class="grid gap-2">
-                    <Label for="name"
-                        >Tenant Name <span class="text-destructive">*</span
-                        ></Label
-                    >
+                    <Label for="name">
+                        Tenant Name <span class="text-destructive">*</span>
+                    </Label>
                     <Input
                         id="name"
                         name="name"
@@ -142,25 +126,9 @@
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="public_slug">Public Slug</Label>
-                    <Input
-                        id="public_slug"
-                        name="public_slug"
-                        bind:value={publicSlug}
-                        placeholder="my-awesome-blog"
-                        disabled={loading}
-                    />
-                    <p class="text-xs text-muted-foreground">
-                        Optional. Leave empty to auto-generate from name. Used
-                        in public URLs.
-                    </p>
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="access_level"
-                        >Access Level <span class="text-destructive">*</span
-                        ></Label
-                    >
+                    <Label for="access_level">
+                        Access Level <span class="text-destructive">*</span>
+                    </Label>
                     <Select.Root
                         type="single"
                         name="access_level"
@@ -168,7 +136,9 @@
                         disabled={loading}
                     >
                         <Select.Trigger class="w-full">
-                            {getAccessLevelLabel(accessLevelValue)}
+                            {accessLevelOptions.find(
+                                (opt) => opt.value === accessLevelValue,
+                            )?.label || accessLevelValue}
                         </Select.Trigger>
                         <Select.Content>
                             {#each accessLevelOptions as option (option.value)}
@@ -182,7 +152,9 @@
                         </Select.Content>
                     </Select.Root>
                     <p class="text-xs text-muted-foreground">
-                        {getAccessLevelDescription(accessLevelValue)}
+                        {accessLevelOptions.find(
+                            (opt) => opt.value === accessLevelValue,
+                        )?.description || ""}
                     </p>
                 </div>
             </div>

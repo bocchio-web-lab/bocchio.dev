@@ -14,7 +14,7 @@ export const load: PageLoad = async ({ url, fetch }) => {
         },
         query: {
             page: page !== '1' ? String(page) : undefined,
-            per_page: String(3),
+            per_page: String(10),
         },
         fetch: fetch
     });
