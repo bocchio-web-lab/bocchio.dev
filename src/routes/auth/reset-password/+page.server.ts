@@ -1,26 +1,17 @@
-// src/routes/auth/reset-password/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { createAuthService } from '$lib/api/auth.server';
+import { createIdentitySdk } from '$lib/sdk.server';
 
-export const load = (async ({ cookies, url }) => {
-    const authService = createAuthService(cookies);
-    // Redirect if already authenticated
-    if (await authService.isAuthenticated()) {
-        throw redirect(302, '/user/dashboard');
-    }
+export const load = (async ({ url, locals }) => {
+
+    if (locals.user) redirect(302, '/user/dashboard');
 
     const token = url.searchParams.get('token');
     const email = url.searchParams.get('email');
+    if (!token || !email) throw redirect(302, '/auth/forgot-password');
 
-    if (!token || !email) {
-        throw redirect(302, '/auth/forgot-password');
-    }
+    return { user: null, token, email };
 
-    return {
-        token,
-        email
-    };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -34,31 +25,45 @@ export const actions = {
         if (!token || !email || !password || !password_confirmation) {
             return fail(400, {
                 error: 'All fields are required',
-                email
+                errors: {
+                    token: !token ? ['Token is required'] : undefined,
+                    email: !email ? ['Email is required'] : undefined,
+                    password: !password ? ['Password is required'] : undefined,
+                    password_confirmation: !password_confirmation ? ['Password confirmation is required'] : undefined,
+                },
+                token,
+                email,
             });
         }
 
         if (password !== password_confirmation) {
             return fail(400, {
                 error: 'Passwords do not match',
-                email
+                errors: { password_confirmation: ['Passwords do not match'] },
+                token,
+                email,
             });
         }
 
-        if (password.length < 8) {
-            return fail(400, {
-                error: 'Password must be at least 8 characters',
-                email
-            });
-        }
+        const sdk = createIdentitySdk(cookies);
+        const csrf = await sdk.ensureCsrf();
+        if (!csrf.ok) return fail(503, { error: csrf.error, errors: null, email });
 
-        const authService = createAuthService(cookies);
-        const result = await authService.resetPassword(token, email, password, password_confirmation);
+        const result = await sdk.passwordUpdate({
+            body: {
+                token,
+                email,
+                password,
+                password_confirmation
+            },
+            throwOnError: false
+        });
 
-        if (!result.success) {
+        if (result.error) {
             return fail(422, {
-                error: result.message || 'Failed to reset password',
-                errors: result.errors,
+                error: result.error.message || 'Failed to reset password',
+                errors: result.error.errors,
+                token,
                 email
             });
         }

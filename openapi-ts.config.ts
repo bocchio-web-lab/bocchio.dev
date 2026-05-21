@@ -7,10 +7,11 @@ const env = loadEnv(
     ''
 );
 
-const inputs = ['identity', 'platform', 'cms', 'ptm']
-    .map(endpoint => `${env.PUBLIC_API_BASE_URL}/docs/${endpoint}/api.json`);
+const targets = ['identity', 'platform', 'cms', 'ptm'];
+const inputs = targets.map(endpoint => `${env.PUBLIC_API_BASE_URL}/docs/${endpoint}/api.json`);
+const outputs = targets.map(endpoint => `src/lib/sdk/${endpoint}`);
 
 export default defineConfig({
     input: inputs,
-    output: 'src/lib/api/generated',
+    output: outputs,
 });

@@ -10,8 +10,10 @@ export default defineConfig({
         include: ['src/**/*.{test,spec}.{js,ts}']
     },
     server: {
+        host: 'bocchio.test',
+        port: 5173,
         watch: {
-            ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/.svelte-kit/**', '**/.netlify/**', '**/.scribe/**']
+            ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/.svelte-kit/**', '**/.netlify/**']
         }
     }
 });

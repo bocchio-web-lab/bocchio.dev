@@ -1,6 +1,6 @@
 <script lang="ts">
-    import AtomicCard from "$lib/components/atomic/card.svelte";
-    import * as Pagination from "$lib/components/ui/pagination";
+    import AtomicCard from "$components/atomic/card.svelte";
+    import * as Pagination from "$components/ui/pagination";
     import { goto, pushState } from "$app/navigation";
     import { onMount } from "svelte";
 

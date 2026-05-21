@@ -1,17 +1,10 @@
-// src/routes/auth/login/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { createAuthService } from '$lib/api/auth.server';
+import { createIdentitySdk } from '$lib/sdk.server';
 
-export const load = (async ({ cookies }) => {
-    const authService = createAuthService(cookies);
-    // Redirect if already authenticated
-    if (await authService.isAuthenticated()) {
-        throw redirect(302, '/user/dashboard');
-    }
-    return {
-        user: null
-    };
+export const load = (async ({ locals }) => {
+    if (locals.user) redirect(302, '/user/dashboard');
+    return { user: null };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -22,23 +15,32 @@ export const actions = {
 
         if (!email || !password) {
             return fail(400, {
-                error: 'Email and password are required',
-                email
+                errors: {
+                    email: !email ? ['Email is required'] : undefined,
+                    password: !password ? ['Password is required'] : undefined,
+                },
+                email,
             });
         }
 
-        const authService = createAuthService(cookies);
-        const result = await authService.login(email, password);
+        const sdk = createIdentitySdk(cookies);
+        const csrf = await sdk.ensureCsrf();
+        if (!csrf.ok) return fail(503, { error: csrf.error, errors: null, email });
 
-        if (!result.success) {
-            return fail(401, {
-                error: result.message || 'Invalid credentials',
-                errors: result.errors,
-                email
+        const result = await sdk.loginStore({
+            body: { email, password },
+            throwOnError: false,
+        });
+
+        if (result.error) {
+            const status = result.response?.status ?? 401;
+            return fail(status, {
+                error: result.error.message ?? 'Invalid credentials',
+                errors: result.error.errors ?? null,
+                email,
             });
         }
 
-        // Redirect to dashboard on success
-        throw redirect(302, '/user/dashboard');
-    }
+        redirect(302, '/user/dashboard');
+    },
 } satisfies Actions;

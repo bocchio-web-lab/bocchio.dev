@@ -9,8 +9,8 @@
         TimelineOppositeContent,
     } from "svelte-vertical-timeline";
     import { goto } from "$app/navigation";
-    import AtomicCard from "$lib/components/atomic/card.svelte";
-    import * as Pagination from "$lib/components/ui/pagination";
+    import AtomicCard from "$components/atomic/card.svelte";
+    import * as Pagination from "$components/ui/pagination";
     import { CldImage } from "svelte-cloudinary";
 
     import type { PageData } from "./$types";
@@ -44,9 +44,9 @@
             <TimelineSeparator>
                 <TimelineDot>
                     <button onclick={() => goto(`/projects/${project.slug}`)}>
-                        {#if (project.meta?.headerImages[0] || "").includes("res.cloudinary.com")}
+                        {#if (project.meta?.headerImages?.[0] || "").includes("res.cloudinary.com")}
                             <CldImage
-                                src={project.meta?.headerImages[0] as string}
+                                src={project.meta?.headerImages?.[0] as string}
                                 alt={project.title}
                                 width="420"
                                 height="420"
@@ -59,7 +59,7 @@
                         {:else}
                             <img
                                 src={(project.meta
-                                    ?.headerImages[0] as string) ||
+                                    ?.headerImages?.[0] as string) ||
                                     "https://avatars.githubusercontent.com/u/67842431"}
                                 alt={project.title}
                                 loading={index < 3 ? "eager" : "lazy"}

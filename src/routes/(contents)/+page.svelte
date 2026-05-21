@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { preloadData } from "$app/navigation";
-    import { Button } from "$lib/components/ui/button/index.js";
+    import { Button } from "$components/ui/button/index.js";
     import { MailIcon, GithubIcon, LinkedinIcon } from "@lucide/svelte";
     import { CldImage } from "svelte-cloudinary";
 

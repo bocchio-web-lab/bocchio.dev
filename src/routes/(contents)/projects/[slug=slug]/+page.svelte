@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Button } from "$lib/components/ui/button";
-    import * as Carousel from "$lib/components/ui/carousel/index.js";
+    import { Button } from "$components/ui/button";
+    import * as Carousel from "$components/ui/carousel/index.js";
     import type { PageData } from "./$types";
     import { ExternalLink } from "@lucide/svelte";
 

@@ -1,9 +1,16 @@
-// src/hooks.server.ts
 import type { Handle } from '@sveltejs/kit';
-import { createAuthService } from '$lib/api/auth.server';
+import { createIdentitySdk } from '$lib/sdk.server';
 
 export const handle: Handle = async ({ event, resolve }) => {
-    const authService = createAuthService(event.cookies);
-    event.locals.user = await authService.getUser();
-    return resolve(event);
+    const sdk = createIdentitySdk(event.cookies);
+    const user = await sdk.getUser({ throwOnError: false });
+    event.locals.user = user.data || null;
+
+    const response = await resolve(event, {
+        filterSerializedResponseHeaders: (name) => {
+            return name === 'content-type';
+        }
+    });
+
+    return response;
 };

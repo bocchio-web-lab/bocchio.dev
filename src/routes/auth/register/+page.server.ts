@@ -1,14 +1,10 @@
-// src/routes/auth/register/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { createAuthService } from '$lib/api/auth.server';
+import { createIdentitySdk } from '$lib/sdk.server';
 
-export const load = (async ({ cookies }) => {
-    const authService = createAuthService(cookies);
-    // Redirect if already authenticated
-    if (await authService.isAuthenticated()) {
-        throw redirect(302, '/user/dashboard');
-    }
+export const load = (async ({ locals }) => {
+    if (locals.user) redirect(302, '/user/dashboard');
+    return { user: null };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -22,37 +18,45 @@ export const actions = {
         if (!name || !email || !password || !password_confirmation) {
             return fail(400, {
                 error: 'All fields are required',
+                errors: {
+                    name: !name ? ['Name is required'] : undefined,
+                    email: !email ? ['Email is required'] : undefined,
+                    password: !password ? ['Password is required'] : undefined,
+                    password_confirmation: !password_confirmation ? ['Password confirmation is required'] : undefined,
+                },
                 name,
-                email
+                email,
             });
         }
 
         if (password !== password_confirmation) {
             return fail(400, {
                 error: 'Passwords do not match',
+                errors: { password_confirmation: ['Passwords do not match'] },
                 name,
-                email
+                email,
             });
         }
 
-        const authService = createAuthService(cookies);
-        const result = await authService.register({
-            name,
-            email,
-            password,
-            password_confirmation
+        const sdk = createIdentitySdk(cookies);
+        const csrf = await sdk.ensureCsrf();
+        if (!csrf.ok) return fail(503, { error: csrf.error, errors: null, email });
+
+        const result = await sdk.registerStore({
+            body: { name, email, password, password_confirmation },
+            throwOnError: false,
         });
 
-        if (!result.success) {
-            return fail(422, {
-                error: result.message || 'Registration failed',
-                errors: result.errors,
+        if (result.error) {
+            const status = result.response?.status ?? 422;
+            return fail(status, {
+                error: result.error.message ?? 'Registration failed',
+                errors: result.error.errors ?? null,
                 name,
-                email
+                email,
             });
         }
 
-        // Redirect to dashboard on success (Laravel Fortify auto-logs in after registration)
-        throw redirect(302, '/user/dashboard');
-    }
+        redirect(302, '/user/dashboard');
+    },
 } satisfies Actions;

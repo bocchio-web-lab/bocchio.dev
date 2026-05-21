@@ -1,15 +1,10 @@
-// src/routes/auth/forgot-password/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { createAuthService } from '$lib/api/auth.server';
+import { createIdentitySdk } from '$lib/sdk.server';
 
-export const load = (async ({ cookies }) => {
-    const authService = createAuthService(cookies);
-    // Redirect if already authenticated
-    if (await authService.isAuthenticated()) {
-        throw redirect(302, '/user/dashboard');
-    }
-    return {};
+export const load = (async ({ locals }) => {
+    if (locals.user) redirect(302, '/user/dashboard');
+    return { user: null };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -17,27 +12,28 @@ export const actions = {
         const data = await request.formData();
         const email = data.get('email')?.toString();
 
-        if (!email) {
-            return fail(400, {
-                error: 'Email is required',
-                email
-            });
-        }
+        if (!email) return fail(400, { errors: { email: ['Email is required'] }, email });
 
-        const authService = createAuthService(cookies);
-        const result = await authService.forgotPassword(email);
+        const sdk = createIdentitySdk(cookies);
+        const csrf = await sdk.ensureCsrf();
+        if (!csrf.ok) return fail(503, { error: csrf.error, errors: null, email });
 
-        if (!result.success) {
+        const result = await sdk.passwordEmail({
+            body: { email },
+            throwOnError: false
+        });
+
+        if (result.error) {
             return fail(422, {
-                error: result.message || 'Failed to send reset link',
-                errors: result.errors,
+                error: result.error.message || 'Failed to send reset link',
+                errors: result.error.errors,
                 email
             });
         }
 
         return {
             success: true,
-            message: result.message
+            message: result.data?.message || 'Password reset link sent!'
         };
     }
 } satisfies Actions;

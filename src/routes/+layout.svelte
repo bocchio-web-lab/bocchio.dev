@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import Footer from '$lib/components/footer/footer.svelte';
-	import '../app.css';
-	import { ModeWatcher } from 'mode-watcher';
+    import "../app.css";
+    import Footer from "$components/footer/footer.svelte";
+    import { ModeWatcher } from "mode-watcher";
 
-	interface Props {
-		children?: import('svelte').Snippet;
-	}
+    interface Props {
+        children?: import("svelte").Snippet;
+    }
 
-	let { children }: Props = $props();
+    let { children }: Props = $props();
 </script>
 
 <ModeWatcher />

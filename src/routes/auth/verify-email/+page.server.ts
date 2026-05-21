@@ -1,40 +1,54 @@
-// src/routes/auth/verify-email/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
-import { requireAuth, createAuthService } from '$lib/api/auth.server';
+import { createIdentitySdk } from '$lib/sdk.server';
 
-export const load = (async ({ cookies }) => {
-    await requireAuth(cookies);
+export const load = (async ({ locals, url, cookies }) => {
+    if (!locals.user) redirect(302, '/auth/login');
+    if (locals.user?.email_verified_at) redirect(302, '/user/dashboard');
 
-    const authService = createAuthService(cookies);
-    const user = await authService.getUser();
+    const verifyUrl = url.searchParams.get('verify_url');
 
-    // If already verified, redirect to dashboard
-    if (user?.email_verified_at) {
-        throw redirect(302, '/user/dashboard');
+    if (verifyUrl) {
+        const parsed = new URL(verifyUrl);
+        const segments = parsed.pathname.split('/').filter(Boolean);
+
+        const hash = segments.at(-1);
+        const id = segments.at(-2);
+        const expires = parsed.searchParams.get('expires') ?? '';
+        const signature = parsed.searchParams.get('signature') ?? '';
+
+        if (!id || !hash || !expires || !signature) {
+            redirect(302, '/auth/verify-email?error=invalid');
+        }
+
+        const sdk = createIdentitySdk(cookies);
+        const result = await sdk.verificationVerify({
+            path: { id, hash },
+            query: { expires, signature },
+            throwOnError: false,
+        });
+
+        if (result.error) {
+            redirect(302, '/auth/verify-email?error=failed');
+        }
+
+        redirect(302, '/user/dashboard?verified=1');
     }
 
-    return {
-        user
-    };
+    return { user: locals.user };
 }) satisfies PageServerLoad;
 
 export const actions = {
     resend: async ({ cookies }) => {
-        await requireAuth(cookies);
+        const sdk = createIdentitySdk(cookies);
+        const result = await sdk.verificationSend({ throwOnError: false });
 
-        const authService = createAuthService(cookies);
-        const result = await authService.resendVerification();
-
-        if (!result.success) {
+        if (result.error) {
             return fail(422, {
-                error: result.message || 'Failed to send verification email'
+                error: result.error.message ?? 'Failed to send verification email',
             });
         }
 
-        return {
-            success: true,
-            message: result.message
-        };
-    }
+        redirect(302, '/auth/verify-email?sent=1');
+    },
 } satisfies Actions;

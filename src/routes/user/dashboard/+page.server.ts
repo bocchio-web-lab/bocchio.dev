@@ -1,24 +1,18 @@
-// src/routes/user/dashboard/+page.server.ts
+import { servicesIndex, tenantsIndex } from '$lib/sdk/platform';
+import { createPlatformSdk } from '$lib/sdk.server';
 import type { PageServerLoad } from './$types';
-import { requireAuth } from '$lib/api/auth.server';
-import { createServerHttpClient } from '$lib/api/http.server';
 
-export const load: PageServerLoad = async ({ cookies, locals }) => {
-    await requireAuth(cookies);
+export const load = (async ({ cookies, locals }) => {
+    const sdk = createPlatformSdk(cookies);
 
-    const httpClient = createServerHttpClient(cookies);
-
-    // Fetch services
-    const servicesResponse = await httpClient.get('/api/manage/services');
-    const services = servicesResponse.ok ? servicesResponse.data.data : [];
-
-    // Fetch user's tenants
-    const tenantsResponse = await httpClient.get('/api/manage/tenants');
-    const tenants = tenantsResponse.ok ? tenantsResponse.data.data : [];
+    const [servicesResult, tenantsResult] = await Promise.all([
+        servicesIndex({ client: sdk.client }),
+        tenantsIndex({ client: sdk.client }),
+    ]);
 
     return {
         user: locals.user,
-        services,
-        tenants
+        services: servicesResult.data?.data ?? [],
+        tenants: tenantsResult.data?.data ?? [],
     };
-};
+}) satisfies PageServerLoad;
