@@ -12,7 +12,7 @@ import * as cmsAPIs from '$lib/sdk/cms';
  * Cookie and header constants shared across client and server
  */
 export const COOKIES = {
-    SESSION: 'backend_bocchio_session',
+    SESSION: 'bocchios_api_session',
     XSRF_TOKEN: 'XSRF-TOKEN',
 } as const;
 

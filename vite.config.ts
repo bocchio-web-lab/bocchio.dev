@@ -1,11 +1,15 @@
-import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
-import { heyApiPlugin } from '@hey-api/vite-plugin';
+import { sveltekit } from '@sveltejs/kit/vite';
+// import { heyApiPlugin } from '@hey-api/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 
 
 export default defineConfig({
-    plugins: [tailwindcss(), sveltekit(), heyApiPlugin()],
+    plugins: [
+        // heyApiPlugin(),
+        tailwindcss(),
+        sveltekit(),
+    ],
     test: {
         include: ['src/**/*.{test,spec}.{js,ts}']
     },
