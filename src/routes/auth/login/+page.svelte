@@ -101,6 +101,7 @@
                         <a
                             href="/auth/forgot-password"
                             class="ms-auto inline-block text-sm underline"
+                            tabindex="1"
                         >
                             Forgot your password?
                         </a>

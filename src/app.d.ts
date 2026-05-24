@@ -6,9 +6,9 @@ declare global {
             user: User | null;
         }
 
-        interface PageData {
-            user: App.Locals['user'];
-        }
+        // interface PageData {
+        //     user: App.Locals['user'];
+        // }
     }
 }
 

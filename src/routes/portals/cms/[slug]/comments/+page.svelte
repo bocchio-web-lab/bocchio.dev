@@ -15,6 +15,7 @@
 
     let { data, form }: Props = $props();
 
+    let tenant = $derived(data.tenant);
     let deletingCommentId: number | null = $state(null);
     let filterValue = $state(getFilterValue());
 
@@ -46,10 +47,6 @@
         return data.filters.approved;
     }
 </script>
-
-<svelte:head>
-    <title>Comments - {data.tenant.name}</title>
-</svelte:head>
 
 <div class="space-y-6">
     <div>
@@ -165,6 +162,12 @@
                             <form method="POST" action="?/approve" use:enhance>
                                 <input
                                     type="hidden"
+                                    name="tenant_id"
+                                    value={tenant.id}
+                                />
+
+                                <input
+                                    type="hidden"
                                     name="comment_id"
                                     value={comment.id}
                                 />
@@ -176,6 +179,12 @@
                             </form>
                         {:else}
                             <form method="POST" action="?/reject" use:enhance>
+                                <input
+                                    type="hidden"
+                                    name="tenant_id"
+                                    value={tenant.id}
+                                />
+
                                 <input
                                     type="hidden"
                                     name="comment_id"
@@ -196,6 +205,12 @@
                                 use:enhance
                                 class="flex gap-2"
                             >
+                                <input
+                                    type="hidden"
+                                    name="tenant_id"
+                                    value={tenant.id}
+                                />
+
                                 <input
                                     type="hidden"
                                     name="comment_id"

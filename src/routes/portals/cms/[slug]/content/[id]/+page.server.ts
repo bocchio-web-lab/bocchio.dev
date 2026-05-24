@@ -1,8 +1,6 @@
-// src/routes/portals/cms/[slug]/content/[id]/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { createCmsSdk } from '$lib/sdk.server';
-import { getCmsPortalTenant } from '../../portal.server';
 
 export const load: PageServerLoad = async ({ parent, cookies, params }) => {
     const { tenant } = await parent();
@@ -35,10 +33,10 @@ export const load: PageServerLoad = async ({ parent, cookies, params }) => {
 
 export const actions: Actions = {
     update: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const type = formData.get('type') as string;
         const title = formData.get('title') as string;
         const slug = formData.get('slug') as string;
@@ -101,7 +99,7 @@ export const actions: Actions = {
         const response = await sdk.contentUpdate({
             path: { id: params.id },
             body: payload,
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {
@@ -113,12 +111,15 @@ export const actions: Actions = {
         return { success: true };
     },
 
-    delete: async ({ cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
+    delete: async ({ request, cookies, params }) => {
         const sdk = createCmsSdk(cookies);
+
+        const formData = await request.formData();
+        const tenantId = formData.get('tenant_id') as string;
+
         const response = await sdk.contentDestroy({
             path: { id: params.id },
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {

@@ -16,6 +16,7 @@
 
     let { data, form }: Props = $props();
 
+    let tenant = $derived(data.tenant);
     let selectedStatus = $derived(data.content.status);
     let selectedTags: number[] = $derived(
         data.content.tags?.map((t) => t.id) || [],
@@ -86,10 +87,6 @@
     }
 </script>
 
-<svelte:head>
-    <title>Edit: {data.content.title} - {data.tenant.name}</title>
-</svelte:head>
-
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
@@ -135,6 +132,7 @@
             };
         }}
     >
+        <input type="hidden" name="tenant_id" value={tenant.id} />
         <div class="space-y-6">
             <Card.Root>
                 <Card.Header>
@@ -183,7 +181,7 @@
                         <Textarea
                             id="excerpt"
                             name="excerpt"
-                            value={data.content.excerpt || ""}
+                            value={data.content.excerpt}
                             rows={3}
                         />
                     </div>

@@ -18,6 +18,7 @@
 
     let { data, form }: Props = $props();
 
+    let tenant = $derived(data.tenant);
     let showCreateDialog = $state(false);
     let editingTag: any = $state(null);
     let deletingTagId: number | null = $state(null);
@@ -31,10 +32,6 @@
         }
     });
 </script>
-
-<svelte:head>
-    <title>Tags - {data.tenant.name}</title>
-</svelte:head>
 
 <div class="space-y-6">
     <div class="flex items-center justify-between">
@@ -117,6 +114,12 @@
                                         >
                                             <input
                                                 type="hidden"
+                                                name="tenant_id"
+                                                value={tenant.id}
+                                            />
+
+                                            <input
+                                                type="hidden"
                                                 name="id"
                                                 value={tag.id}
                                             />
@@ -184,6 +187,8 @@
                 };
             }}
         >
+            <input type="hidden" name="tenant_id" value={tenant.id} />
+
             <div class="space-y-4 py-4">
                 <div class="space-y-2">
                     <Label for="create-name">Name *</Label>
@@ -244,6 +249,7 @@
                     };
                 }}
             >
+                <input type="hidden" name="tenant_id" value={tenant.id} />
                 <input type="hidden" name="id" value={editingTag.id} />
                 <div class="space-y-4 py-4">
                     <div class="space-y-2">

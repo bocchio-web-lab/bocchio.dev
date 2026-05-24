@@ -17,16 +17,14 @@ export const load: PageServerLoad = async ({ parent, cookies }) => {
     const comments = commentsResult.data?.data ?? [];
 
     return {
-        overview: {
-            contentTotal: contentResult.data?.total ?? content.length,
-            tagsTotal: tags.length,
-            commentsTotal: commentsResult.data?.total ?? comments.length,
-            publishedCount: content.filter((item: any) => item.status === 'published').length,
-            draftCount: content.filter((item: any) => item.status === 'draft').length,
+        stats: {
+            published: content.filter((item: any) => item.status === 'published').length,
+            drafts: content.filter((item: any) => item.status === 'draft').length,
+            pages: content.filter((item: any) => item.type === 'page').length,
+            tags: tags.length,
+            pendingComments: comments.filter((item: any) => item.approved === false).length,
         },
-        recentContent: content.slice(0, 4),
-        recentTags: tags.slice(0, 5),
-        recentComments: comments.slice(0, 4),
-        userRole,
+        recentContent: content.slice(0, 5),
+        recentComments: comments.slice(0, 5),
     };
 };

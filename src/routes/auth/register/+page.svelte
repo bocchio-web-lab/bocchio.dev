@@ -131,9 +131,9 @@
                         {loading ? "Creating account..." : "Create an account"}
                     </Button>
                     <FieldDescription class="text-center">
-                        Already have an account? <a href="/auth/login"
-                            >Sign in</a
-                        >
+                        Already have an account? <a href="/auth/login">
+                            Sign in
+                        </a>
                     </FieldDescription>
                 </Field>
             </FieldGroup>

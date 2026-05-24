@@ -1,8 +1,6 @@
-// src/routes/portals/cms/[slug]/tags/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { createCmsSdk } from '$lib/sdk.server';
-import { getCmsPortalTenant } from '../portal.server';
 
 export const load: PageServerLoad = async ({ parent, cookies }) => {
     const { tenant } = await parent();
@@ -23,10 +21,10 @@ export const load: PageServerLoad = async ({ parent, cookies }) => {
 
 export const actions: Actions = {
     create: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const name = formData.get('name') as string;
         const slug = formData.get('slug') as string;
 
@@ -35,7 +33,7 @@ export const actions: Actions = {
                 name,
                 ...(slug ? { slug } : {}),
             },
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {
@@ -48,10 +46,10 @@ export const actions: Actions = {
     },
 
     update: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const id = formData.get('id') as string;
         const name = formData.get('name') as string;
         const slug = formData.get('slug') as string;
@@ -62,7 +60,7 @@ export const actions: Actions = {
                 name,
                 slug,
             },
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {
@@ -75,15 +73,15 @@ export const actions: Actions = {
     },
 
     delete: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const id = formData.get('id') as string;
 
         const response = await sdk.tagsDestroy({
             path: { tag: Number(id) },
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {

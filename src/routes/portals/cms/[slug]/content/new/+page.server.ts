@@ -1,8 +1,6 @@
-// src/routes/portals/cms/[slug]/content/new/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
 import { createCmsSdk } from '$lib/sdk.server';
-import { getCmsPortalTenant } from '../../portal.server';
 
 export const load: PageServerLoad = async ({ parent, cookies }) => {
     const { tenant } = await parent();
@@ -20,10 +18,10 @@ export const load: PageServerLoad = async ({ parent, cookies }) => {
 
 export const actions: Actions = {
     default: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const type = formData.get('type') as string;
         const title = formData.get('title') as string;
         const slug = formData.get('slug') as string;
@@ -85,7 +83,7 @@ export const actions: Actions = {
 
         const response = await sdk.contentStore({
             body: payload,
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {

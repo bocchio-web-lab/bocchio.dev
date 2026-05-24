@@ -16,6 +16,7 @@
 
     let { data, form }: Props = $props();
 
+    let tenant = $derived(data.tenant);
     let selectedType = $state("post");
     let selectedStatus = $state("draft");
     let selectedTags: number[] = $state([]);
@@ -54,10 +55,6 @@
     }
 </script>
 
-<svelte:head>
-    <title>Create Content - {data.tenant.name}</title>
-</svelte:head>
-
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
@@ -94,6 +91,7 @@
             };
         }}
     >
+        <input type="hidden" name="tenant_id" value={tenant.id} />
         <div class="space-y-6">
             <Card.Root>
                 <Card.Header>

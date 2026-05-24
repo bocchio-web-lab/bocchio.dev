@@ -1,8 +1,6 @@
-// src/routes/portals/cms/[slug]/comments/+page.server.ts
 import type { PageServerLoad, Actions } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { createCmsSdk } from '$lib/sdk.server';
-import { getCmsPortalTenant } from '../portal.server';
 
 export const load: PageServerLoad = async ({ parent, cookies, url }) => {
     const { tenant } = await parent();
@@ -42,15 +40,15 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
 
 export const actions: Actions = {
     approve: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const commentId = formData.get('comment_id') as string;
 
         const response = await sdk.commentModerationApprove({
             path: { comment: Number(commentId) },
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {
@@ -63,15 +61,15 @@ export const actions: Actions = {
     },
 
     reject: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const commentId = formData.get('comment_id') as string;
 
         const response = await sdk.commentModerationReject({
             path: { comment: Number(commentId) },
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {
@@ -84,15 +82,15 @@ export const actions: Actions = {
     },
 
     delete: async ({ request, cookies, params }) => {
-        const tenant = await getCmsPortalTenant(cookies, params.slug);
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
+        const tenantId = formData.get('tenant_id') as string;
         const commentId = formData.get('comment_id') as string;
 
         const response = await sdk.commentModerationDestroy({
             path: { comment: Number(commentId) },
-            headers: { 'X-Tenant-ID': tenant.id.toString() },
+            headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {

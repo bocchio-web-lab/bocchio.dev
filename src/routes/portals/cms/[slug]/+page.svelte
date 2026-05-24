@@ -10,29 +10,6 @@
 
     let { data }: Props = $props();
 
-    const shortcuts = [
-        {
-            href: `/portals/cms/${data.tenant.public_slug}/content`,
-            label: "Manage Content",
-            description: "Browse, edit, and publish content items",
-        },
-        {
-            href: `/portals/cms/${data.tenant.public_slug}/content/new`,
-            label: "Create Content",
-            description: "Jump straight into the editor",
-        },
-        {
-            href: `/portals/cms/${data.tenant.public_slug}/tags`,
-            label: "Organize Tags",
-            description: "Keep taxonomy clean and useful",
-        },
-        {
-            href: `/portals/cms/${data.tenant.public_slug}/comments`,
-            label: "Moderate Comments",
-            description: "Approve, reject, or remove discussions",
-        },
-    ];
-
     function formatDate(value: string | null | undefined): string {
         if (!value) return "Unknown";
         return new Date(value).toLocaleDateString();
@@ -40,214 +17,167 @@
 </script>
 
 <svelte:head>
-    <title>{data.tenant.name} - CMS Portal</title>
+    <title>{data.tenant.name} - CMS Dashboard</title>
 </svelte:head>
 
-<div class="space-y-8">
-    <section
-        class="grid gap-4 rounded-xl border bg-linear-to-br from-background via-background to-muted/40 p-6 md:grid-cols-[1.5fr_1fr] md:p-8"
-    >
-        <div class="space-y-4">
-            <div class="space-y-2">
-                <Badge variant="outline">CMS Portal</Badge>
-                <h1 class="text-3xl font-bold tracking-tight md:text-4xl">
-                    {data.tenant.name}
-                </h1>
-                <p class="max-w-2xl text-sm text-muted-foreground md:text-base">
-                    A quick control center for content, taxonomy, and moderation
-                    tasks.
-                </p>
-            </div>
-
-            <div class="flex flex-wrap gap-2">
-                <Badge variant="default">Role: {data.userRole}</Badge>
-                <Badge variant="secondary"
-                    >Slug: {data.tenant.public_slug}</Badge
-                >
-                <Badge variant="outline">Status: Active portal</Badge>
-            </div>
-
-            <div class="flex flex-wrap gap-3">
-                <Button href={`/portals/cms/${data.tenant.public_slug}/content`}
-                    >Open Content</Button
-                >
-                <Button
-                    href={`/portals/cms/${data.tenant.public_slug}/content/new`}
-                    variant="outline"
-                >
-                    New Content
-                </Button>
-            </div>
+<div class="space-y-6">
+    <section class="space-y-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold tracking-tight">Dashboard</h2>
         </div>
-
-        <div class="grid gap-3 sm:grid-cols-2">
+        <!-- <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             <Card.Root>
-                <Card.Content class="p-4">
-                    <p
-                        class="text-xs uppercase tracking-wide text-muted-foreground"
-                    >
-                        Content Items
-                    </p>
-                    <p class="mt-2 text-3xl font-semibold">
-                        {data.overview.contentTotal}
-                    </p>
-                </Card.Content>
-            </Card.Root>
-            <Card.Root>
-                <Card.Content class="p-4">
-                    <p
-                        class="text-xs uppercase tracking-wide text-muted-foreground"
-                    >
-                        Tags
-                    </p>
-                    <p class="mt-2 text-3xl font-semibold">
-                        {data.overview.tagsTotal}
-                    </p>
-                </Card.Content>
-            </Card.Root>
-            <Card.Root>
-                <Card.Content class="p-4">
-                    <p
-                        class="text-xs uppercase tracking-wide text-muted-foreground"
-                    >
-                        Comments
-                    </p>
-                    <p class="mt-2 text-3xl font-semibold">
-                        {data.overview.commentsTotal}
-                    </p>
-                </Card.Content>
-            </Card.Root>
-            <Card.Root>
-                <Card.Content class="p-4">
-                    <p
-                        class="text-xs uppercase tracking-wide text-muted-foreground"
-                    >
+                <Card.Content class="p-6">
+                    <p class="text-sm font-medium text-muted-foreground">
                         Published
                     </p>
-                    <p class="mt-2 text-3xl font-semibold">
-                        {data.overview.publishedCount}
+                    <p class="mt-2 text-3xl font-bold">
+                        {data.stats.published}
                     </p>
                 </Card.Content>
             </Card.Root>
-        </div>
+            <Card.Root>
+                <Card.Content class="p-6">
+                    <p class="text-sm font-medium text-muted-foreground">
+                        Drafts
+                    </p>
+                    <p class="mt-2 text-3xl font-bold">{data.stats.drafts}</p>
+                </Card.Content>
+            </Card.Root>
+            <Card.Root>
+                <Card.Content class="p-6">
+                    <p class="text-sm font-medium text-muted-foreground">
+                        Pages
+                    </p>
+                    <p class="mt-2 text-3xl font-bold">{data.stats.pages}</p>
+                </Card.Content>
+            </Card.Root>
+            <Card.Root>
+                <Card.Content class="p-6">
+                    <p class="text-sm font-medium text-muted-foreground">
+                        Tags
+                    </p>
+                    <p class="mt-2 text-3xl font-bold">{data.stats.tags}</p>
+                </Card.Content>
+            </Card.Root>
+            <Card.Root>
+                <Card.Content class="p-6">
+                    <p class="text-sm font-medium text-muted-foreground">
+                        Pending Comments
+                    </p>
+                    <p class="mt-2 text-3xl font-bold text-destructive">
+                        {data.stats.pendingComments}
+                    </p>
+                </Card.Content>
+            </Card.Root>
+        </div> -->
     </section>
 
-    <section class="grid gap-6 lg:grid-cols-2">
-        <Card.Root>
-            <Card.Header>
-                <Card.Title>Quick Shortcuts</Card.Title>
-                <Card.Description
-                    >Jump into the places you use most.</Card.Description
-                >
-            </Card.Header>
-            <Card.Content class="grid gap-3">
-                {#each shortcuts as shortcut}
-                    <div
-                        class="flex items-center justify-between gap-4 rounded-lg border p-4"
-                    >
-                        <div>
-                            <p class="font-medium">{shortcut.label}</p>
-                            <p class="text-sm text-muted-foreground">
-                                {shortcut.description}
-                            </p>
-                        </div>
-                        <Button href={shortcut.href} variant="outline" size="sm"
-                            >Open</Button
-                        >
-                    </div>
-                {/each}
-            </Card.Content>
-        </Card.Root>
-
-        <Card.Root>
+    <section class="grid gap-6 md:grid-cols-2">
+        <Card.Root class="flex flex-col">
             <Card.Header>
                 <Card.Title>Recent Content</Card.Title>
                 <Card.Description
-                    >Latest items pulled from the CMS API.</Card.Description
+                    >Latest items created or updated.</Card.Description
                 >
             </Card.Header>
-            <Card.Content class="space-y-3">
+            <Card.Content class="flex-1 space-y-4">
                 {#if data.recentContent.length > 0}
-                    {#each data.recentContent as item}
-                        <div class="rounded-lg border p-4">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <p class="font-medium">{item.title}</p>
-                                    <p class="text-sm text-muted-foreground">
+                    <ul class="space-y-3">
+                        {#each data.recentContent as item}
+                            <li
+                                class="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0"
+                            >
+                                <div class="space-y-1">
+                                    <p class="font-medium leading-none">
+                                        {item.title}
+                                    </p>
+                                    <p class="text-xs text-muted-foreground">
                                         {item.type} • {formatDate(
                                             item.updated_at,
                                         )}
                                     </p>
                                 </div>
-                                <Badge variant="outline">{item.status}</Badge>
-                            </div>
-                        </div>
-                    {/each}
+                                <Badge
+                                    variant={item.status === "published"
+                                        ? "default"
+                                        : "secondary"}
+                                >
+                                    {item.status}
+                                </Badge>
+                            </li>
+                        {/each}
+                    </ul>
                 {:else}
                     <p class="text-sm text-muted-foreground">
                         No content items yet.
                     </p>
                 {/if}
             </Card.Content>
-        </Card.Root>
-
-        <Card.Root>
-            <Card.Header>
-                <Card.Title>Recent Tags</Card.Title>
-                <Card.Description
-                    >A few of the current taxonomy entries.</Card.Description
+            <Card.Footer>
+                <Button
+                    href={`/portals/cms/${data.tenant.public_slug}/content`}
+                    variant="outline"
+                    class="w-full"
                 >
-            </Card.Header>
-            <Card.Content class="flex flex-wrap gap-2">
-                {#if data.recentTags.length > 0}
-                    {#each data.recentTags as tag}
-                        <Badge variant="secondary">{tag.name}</Badge>
-                    {/each}
-                {:else}
-                    <p class="text-sm text-muted-foreground">No tags yet.</p>
-                {/if}
-            </Card.Content>
+                    View All Content
+                </Button>
+            </Card.Footer>
         </Card.Root>
 
-        <Card.Root>
+        <Card.Root class="flex flex-col">
             <Card.Header>
                 <Card.Title>Recent Comments</Card.Title>
-                <Card.Description
-                    >Latest moderation items to review.</Card.Description
-                >
+                <Card.Description>Latest community feedback.</Card.Description>
             </Card.Header>
-            <Card.Content class="space-y-3">
+            <Card.Content class="flex-1 space-y-4">
                 {#if data.recentComments.length > 0}
-                    {#each data.recentComments as comment}
-                        <div class="rounded-lg border p-4">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <p class="font-medium">
-                                        {comment.author_name ||
-                                            "Unknown author"}
+                    <ul class="space-y-3">
+                        {#each data.recentComments as comment}
+                            <li
+                                class="flex flex-col gap-1 border-b pb-3 last:border-0 last:pb-0"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium">
+                                        {comment.author_name || "Unknown"} on
+                                        <span class="italic"
+                                            >"{comment.content_item?.title ||
+                                                "Deleted Item"}"</span
+                                        >
                                     </p>
-                                    <p
-                                        class="line-clamp-2 text-sm text-muted-foreground"
+                                    <Badge
+                                        variant={comment.approved
+                                            ? "outline"
+                                            : "default"}
                                     >
-                                        {comment.body}
-                                    </p>
+                                        {comment.approved
+                                            ? "Approved"
+                                            : "Pending"}
+                                    </Badge>
                                 </div>
-                                <Badge
-                                    variant={comment.approved
-                                        ? "default"
-                                        : "secondary"}
+                                <p
+                                    class="line-clamp-1 text-sm text-muted-foreground"
                                 >
-                                    {comment.approved ? "Approved" : "Pending"}
-                                </Badge>
-                            </div>
-                        </div>
-                    {/each}
+                                    "{comment.body}"
+                                </p>
+                            </li>
+                        {/each}
+                    </ul>
                 {:else}
                     <p class="text-sm text-muted-foreground">
                         No comments loaded yet.
                     </p>
                 {/if}
             </Card.Content>
+            <Card.Footer>
+                <Button
+                    href={`/portals/cms/${data.tenant.public_slug}/comments`}
+                    variant="outline"
+                    class="w-full"
+                >
+                    Manage Comments
+                </Button>
+            </Card.Footer>
         </Card.Root>
     </section>
 </div>

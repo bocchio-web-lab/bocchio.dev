@@ -20,7 +20,7 @@
 
     function getPortalLink(tenant: any) {
         if (tenant.service.slug === "cms") {
-            return `/portals/cms/${tenant.public_slug}/content`;
+            return `/portals/cms/${tenant.public_slug}`;
         }
         if (tenant.service.slug === "ptm") {
             return `/portals/ptm/${tenant.public_slug}`;
