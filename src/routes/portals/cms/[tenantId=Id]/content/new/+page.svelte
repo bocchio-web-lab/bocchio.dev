@@ -17,7 +17,6 @@
     let { data, form }: Props = $props();
 
     let tenant = $derived(data.tenant);
-    let selectedType = $state("post");
     let selectedStatus = $state("draft");
     let selectedTags: number[] = $state([]);
     let isSubmitting = $state(false);
@@ -66,7 +65,7 @@
             </p>
         </div>
         <Button
-            href={`/portals/cms/${data.tenant.public_slug}/content`}
+            href={`/portals/cms/${data.tenant.id}/content`}
             variant="outline"
         >
             Cancel
@@ -91,7 +90,6 @@
             };
         }}
     >
-        <input type="hidden" name="tenant_id" value={tenant.id} />
         <div class="space-y-6">
             <Card.Root>
                 <Card.Header>
@@ -384,7 +382,7 @@
                 <Button
                     type="button"
                     variant="outline"
-                    href={`/portals/cms/${data.tenant.public_slug}/content`}
+                    href={`/portals/cms/${data.tenant.id}/content`}
                 >
                     Cancel
                 </Button>

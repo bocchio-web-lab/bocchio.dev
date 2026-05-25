@@ -2,7 +2,7 @@
     import { page } from "$app/state";
     import { goto } from "$app/navigation";
     import * as DropdownMenu from "$components/ui/dropdown-menu";
-    import IconRunningMan from "$components/atomic/icon-running-man.svelte";
+    import IconRunningMan from "$components/icons/icon-running-man.svelte";
     import {
         LogIn,
         SunMoonIcon,

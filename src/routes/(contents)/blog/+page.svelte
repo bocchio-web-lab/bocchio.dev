@@ -1,6 +1,6 @@
 <script lang="ts">
-    import AtomicCard from "$components/atomic/card.svelte";
-    import * as Pagination from "$components/ui/pagination";
+    import AtomicCard from "$components/cards/card.svelte";
+    import PaginationControls from "$components/pagination/pagination-controls.svelte";
     import { goto, pushState } from "$app/navigation";
     import { onMount } from "svelte";
 
@@ -70,45 +70,8 @@
     {/each}
 </div>
 
-{#if data.pagination && (data.pagination.total ?? 0) > (data.pagination.per_page ?? 10)}
-    <div class="mt-12 flex justify-center">
-        <Pagination.Root
-            count={data.pagination?.total || 0}
-            perPage={data.pagination?.per_page || 10}
-        >
-            {#snippet children({ pages, currentPage })}
-                <Pagination.Content>
-                    <Pagination.Item>
-                        <Pagination.Previous
-                            onclick={() => goto(`?page=${currentPage - 1}`)}
-                        />
-                    </Pagination.Item>
-
-                    {#each pages as page (page.key)}
-                        {#if page.type === "ellipsis"}
-                            <Pagination.Item>
-                                <Pagination.Ellipsis />
-                            </Pagination.Item>
-                        {:else}
-                            <Pagination.Item>
-                                <Pagination.Link
-                                    {page}
-                                    isActive={currentPage === page.value}
-                                    onclick={() => goto(`?page=${page.value}`)}
-                                >
-                                    {page.value}
-                                </Pagination.Link>
-                            </Pagination.Item>
-                        {/if}
-                    {/each}
-
-                    <Pagination.Item>
-                        <Pagination.Next
-                            onclick={() => goto(`?page=${currentPage + 1}`)}
-                        />
-                    </Pagination.Item>
-                </Pagination.Content>
-            {/snippet}
-        </Pagination.Root>
-    </div>
-{/if}
+<PaginationControls
+    count={data.pagination?.total || 0}
+    perPage={data.pagination?.per_page || 10}
+    onPageChange={(page) => goto(`?page=${page}`)}
+/>

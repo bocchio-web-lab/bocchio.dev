@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { page } from "$app/stores";
-    import { derived } from "svelte/store";
+    import { page } from "$app/state";
 
     const navItems = [
         { href: "/projects", label: "Projects" },
@@ -8,7 +7,7 @@
         { href: "/blog", label: "Blog" },
     ];
 
-    const currentPath = derived(page, ($page) => $page.url.pathname);
+    const currentPath = $derived(page.url.pathname);
 </script>
 
 <nav>
@@ -18,7 +17,7 @@
                 <a
                     {href}
                     class="text-center text-lg font-bold hover:text-primary sm:text-xl"
-                    class:text-primary={$currentPath.startsWith(href)}
+                    class:text-primary={currentPath.startsWith(href)}
                 >
                     {label}
                 </a>

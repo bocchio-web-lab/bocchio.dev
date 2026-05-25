@@ -28,12 +28,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
 
     return {
         comments: commentsData.data || [],
-        pagination: {
-            currentPage: commentsData.current_page || 1,
-            perPage: commentsData.per_page || 20,
-            total: commentsData.total || 0,
-            lastPage: commentsData.last_page || 1
-        },
+        pagination: commentsData,
         filters: { approved }
     };
 };
@@ -43,7 +38,7 @@ export const actions: Actions = {
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
-        const tenantId = formData.get('tenant_id') as string;
+        const tenantId = params.tenantId;
         const commentId = formData.get('comment_id') as string;
 
         const response = await sdk.commentModerationApprove({
@@ -52,7 +47,7 @@ export const actions: Actions = {
         } as any);
 
         if (response.error) {
-            return fail(response.status || 400, {
+            return fail(response.response?.status || 400, {
                 error: response.error?.message || 'Failed to approve comment',
             });
         }
@@ -64,7 +59,7 @@ export const actions: Actions = {
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
-        const tenantId = formData.get('tenant_id') as string;
+        const tenantId = params.tenantId;
         const commentId = formData.get('comment_id') as string;
 
         const response = await sdk.commentModerationReject({
@@ -73,7 +68,7 @@ export const actions: Actions = {
         } as any);
 
         if (response.error) {
-            return fail(response.status || 400, {
+            return fail(response.response?.status || 400, {
                 error: response.error?.message || 'Failed to reject comment',
             });
         }
@@ -85,7 +80,7 @@ export const actions: Actions = {
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
-        const tenantId = formData.get('tenant_id') as string;
+        const tenantId = params.tenantId;
         const commentId = formData.get('comment_id') as string;
 
         const response = await sdk.commentModerationDestroy({
@@ -94,7 +89,7 @@ export const actions: Actions = {
         } as any);
 
         if (response.error) {
-            return fail(response.status || 400, {
+            return fail(response.response?.status || 400, {
                 error: response.error?.message || 'Failed to delete comment',
             });
         }

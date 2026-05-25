@@ -34,7 +34,9 @@
 </script>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
+    >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">Tag Management</h2>
             <p class="text-muted-foreground">Organize your content with tags</p>
@@ -114,12 +116,6 @@
                                         >
                                             <input
                                                 type="hidden"
-                                                name="tenant_id"
-                                                value={tenant.id}
-                                            />
-
-                                            <input
-                                                type="hidden"
                                                 name="id"
                                                 value={tag.id}
                                             />
@@ -187,8 +183,6 @@
                 };
             }}
         >
-            <input type="hidden" name="tenant_id" value={tenant.id} />
-
             <div class="space-y-4 py-4">
                 <div class="space-y-2">
                     <Label for="create-name">Name *</Label>
@@ -249,7 +243,6 @@
                     };
                 }}
             >
-                <input type="hidden" name="tenant_id" value={tenant.id} />
                 <input type="hidden" name="id" value={editingTag.id} />
                 <div class="space-y-4 py-4">
                     <div class="space-y-2">

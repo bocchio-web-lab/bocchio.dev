@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import { createCmsSdk } from '$lib/sdk.server';
 
 export const load: PageServerLoad = async ({ parent, cookies }) => {
-    const { tenant, userRole } = await parent();
+    const { tenant } = await parent();
     const sdk = createCmsSdk(cookies);
     const headers = { 'X-Tenant-ID': tenant.id.toString() };
 

@@ -25,7 +25,7 @@
     <title>Reset Password</title>
 </svelte:head>
 
-<Card.Root class="mx-auto w-full max-w-sm">
+<Card.Root>
     <Card.Header>
         <Card.Title>Reset Password</Card.Title>
         <Card.Description>Enter your new password below.</Card.Description>

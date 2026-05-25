@@ -30,7 +30,7 @@
     <title>Login</title>
 </svelte:head>
 
-<Card.Root class="mx-auto w-full max-w-sm">
+<Card.Root>
     <Card.Header>
         <Card.Title class="text-2xl">Login</Card.Title>
         <Card.Description

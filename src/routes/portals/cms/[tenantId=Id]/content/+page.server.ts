@@ -10,12 +10,14 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
     // Get filter params from URL
     const type = url.searchParams.get('type') || '';
     const status = url.searchParams.get('status') || '';
+    const title = url.searchParams.get('title') || '';
     const page = url.searchParams.get('page') || '1';
 
     // Build query string
     const queryParams = new URLSearchParams();
     if (type) queryParams.set('type', type);
     if (status) queryParams.set('status', status);
+    if (title) queryParams.set('title', title);
     if (page !== '1') queryParams.set('page', page);
 
     const queryString = queryParams.toString();
@@ -43,6 +45,6 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
             total: contentData.total || 0,
             lastPage: contentData.last_page || 1
         },
-        filters: { type, status }
+        filters: { type, status, title }
     };
 };

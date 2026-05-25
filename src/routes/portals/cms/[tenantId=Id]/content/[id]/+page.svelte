@@ -14,35 +14,57 @@
         form: ActionData;
     }
 
+    type ContentData = {
+        title: string;
+        type: string;
+        slug: string;
+        excerpt: string;
+        body: string;
+        status: string;
+        published_at: string | null;
+        created_at: string;
+        updated_at: string;
+        author?: { name?: string } | null;
+        tags?: { id: number }[];
+        meta?: {
+            headerImages?: string[];
+            externalLinks?: { title: string; url: string }[];
+            [key: string]: unknown;
+        };
+    };
+
     let { data, form }: Props = $props();
 
     let tenant = $derived(data.tenant);
-    let selectedStatus = $derived(data.content.status);
-    let selectedTags: number[] = $derived(
-        data.content.tags?.map((t) => t.id) || [],
-    );
+    let content = $derived(data.content as unknown as ContentData);
+
+    let selectedStatus = $state("");
+    let selectedTags = $state<number[]>([]);
     let isSubmitting = $state(false);
     let showDeleteConfirm = $state(false);
 
+    $effect(() => {
+        selectedStatus = content.status;
+        selectedTags = content.tags ? content.tags.map((t) => t.id) : [];
+    });
+
     // Meta properties - Initialize from existing data
     let headerImages: string[] = $derived(
-        data.content.meta?.headerImages &&
-            Array.isArray(data.content.meta.headerImages)
-            ? [...data.content.meta.headerImages]
+        content.meta?.headerImages && Array.isArray(content.meta.headerImages)
+            ? [...content.meta.headerImages]
             : [""],
     );
     let externalLinks: { title: string; url: string }[] = $derived(
-        data.content.meta?.externalLinks &&
-            Array.isArray(data.content.meta.externalLinks)
-            ? [...data.content.meta.externalLinks]
+        content.meta?.externalLinks && Array.isArray(content.meta.externalLinks)
+            ? [...content.meta.externalLinks]
             : [{ title: "", url: "" }],
     );
 
     // Get custom meta fields (excluding headerImages and externalLinks)
     function getCustomMetaEntries() {
-        if (!data.content.meta) return [];
+        if (!content.meta) return [];
         const entries: { key: string; value: string }[] = [];
-        for (const [key, value] of Object.entries(data.content.meta)) {
+        for (const [key, value] of Object.entries(content.meta)) {
             if (key !== "headerImages" && key !== "externalLinks") {
                 entries.push({ key, value: String(value) });
             }
@@ -80,7 +102,9 @@
     }
 
     // Format datetime for input
-    function formatDatetimeLocal(dateString: string | undefined): string {
+    function formatDatetimeLocal(
+        dateString: string | null | undefined,
+    ): string {
         if (!dateString) return "";
         const date = new Date(dateString);
         return date.toISOString().slice(0, 16);
@@ -91,11 +115,11 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold tracking-tight">Edit Content</h2>
-            <p class="text-muted-foreground">{data.content.title}</p>
+            <p class="text-muted-foreground">{content.title}</p>
         </div>
         <div class="flex gap-2">
             <Button
-                href={`/portals/cms/${data.tenant.public_slug}/content`}
+                href={`/portals/cms/${data.tenant.id}/content`}
                 variant="outline"
             >
                 Back to List
@@ -132,14 +156,13 @@
             };
         }}
     >
-        <input type="hidden" name="tenant_id" value={tenant.id} />
         <div class="space-y-6">
             <Card.Root>
                 <Card.Header>
                     <Card.Title>Basic Information</Card.Title>
                     <div class="flex gap-2">
-                        <Badge variant="outline">{data.content.type}</Badge>
-                        <Badge>{data.content.status}</Badge>
+                        <Badge variant="outline">{content.type}</Badge>
+                        <Badge>{content.status}</Badge>
                     </div>
                 </Card.Header>
                 <Card.Content class="space-y-4">
@@ -149,7 +172,7 @@
                         <Input
                             id="type"
                             name="type"
-                            value={data.content.type}
+                            value={content.type}
                             required
                         />
                     </div>
@@ -160,7 +183,7 @@
                         <Input
                             id="title"
                             name="title"
-                            value={data.content.title}
+                            value={content.title}
                             required
                         />
                     </div>
@@ -168,11 +191,7 @@
                     <!-- Slug -->
                     <div class="space-y-2">
                         <Label for="slug">Slug</Label>
-                        <Input
-                            id="slug"
-                            name="slug"
-                            value={data.content.slug}
-                        />
+                        <Input id="slug" name="slug" value={content.slug} />
                     </div>
 
                     <!-- Excerpt -->
@@ -181,7 +200,7 @@
                         <Textarea
                             id="excerpt"
                             name="excerpt"
-                            value={data.content.excerpt}
+                            value={content.excerpt}
                             rows={3}
                         />
                     </div>
@@ -198,7 +217,7 @@
                         <Textarea
                             id="body"
                             name="body"
-                            value={data.content.body}
+                            value={content.body}
                             rows={15}
                             required
                         />
@@ -371,7 +390,7 @@
                                 name="published_at"
                                 type="datetime-local"
                                 value={formatDatetimeLocal(
-                                    data.content.published_at,
+                                    content.published_at,
                                 )}
                             />
                         </div>
@@ -386,8 +405,6 @@
                                     <div class="flex items-center space-x-2">
                                         <Checkbox
                                             id={`tag-${tag.id}`}
-                                            name="tags"
-                                            value={tag.id}
                                             checked={selectedTags.includes(
                                                 tag.id,
                                             )}
@@ -406,6 +423,14 @@
                                                 }
                                             }}
                                         />
+                                        <!-- Hidden input for form submission -->
+                                        {#if selectedTags.includes(tag.id)}
+                                            <input
+                                                type="hidden"
+                                                name="tags"
+                                                value={tag.id}
+                                            />
+                                        {/if}
                                         <Label
                                             for={`tag-${tag.id}`}
                                             class="cursor-pointer text-sm font-normal"
@@ -424,19 +449,15 @@
                         <div class="space-y-1 text-sm">
                             <p>
                                 <span class="font-medium">Author:</span>
-                                {data.content.author?.name || "Unknown"}
+                                {content.author?.name || "Unknown"}
                             </p>
                             <p>
                                 <span class="font-medium">Created:</span>
-                                {new Date(
-                                    data.content.created_at,
-                                ).toLocaleString()}
+                                {new Date(content.created_at).toLocaleString()}
                             </p>
                             <p>
                                 <span class="font-medium">Last Updated:</span>
-                                {new Date(
-                                    data.content.updated_at,
-                                ).toLocaleString()}
+                                {new Date(content.updated_at).toLocaleString()}
                             </p>
                         </div>
                     </div>
@@ -482,7 +503,7 @@
                     <Button
                         type="button"
                         variant="outline"
-                        href={`/portals/cms/${data.tenant.public_slug}/content`}
+                        href={`/portals/cms/${data.tenant.id}/content`}
                     >
                         Cancel
                     </Button>

@@ -116,7 +116,7 @@
             </Card.Content>
             <Card.Footer>
                 <Button
-                    href={`/portals/cms/${data.tenant.public_slug}/content`}
+                    href={`/portals/cms/${data.tenant.id}/content`}
                     variant="outline"
                     class="w-full"
                 >
@@ -171,7 +171,7 @@
             </Card.Content>
             <Card.Footer>
                 <Button
-                    href={`/portals/cms/${data.tenant.public_slug}/comments`}
+                    href={`/portals/cms/${data.tenant.id}/comments`}
                     variant="outline"
                     class="w-full"
                 >

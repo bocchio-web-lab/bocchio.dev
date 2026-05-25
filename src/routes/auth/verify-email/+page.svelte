@@ -23,7 +23,7 @@
     <title>Verify Email</title>
 </svelte:head>
 
-<Card.Root class="mx-auto w-full max-w-sm">
+<Card.Root>
     <Card.Header>
         <Card.Title>Verify Your Email Address</Card.Title>
         <Card.Description>

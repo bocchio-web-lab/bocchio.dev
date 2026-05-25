@@ -1,5 +1,5 @@
 <script lang="ts">
-    import IconGearBulb from "$components/atomic/icon-gear-bulb.svelte";
+    import IconGearBulb from "$components/icons/icon-gear-bulb.svelte";
 </script>
 
 <a href="/" aria-label="Go to homepage" class="group flex items-center gap-4">

@@ -1,11 +1,11 @@
 <script lang="ts">
-	interface Props {
-		children?: import('svelte').Snippet;
-	}
+    interface Props {
+        children?: import("svelte").Snippet;
+    }
 
-	let { children }: Props = $props();
+    let { children }: Props = $props();
 </script>
 
-<main class="m-auto flex h-max w-full flex-col items-center justify-center px-4 py-8">
-	{@render children?.()}
-</main>
+<section class="container mx-auto min-h-full px-4 py-8">
+    {@render children?.()}
+</section>

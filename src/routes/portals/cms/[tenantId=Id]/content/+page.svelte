@@ -3,10 +3,11 @@
     import { page } from "$app/state";
     import { Button } from "$components/ui/button/index.js";
     import { Badge } from "$components/ui/badge/index.js";
+    import PaginationControls from "$components/pagination/pagination-controls.svelte";
     import * as Card from "$components/ui/card/index.js";
     import * as Table from "$components/ui/table/index.js";
     import * as Select from "$components/ui/select/index.js";
-    import * as Pagination from "$components/ui/pagination";
+    // import { Input } from "$components/ui/input/index.js";
 
     import type { PageData } from "./$types";
 
@@ -23,15 +24,28 @@
         { value: "archived", label: "Archived" },
     ];
 
-    const type_options = [
-        { value: "", label: "All Types" },
-        { value: "project", label: "Project" },
-        { value: "post", label: "Post" },
-        { value: "app", label: "App" },
-    ];
+    const type_options = $derived(
+        (() => {
+            const items = data.content ?? [];
+            const uniqueTypes = Array.from(
+                new Set(items.map((i: any) => i.type).filter(Boolean)),
+            );
+
+            return [
+                { value: "", label: "All Types" },
+                ...uniqueTypes.map((t) => ({
+                    value: t,
+                    label:
+                        (t as string).charAt(0).toUpperCase() +
+                        (t as string).slice(1),
+                })),
+            ] as { value: string; label: string }[];
+        })(),
+    );
 
     let status = $state("");
     let type = $state("");
+    let title = $state("");
 
     function getStatusBadgeVariant(status: string) {
         const status_badge_variants: Record<
@@ -59,7 +73,9 @@
 </script>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
+    >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">
                 Content Management
@@ -68,7 +84,7 @@
                 Manage all your posts, pages, and projects
             </p>
         </div>
-        <Button href={`/portals/cms/${data.tenant.public_slug}/content/new`}>
+        <Button href={`/portals/cms/${data.tenant.id}/content/new`}>
             Create New Content
         </Button>
     </div>
@@ -78,71 +94,82 @@
         <Card.Header>
             <Card.Title>Filters</Card.Title>
         </Card.Header>
-        <Card.Content>
-            <div class="flex gap-4">
-                <div class="w-48">
-                    <Select.Root
-                        type="single"
-                        name="type"
-                        bind:value={type}
-                        onValueChange={(val) => updateFilter("type", val)}
-                    >
-                        <Select.Trigger class="w-45">
-                            {type_options.find((f) => f.value === type)
-                                ?.label ?? "Select a type"}
-                        </Select.Trigger>
-                        <Select.Content>
-                            {#each type_options as option (option.value)}
-                                <Select.Item
-                                    value={option.value}
-                                    label={option.label}
-                                >
-                                    {option.label}
-                                </Select.Item>
-                            {/each}
-                        </Select.Content>
-                    </Select.Root>
-                </div>
+        <Card.Content class="flex flex-col gap-4 md:flex-row md:items-center">
+            <!-- <div class="w-full md:w-1/3">
+                <Input
+                    type="text"
+                    name="title"
+                    bind:value={data.filters.title}
+                    placeholder="Search by title..."
+                    on:input={(e) =>
+                        updateFilter("title", (e.target as HTMLInputElement).value)
+                    }
+                />
+            </div> -->
 
-                <div class="w-48">
-                    <Select.Root
-                        type="single"
-                        name="status"
-                        bind:value={status}
-                        onValueChange={(val) => updateFilter("status", val)}
-                    >
-                        <Select.Trigger class="w-45">
-                            {status_options.find((f) => f.value === status)
-                                ?.label ?? "Select a status"}
-                        </Select.Trigger>
-                        <Select.Content>
-                            {#each status_options as option (option.value)}
-                                <Select.Item
-                                    value={option.value}
-                                    label={option.label}
-                                >
-                                    {option.label}
-                                </Select.Item>
-                            {/each}
-                        </Select.Content>
-                    </Select.Root>
-                </div>
-
-                {#if data.filters.type || data.filters.status}
-                    <Button
-                        variant="outline"
-                        onclick={() => {
-                            goto(
-                                `/portals/cms/${data.tenant.public_slug}/content`,
-                            );
-                            status = "";
-                            type = "";
-                        }}
-                    >
-                        Clear Filters
-                    </Button>
-                {/if}
+            <div class="w-full md:w-1/3">
+                <Select.Root
+                    type="single"
+                    name="type"
+                    bind:value={type}
+                    onValueChange={(val) => updateFilter("type", val)}
+                >
+                    <Select.Trigger class="w-full">
+                        {type_options.find((f) => f.value === type)?.label ??
+                            "Select a type"}
+                    </Select.Trigger>
+                    <Select.Content>
+                        {#each type_options as option (option.value)}
+                            <Select.Item
+                                value={option.value}
+                                label={option.label}
+                            >
+                                {option.label}
+                            </Select.Item>
+                        {/each}
+                    </Select.Content>
+                </Select.Root>
             </div>
+
+            <div class="w-full md:w-1/3">
+                <Select.Root
+                    type="single"
+                    name="status"
+                    bind:value={status}
+                    onValueChange={(val) => updateFilter("status", val)}
+                >
+                    <Select.Trigger class="w-full">
+                        {status_options.find((f) => f.value === status)
+                            ?.label ?? "Select a status"}
+                    </Select.Trigger>
+                    <Select.Content>
+                        {#each status_options as option (option.value)}
+                            <Select.Item
+                                value={option.value}
+                                label={option.label}
+                            >
+                                {option.label}
+                            </Select.Item>
+                        {/each}
+                    </Select.Content>
+                </Select.Root>
+            </div>
+
+            <Button
+                variant="outline"
+                onclick={() => {
+                    goto(`/portals/cms/${data.tenant.id}/content`);
+                    status = "";
+                    type = "";
+                    title = "";
+                }}
+                class="w-full md:w-1/3"
+                disabled={!data.filters.type &&
+                    !data.filters.status &&
+                    !data.filters.title}
+            >
+                Clear Filters
+            </Button>
         </Card.Content>
     </Card.Root>
 
@@ -212,7 +239,7 @@
                                     </Table.Cell>
                                     <Table.Cell class="text-right">
                                         <Button
-                                            href={`/portals/cms/${data.tenant.public_slug}/content/${item.id}`}
+                                            href={`/portals/cms/${data.tenant.id}/content/${item.id}`}
                                             size="sm"
                                             variant="outline"
                                         >
@@ -226,64 +253,15 @@
                 </div>
 
                 <!-- Pagination -->
-                {#if data.pagination.lastPage > 1}
-                    <div class="mt-12 flex justify-center">
-                        <Pagination.Root
-                            count={data.pagination?.total || 0}
-                            perPage={data.pagination?.perPage || 10}
-                        >
-                            {#snippet children({ pages, currentPage })}
-                                <Pagination.Content>
-                                    <Pagination.Item>
-                                        <Pagination.Previous
-                                            onclick={() =>
-                                                goto(
-                                                    `?page=${currentPage - 1}`,
-                                                )}
-                                        />
-                                    </Pagination.Item>
-
-                                    {#each pages as page (page.key)}
-                                        {#if page.type === "ellipsis"}
-                                            <Pagination.Item>
-                                                <Pagination.Ellipsis />
-                                            </Pagination.Item>
-                                        {:else}
-                                            <Pagination.Item>
-                                                <Pagination.Link
-                                                    {page}
-                                                    isActive={currentPage ===
-                                                        page.value}
-                                                    onclick={() =>
-                                                        goto(
-                                                            `?page=${page.value}`,
-                                                        )}
-                                                >
-                                                    {page.value}
-                                                </Pagination.Link>
-                                            </Pagination.Item>
-                                        {/if}
-                                    {/each}
-
-                                    <Pagination.Item>
-                                        <Pagination.Next
-                                            onclick={() =>
-                                                goto(
-                                                    `?page=${currentPage + 1}`,
-                                                )}
-                                        />
-                                    </Pagination.Item>
-                                </Pagination.Content>
-                            {/snippet}
-                        </Pagination.Root>
-                    </div>
-                {/if}
+                <PaginationControls
+                    count={data.pagination?.total || 0}
+                    perPage={data.pagination?.perPage || 10}
+                    onPageChange={(page) => goto(`?page=${page}`)}
+                />
             {:else}
                 <div class="py-12 text-center">
                     <p class="mb-4 text-muted-foreground">No content found</p>
-                    <Button
-                        href={`/portals/cms/${data.tenant.public_slug}/content/new`}
-                    >
+                    <Button href={`/portals/cms/${data.tenant.id}/content/new`}>
                         Create Your First Content
                     </Button>
                 </div>

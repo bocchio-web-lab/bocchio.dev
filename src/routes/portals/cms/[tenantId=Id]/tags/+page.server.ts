@@ -24,7 +24,7 @@ export const actions: Actions = {
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
-        const tenantId = formData.get('tenant_id') as string;
+        const tenantId = params.tenantId;
         const name = formData.get('name') as string;
         const slug = formData.get('slug') as string;
 
@@ -49,7 +49,7 @@ export const actions: Actions = {
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
-        const tenantId = formData.get('tenant_id') as string;
+        const tenantId = params.tenantId;
         const id = formData.get('id') as string;
         const name = formData.get('name') as string;
         const slug = formData.get('slug') as string;
@@ -76,7 +76,7 @@ export const actions: Actions = {
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
-        const tenantId = formData.get('tenant_id') as string;
+        const tenantId = params.tenantId;
         const id = formData.get('id') as string;
 
         const response = await sdk.tagsDestroy({

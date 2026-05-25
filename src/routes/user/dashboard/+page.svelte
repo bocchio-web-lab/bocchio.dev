@@ -3,8 +3,6 @@
     import * as Card from "$components/ui/card/index.js";
     import * as Table from "$components/ui/table/index.js";
     import { Badge } from "$components/ui/badge/index.js";
-    import CreateTenantDialog from "$components/create-tenant-dialog.svelte";
-    import { invalidateAll } from "$app/navigation";
     import type { PageData } from "./$types";
 
     interface Props {
@@ -13,19 +11,20 @@
 
     let { data }: Props = $props();
 
-    async function handleTenantCreated() {
-        // Refresh the page data to show the new tenant
-        await invalidateAll();
-    }
-
     function getPortalLink(tenant: any) {
-        if (tenant.service.slug === "cms") {
-            return `/portals/cms/${tenant.public_slug}`;
+        const service = data.services.find(
+            (item) => item.id === tenant.service_id,
+        );
+
+        if (service?.slug === "cms") {
+            return `/portals/cms/${tenant.id}`;
         }
-        if (tenant.service.slug === "ptm") {
-            return `/portals/ptm/${tenant.public_slug}`;
+
+        if (service?.slug === "ptm") {
+            return `/portals/ptm/${tenant.id}`;
         }
-        return "#";
+
+        return null;
     }
 
     function getRoleBadgeVariant(
@@ -99,8 +98,11 @@
                                 >
                                 <Table.Cell>
                                     <Badge variant="outline"
-                                        >{tenant.service?.name ||
-                                            "Unknown"}</Badge
+                                        >{data.services.find(
+                                            (service) =>
+                                                service.id ===
+                                                tenant.service_id,
+                                        )?.name || "Unknown"}</Badge
                                     >
                                 </Table.Cell>
                                 <Table.Cell>
@@ -128,10 +130,25 @@
                                     {/if}
                                 </Table.Cell>
                                 <Table.Cell class="text-right">
-                                    <Button
-                                        href={getPortalLink(tenant)}
-                                        size="sm">Open Portal</Button
-                                    >
+                                    <div class="flex justify-end gap-2">
+                                        {#if getPortalLink(tenant)}
+                                            <Button
+                                                href={getPortalLink(
+                                                    tenant,
+                                                ) as string}
+                                                size="sm"
+                                                variant="outline"
+                                            >
+                                                Open Portal
+                                            </Button>
+                                        {/if}
+                                        <Button
+                                            href={`/user/dashboard/tenants/${tenant.id}`}
+                                            size="sm"
+                                        >
+                                            Manage
+                                        </Button>
+                                    </div>
                                 </Table.Cell>
                             </Table.Row>
                         {/each}
@@ -170,30 +187,29 @@
                     {#each data.services as service}
                         <Card.Root>
                             <Card.Header>
-                                <Card.Title class="text-lg"
-                                    >{service.name}</Card.Title
-                                >
-                                <Card.Description
-                                    >{service.description}</Card.Description
-                                >
+                                <Card.Title class="text-lg">
+                                    {service.name}
+                                </Card.Title>
+                                <Card.Description>
+                                    {service.description}
+                                </Card.Description>
                             </Card.Header>
                             <Card.Content>
-                                <Badge
+                                <!-- <Badge
                                     variant={service.is_active
                                         ? "default"
                                         : "secondary"}
                                 >
                                     {service.is_active ? "Active" : "Inactive"}
-                                </Badge>
+                                </Badge> -->
+                                <Button
+                                    href={`/user/dashboard/tenants/new?service=${service.id}`}
+                                    size="sm"
+                                    class="w-full"
+                                >
+                                    Create tenant
+                                </Button>
                             </Card.Content>
-                            <Card.Footer>
-                                {#if service.is_active}
-                                    <CreateTenantDialog
-                                        {service}
-                                        onSuccess={handleTenantCreated}
-                                    />
-                                {/if}
-                            </Card.Footer>
                         </Card.Root>
                     {/each}
                 </div>

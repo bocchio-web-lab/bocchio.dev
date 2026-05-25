@@ -7,6 +7,7 @@
     import * as Card from "$components/ui/card/index.js";
     import * as Select from "$components/ui/select/index.js";
     import type { PageData, ActionData } from "./$types";
+    import PaginationControls from "$components/pagination/pagination-controls.svelte";
 
     interface Props {
         data: PageData;
@@ -33,12 +34,6 @@
             url.searchParams.set("approved", value);
         }
         url.searchParams.delete("page");
-        goto(url.toString());
-    }
-
-    function changePage(newPage: number) {
-        const url = new URL(page.url);
-        url.searchParams.set("page", newPage.toString());
         goto(url.toString());
     }
 
@@ -83,15 +78,15 @@
         <Card.Header>
             <Card.Title>Filters</Card.Title>
         </Card.Header>
-        <Card.Content>
-            <div class="w-48">
+        <Card.Content class="flex flex-col gap-4 md:flex-row md:items-center">
+            <div class="w-full">
                 <Select.Root
                     type="single"
                     name="approved"
                     bind:value={filterValue}
                     onValueChange={(val) => updateFilter(val)}
                 >
-                    <Select.Trigger class="w-45">
+                    <Select.Trigger class="w-full">
                         {filter_options.find((f) => f.value === filterValue)
                             ?.label ?? "All Comments"}
                     </Select.Trigger>
@@ -142,7 +137,7 @@
                                 {#if comment.content_item}
                                     <p class="text-sm text-muted-foreground">
                                         On: <a
-                                            href={`/portals/cms/${data.tenant.public_slug}/content/${comment.content_item.id}`}
+                                            href={`/portals/cms/${data.tenant.id}/content/${comment.content_item.id}`}
                                             class="underline hover:text-foreground"
                                         >
                                             {comment.content_item.title}
@@ -162,12 +157,6 @@
                             <form method="POST" action="?/approve" use:enhance>
                                 <input
                                     type="hidden"
-                                    name="tenant_id"
-                                    value={tenant.id}
-                                />
-
-                                <input
-                                    type="hidden"
                                     name="comment_id"
                                     value={comment.id}
                                 />
@@ -179,12 +168,6 @@
                             </form>
                         {:else}
                             <form method="POST" action="?/reject" use:enhance>
-                                <input
-                                    type="hidden"
-                                    name="tenant_id"
-                                    value={tenant.id}
-                                />
-
                                 <input
                                     type="hidden"
                                     name="comment_id"
@@ -205,12 +188,6 @@
                                 use:enhance
                                 class="flex gap-2"
                             >
-                                <input
-                                    type="hidden"
-                                    name="tenant_id"
-                                    value={tenant.id}
-                                />
-
                                 <input
                                     type="hidden"
                                     name="comment_id"
@@ -248,46 +225,11 @@
             {/each}
 
             <!-- Pagination -->
-            {#if data.pagination.lastPage > 1}
-                <Card.Root>
-                    <Card.Content class="pt-6">
-                        <div class="flex items-center justify-between">
-                            <div class="text-sm text-muted-foreground">
-                                Page {data.pagination.currentPage} of {data
-                                    .pagination.lastPage}
-                                <span class="ml-2"
-                                    >({data.pagination.total} total)</span
-                                >
-                            </div>
-                            <div class="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={data.pagination.currentPage === 1}
-                                    onclick={() =>
-                                        changePage(
-                                            data.pagination.currentPage - 1,
-                                        )}
-                                >
-                                    Previous
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={data.pagination.currentPage >=
-                                        data.pagination.lastPage}
-                                    onclick={() =>
-                                        changePage(
-                                            data.pagination.currentPage + 1,
-                                        )}
-                                >
-                                    Next
-                                </Button>
-                            </div>
-                        </div>
-                    </Card.Content>
-                </Card.Root>
-            {/if}
+            <PaginationControls
+                count={data.pagination?.total || 0}
+                perPage={data.pagination?.per_page || 10}
+                onPageChange={(page) => goto(`?page=${page}`)}
+            />
         {:else}
             <Card.Root>
                 <Card.Content class="pt-12 pb-12 text-center">

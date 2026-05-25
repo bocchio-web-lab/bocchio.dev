@@ -29,6 +29,21 @@
 
         return longestMatch?.href === href;
     }
+
+    function getAccessLevelBadge(
+        level: string,
+    ): "default" | "secondary" | "destructive" | "outline" {
+        switch (level) {
+            case "public":
+                return "default";
+            case "private":
+                return "destructive";
+            case "token_protected":
+                return "secondary";
+            default:
+                return "outline";
+        }
+    }
 </script>
 
 <svelte:head>
@@ -38,7 +53,9 @@
 
 <div class="border-b">
     <div class="container mx-auto px-4">
-        <div class="flex min-h-16 items-center justify-between gap-3 py-3">
+        <div
+            class="flex flex-col min-h-16 justify-between gap-3 py-3 md:flex-row md:items-center"
+        >
             <div class="items-center space-y-1">
                 <h1 class="text-xl font-semibold">
                     {tenant.name}
@@ -48,6 +65,9 @@
                             : "outline"}
                     >
                         {userRole}
+                    </Badge>
+                    <Badge variant={getAccessLevelBadge(tenant.access_level)}>
+                        {tenant.access_level}
                     </Badge>
                 </h1>
                 <p class="text-xs text-muted-foreground">
@@ -66,8 +86,8 @@
 
 {#if navItems.length > 0}
     <div class="border-b">
-        <div class="container mx-auto px-4">
-            <nav class="flex gap-1">
+        <div class="container mx-auto px-4 overflow-auto">
+            <nav class="flex gap-1 justify-center">
                 {#each navItems as item}
                     <Button
                         href={item.href}

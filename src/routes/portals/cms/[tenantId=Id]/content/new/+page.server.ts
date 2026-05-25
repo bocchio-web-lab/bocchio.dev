@@ -1,42 +1,27 @@
 import type { PageServerLoad, Actions } from './$types';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
 import { createCmsSdk } from '$lib/sdk.server';
 
-export const load: PageServerLoad = async ({ parent, cookies, params }) => {
+export const load: PageServerLoad = async ({ parent, cookies }) => {
     const { tenant } = await parent();
     const sdk = createCmsSdk(cookies);
 
-    const tenantId = tenant.id.toString();
-
-    // Fetch content item
-    const contentResponse = await sdk.contentShow({
-        path: { id: params.id },
-        headers: { 'X-Tenant-ID': tenantId },
-    } as any);
-
-    if (contentResponse.error) {
-        throw error(404, 'Content not found');
-    }
-
     // Fetch available tags
     const tagsResponse = await sdk.tagsIndex({
-        headers: { 'X-Tenant-ID': tenantId },
+        headers: { 'X-Tenant-ID': tenant.id.toString() },
     } as any);
 
     const tags = tagsResponse.error ? [] : tagsResponse.data?.data ?? [];
 
-    return {
-        content: contentResponse.data?.data,
-        tags
-    };
+    return { tags };
 };
 
 export const actions: Actions = {
-    update: async ({ request, cookies, params }) => {
+    default: async ({ request, cookies, params }) => {
         const sdk = createCmsSdk(cookies);
         const formData = await request.formData();
 
-        const tenantId = formData.get('tenant_id') as string;
+        const tenantId = params.tenantId;
         const type = formData.get('type') as string;
         const title = formData.get('title') as string;
         const slug = formData.get('slug') as string;
@@ -87,7 +72,7 @@ export const actions: Actions = {
             type,
             title,
             body,
-            status
+            status: status || 'draft'
         };
 
         if (slug) payload.slug = slug;
@@ -96,38 +81,17 @@ export const actions: Actions = {
         if (tags.length > 0) payload.tags = tags;
         if (Object.keys(meta).length > 0) payload.meta = meta;
 
-        const response = await sdk.contentUpdate({
-            path: { id: params.id },
+        const response = await sdk.contentStore({
             body: payload,
             headers: { 'X-Tenant-ID': tenantId },
         } as any);
 
         if (response.error) {
             return fail(response.response?.status || 400, {
-                error: response.error?.message || 'Failed to update content'
+                error: response.error?.message || 'Failed to create content'
             });
         }
 
-        return { success: true };
-    },
-
-    delete: async ({ request, cookies, params }) => {
-        const sdk = createCmsSdk(cookies);
-
-        const formData = await request.formData();
-        const tenantId = formData.get('tenant_id') as string;
-
-        const response = await sdk.contentDestroy({
-            path: { id: params.id },
-            headers: { 'X-Tenant-ID': tenantId },
-        } as any);
-
-        if (response.error) {
-            return fail(response.response?.status || 400, {
-                error: response.error?.message || 'Failed to delete content'
-            });
-        }
-
-        throw redirect(303, `/portals/cms/${params.slug}/content`);
+        throw redirect(303, `/portals/cms/${params.tenantId}/content/${response.data?.data.id}`);
     }
 };

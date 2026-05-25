@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ parent }) => {
         throw error(400, 'This is not a CMS tenant');
     }
 
-    const base = `/portals/cms/${tenant.public_slug}`;
+    const base = `/portals/cms/${tenant.id}`;
 
     return {
         portalNavItems: [
