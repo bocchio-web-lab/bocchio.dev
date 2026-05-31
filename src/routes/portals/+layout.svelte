@@ -2,6 +2,10 @@
     import { page } from "$app/state";
     import { Badge } from "$components/ui/badge/index.js";
     import { Button } from "$components/ui/button/index.js";
+    import {
+        getAccessLevelBadgeVariant,
+        getRoleBadgeVariant,
+    } from "$lib/utils/app";
 
     interface Props {
         children?: import("svelte").Snippet;
@@ -29,21 +33,6 @@
 
         return longestMatch?.href === href;
     }
-
-    function getAccessLevelBadge(
-        level: string,
-    ): "default" | "secondary" | "destructive" | "outline" {
-        switch (level) {
-            case "public":
-                return "default";
-            case "private":
-                return "destructive";
-            case "token_protected":
-                return "secondary";
-            default:
-                return "outline";
-        }
-    }
 </script>
 
 <svelte:head>
@@ -59,14 +48,14 @@
             <div class="items-center space-y-1">
                 <h1 class="text-xl font-semibold">
                     {tenant.name}
-                    <Badge
-                        variant={userRole === "owner" || userRole === "admin"
-                            ? "default"
-                            : "outline"}
-                    >
+                    <Badge variant={getRoleBadgeVariant(userRole)}>
                         {userRole}
                     </Badge>
-                    <Badge variant={getAccessLevelBadge(tenant.access_level)}>
+                    <Badge
+                        variant={getAccessLevelBadgeVariant(
+                            tenant.access_level,
+                        )}
+                    >
                         {tenant.access_level}
                     </Badge>
                 </h1>
@@ -77,9 +66,11 @@
                     {/if}
                 </p>
             </div>
-            <Button href="/user/dashboard" variant="outline">
-                Back to Dashboard
-            </Button>
+            {#if userRole !== "external"}
+                <Button href="/dashboard" variant="outline">
+                    Back to Dashboard
+                </Button>
+            {/if}
         </div>
     </div>
 </div>

@@ -54,7 +54,7 @@
                 </DropdownMenu.Item>
 
                 <DropdownMenu.Item
-                    onclick={() => goto("/user/dashboard")}
+                    onclick={() => goto("/dashboard")}
                     class="flex w-full cursor-pointer items-center"
                 >
                     <Cloud class="mr-2 h-4 w-4" />
@@ -66,7 +66,7 @@
                 <!-- Logout -->
                 <DropdownMenu.Item class="cursor-pointer">
                     <form
-                        action="/auth/logout"
+                        action="/user/logout"
                         method="POST"
                         class="flex w-full items-center"
                     >

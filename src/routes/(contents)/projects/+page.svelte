@@ -26,49 +26,11 @@
     />
 </svelte:head>
 
-<Timeline position="right">
-    {#each data.pagination.data as project, index}
-        <TimelineItem>
-            <TimelineOppositeContent>
-                <AtomicCard
-                    data={{
-                        title: project.title,
-                        content: project.excerpt || "",
-                    }}
-                    clickable={true}
-                    onclick={() => goto(`/projects/${project.slug}`)}
-                    class="desktop-card"
-                />
-            </TimelineOppositeContent>
-
-            <TimelineSeparator>
-                <TimelineDot>
-                    <button onclick={() => goto(`/projects/${project.slug}`)}>
-                        {#if (project.meta?.headerImages?.[0] || "").includes("res.cloudinary.com")}
-                            <CldImage
-                                src={project.meta?.headerImages?.[0] as string}
-                                alt={project.title}
-                                width="420"
-                                height="420"
-                                crop="pad"
-                                loading={index < 3 ? "eager" : "lazy"}
-                                decoding="async"
-                                fetchpriority={index < 3 ? "high" : "low"}
-                                class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-                            />
-                        {:else}
-                            <img
-                                src={(project.meta
-                                    ?.headerImages?.[0] as string) ||
-                                    "https://avatars.githubusercontent.com/u/67842431"}
-                                alt={project.title}
-                                loading={index < 3 ? "eager" : "lazy"}
-                                decoding="async"
-                                fetchpriority={index < 3 ? "high" : "low"}
-                                class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-                            />
-                        {/if}
-                    </button>
+{#if data.pagination != null}
+    <Timeline position="right">
+        {#each data.pagination.data as project, index}
+            <TimelineItem>
+                <TimelineOppositeContent>
                     <AtomicCard
                         data={{
                             title: project.title,
@@ -76,35 +38,82 @@
                         }}
                         clickable={true}
                         onclick={() => goto(`/projects/${project.slug}`)}
-                        class="mobile-card"
+                        class="desktop-card"
                     />
-                </TimelineDot>
+                </TimelineOppositeContent>
 
-                {#if index < data.pagination.data.length - 1}
-                    <TimelineConnector style="height: 100px;" />
-                {/if}
-            </TimelineSeparator>
+                <TimelineSeparator>
+                    <TimelineDot>
+                        <button
+                            onclick={() => goto(`/projects/${project.slug}`)}
+                        >
+                            {#if (project.meta?.headerImages?.[0] || "").includes("res.cloudinary.com")}
+                                <CldImage
+                                    src={project.meta
+                                        ?.headerImages?.[0] as string}
+                                    alt={project.title}
+                                    width="420"
+                                    height="420"
+                                    crop="pad"
+                                    loading={index < 3 ? "eager" : "lazy"}
+                                    decoding="async"
+                                    fetchpriority={index < 3 ? "high" : "low"}
+                                    class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+                                />
+                            {:else}
+                                <img
+                                    src={(project.meta
+                                        ?.headerImages?.[0] as string) ||
+                                        "https://avatars.githubusercontent.com/u/67842431"}
+                                    alt={project.title}
+                                    loading={index < 3 ? "eager" : "lazy"}
+                                    decoding="async"
+                                    fetchpriority={index < 3 ? "high" : "low"}
+                                    class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+                                />
+                            {/if}
+                        </button>
+                        <AtomicCard
+                            data={{
+                                title: project.title,
+                                content: project.excerpt || "",
+                            }}
+                            clickable={true}
+                            onclick={() => goto(`/projects/${project.slug}`)}
+                            class="mobile-card"
+                        />
+                    </TimelineDot>
 
-            <TimelineContent>
-                <AtomicCard
-                    data={{
-                        title: project.title,
-                        content: project.excerpt || "",
-                    }}
-                    clickable={true}
-                    onclick={() => goto(`/projects/${project.slug}`)}
-                    class="desktop-card"
-                />
-            </TimelineContent>
-        </TimelineItem>
-    {/each}
-</Timeline>
+                    {#if index < data.pagination.data.length - 1}
+                        <TimelineConnector style="height: 100px;" />
+                    {/if}
+                </TimelineSeparator>
 
-<PaginationControls
-    count={data.pagination.total || 0}
-    perPage={data.pagination.per_page || 10}
-    onPageChange={(page) => goto(`?page=${page}`)}
-/>
+                <TimelineContent>
+                    <AtomicCard
+                        data={{
+                            title: project.title,
+                            content: project.excerpt || "",
+                        }}
+                        clickable={true}
+                        onclick={() => goto(`/projects/${project.slug}`)}
+                        class="desktop-card"
+                    />
+                </TimelineContent>
+            </TimelineItem>
+        {/each}
+    </Timeline>
+
+    <PaginationControls
+        count={data.pagination.total || 0}
+        perPage={data.pagination.per_page || 10}
+        onPageChange={(page) => goto(`?page=${page}`)}
+    />
+{:else}
+    <p class="text-center text-sm text-muted-foreground">
+        No projects found. Check back later for updates!
+    </p>
+{/if}
 
 <style>
     :global(.opposite-block) {

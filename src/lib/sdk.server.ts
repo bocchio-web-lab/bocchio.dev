@@ -4,9 +4,11 @@ import { PUBLIC_API_BASE_URL, PUBLIC_FRONTEND_URL } from '$env/static/public';
 import { createClient as createIdentityClient } from '$lib/sdk/identity/client';
 import { createClient as createPlatformClient } from '$lib/sdk/platform/client';
 import { createClient as createCMSClient } from '$lib/sdk/cms/client';
+import { createClient as createPTMClient } from '$lib/sdk/ptm/client';
 import * as identityAPIs from '$lib/sdk/identity';
 import * as platformAPIs from '$lib/sdk/platform';
 import * as cmsAPIs from '$lib/sdk/cms';
+import * as ptmAPIs from '$lib/sdk/ptm';
 
 /**
  * Cookie and header constants shared across client and server
@@ -141,6 +143,10 @@ const CLIENT_FACTORIES = {
         create: () => createCMSClient({ baseUrl: `${PUBLIC_API_BASE_URL}/cms`, credentials: 'include' }),
         apis: cmsAPIs,
     },
+    ptm: {
+        create: () => createPTMClient({ baseUrl: `${PUBLIC_API_BASE_URL}/ptm`, credentials: 'include' }),
+        apis: ptmAPIs,
+    },
 } as const;
 
 type ClientType = keyof typeof CLIENT_FACTORIES;
@@ -251,3 +257,4 @@ type SDKWithAPIs<T extends ClientType> = SDK<T> & BoundAPIs<T>;
 export const createIdentitySdk = (cookies: Cookies) => new SDK(cookies, 'identity') as SDKWithAPIs<'identity'>;
 export const createPlatformSdk = (cookies: Cookies) => new SDK(cookies, 'platform') as SDKWithAPIs<'platform'>;
 export const createCmsSdk = (cookies: Cookies) => new SDK(cookies, 'cms') as SDKWithAPIs<'cms'>;
+export const createPtmSdk = (cookies: Cookies) => new SDK(cookies, 'ptm') as SDKWithAPIs<'ptm'>;

@@ -1,4 +1,4 @@
-import type { User } from '$lib/sdk/identity/types';
+import type { User } from '$lib/sdk/identity/types.gen';
 
 declare global {
     namespace App {

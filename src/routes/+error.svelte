@@ -37,9 +37,9 @@
                 {/if}
             </CardDescription>
         </CardHeader>
-        <CardContent>
+        <!-- <CardContent>
             <p class="text-center text-muted-foreground">{message}</p>
-        </CardContent>
+        </CardContent> -->
         <CardFooter class="flex justify-center gap-2">
             <Button variant="outline" href="/">
                 <House class="mr-2 h-4 w-4" />

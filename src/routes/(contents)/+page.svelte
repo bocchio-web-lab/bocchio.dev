@@ -87,6 +87,15 @@
     <!-- Right image -->
     <div class="image-wrapper mt-10 shrink-0 md:mt-0">
         <CldImage
+            src="2026-05-23_color_corrected_2_resized"
+            alt="Profile picture of Tommaso Bocchietti"
+            width="320"
+            height="320"
+            fetchpriority="high"
+            decoding="async"
+            class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80"
+        />
+        <!-- <CldImage
             src="profile_photo_tommaso_bocchietti_no_background"
             alt="Profile picture of Tommaso Bocchietti"
             width="320"
@@ -94,11 +103,11 @@
             fetchpriority="high"
             decoding="async"
             class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80 scale-x-[-1]"
-        />
+        /> -->
         <!-- <img
-            src="https://res.cloudinary.com/bocchio/image/upload/v1772137489/profile_photo_tommaso_bocchietti.png"
+            src="https://res.cloudinary.com/bocchio/image/upload/v1780143576/2026-05-23.png"
             alt="Profile picture of Tommaso Bocchietti"
-            class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80 scale-x-[-1]"
+            class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80"
         /> -->
     </div>
 </section>

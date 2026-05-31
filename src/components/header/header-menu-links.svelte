@@ -3,7 +3,7 @@
 
     const navItems = [
         { href: "/projects", label: "Projects" },
-        // { href: '/apps', label: 'Apps' },
+        // { href: "/apps", label: "Apps" },
         { href: "/blog", label: "Blog" },
     ];
 
