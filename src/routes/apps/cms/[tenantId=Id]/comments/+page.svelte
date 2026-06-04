@@ -1,0 +1,245 @@
+<script lang="ts">
+    import { enhance } from "$app/forms";
+    import { goto } from "$app/navigation";
+    import { page } from "$app/state";
+    import { Button } from "$components/ui/button/index.js";
+    import { Badge } from "$components/ui/badge/index.js";
+    import * as Card from "$components/ui/card/index.js";
+    import * as Select from "$components/ui/select/index.js";
+    import type { PageData, ActionData } from "./$types";
+    import PaginationControls from "$components/pagination/pagination-controls.svelte";
+
+    interface Props {
+        data: PageData;
+        form: ActionData;
+    }
+
+    let { data, form }: Props = $props();
+
+    let tenant = $derived(data.tenant);
+    let deletingCommentId: number | null = $state(null);
+    let filterValue = $state(getFilterValue());
+
+    const filter_options = [
+        { value: "all", label: "All Comments" },
+        { value: "false", label: "Pending" },
+        { value: "true", label: "Approved" },
+    ];
+
+    function updateFilter(value: string) {
+        const url = new URL(page.url);
+        if (value === "all") {
+            url.searchParams.delete("approved");
+        } else {
+            url.searchParams.set("approved", value);
+        }
+        url.searchParams.delete("page");
+        goto(url.toString());
+    }
+
+    function getFilterValue(): string {
+        if (data.filters.approved === null) return "all";
+        return data.filters.approved;
+    }
+</script>
+
+<div class="space-y-6">
+    <div>
+        <h2 class="text-2xl font-bold tracking-tight">Comment Moderation</h2>
+        <p class="text-muted-foreground">
+            Review and manage comments on your content
+        </p>
+    </div>
+
+    {#if form?.success}
+        <Card.Root class="border-green-500">
+            <Card.Content class="pt-6">
+                <p class="text-sm text-green-600">
+                    Comment {form.action === "approve"
+                        ? "approved"
+                        : form.action === "reject"
+                          ? "rejected"
+                          : "deleted"} successfully!
+                </p>
+            </Card.Content>
+        </Card.Root>
+    {/if}
+
+    {#if form?.error}
+        <Card.Root class="border-destructive">
+            <Card.Content class="pt-6">
+                <p class="text-sm text-destructive">{form.error}</p>
+            </Card.Content>
+        </Card.Root>
+    {/if}
+
+    <!-- Filter -->
+    <Card.Root>
+        <Card.Header>
+            <Card.Title>Filters</Card.Title>
+        </Card.Header>
+        <Card.Content class="flex flex-col gap-4 md:flex-row md:items-center">
+            <div class="w-full">
+                <Select.Root
+                    type="single"
+                    name="approved"
+                    bind:value={filterValue}
+                    onValueChange={(val) => updateFilter(val)}
+                >
+                    <Select.Trigger class="w-full">
+                        {filter_options.find((f) => f.value === filterValue)
+                            ?.label ?? "All Comments"}
+                    </Select.Trigger>
+                    <Select.Content>
+                        {#each filter_options as option (option.value)}
+                            <Select.Item
+                                value={option.value}
+                                label={option.label}
+                            >
+                                {option.label}
+                            </Select.Item>
+                        {/each}
+                    </Select.Content>
+                </Select.Root>
+            </div>
+        </Card.Content>
+    </Card.Root>
+
+    <!-- Comments List -->
+    <div class="space-y-4">
+        {#if data.comments && data.comments.length > 0}
+            {#each data.comments as comment}
+                <Card.Root>
+                    <Card.Header>
+                        <div class="flex items-start justify-between">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium"
+                                        >{comment.author?.name ||
+                                            "Unknown User"}</span
+                                    >
+                                    <Badge
+                                        variant={comment.approved
+                                            ? "default"
+                                            : "secondary"}
+                                    >
+                                        {comment.approved
+                                            ? "Approved"
+                                            : "Pending"}
+                                    </Badge>
+                                </div>
+                                <p class="text-sm text-muted-foreground">
+                                    {comment.author?.email || "No email"} •
+                                    {new Date(
+                                        comment.created_at,
+                                    ).toLocaleString()}
+                                </p>
+                                {#if comment.content_item}
+                                    <p class="text-sm text-muted-foreground">
+                                        On: <a
+                                            href={`/apps/cms/${data.tenant.id}/content/${comment.content_item.id}`}
+                                            class="underline hover:text-foreground"
+                                        >
+                                            {comment.content_item.title}
+                                        </a>
+                                    </p>
+                                {/if}
+                            </div>
+                        </div>
+                    </Card.Header>
+                    <Card.Content>
+                        <p class="text-sm whitespace-pre-wrap">
+                            {comment.body}
+                        </p>
+                    </Card.Content>
+                    <Card.Footer class="flex gap-2">
+                        {#if !comment.approved}
+                            <form method="POST" action="?/approve" use:enhance>
+                                <input
+                                    type="hidden"
+                                    name="comment_id"
+                                    value={comment.id}
+                                />
+                                <Button
+                                    type="submit"
+                                    size="sm"
+                                    variant="default">Approve</Button
+                                >
+                            </form>
+                        {:else}
+                            <form method="POST" action="?/reject" use:enhance>
+                                <input
+                                    type="hidden"
+                                    name="comment_id"
+                                    value={comment.id}
+                                />
+                                <Button
+                                    type="submit"
+                                    size="sm"
+                                    variant="outline">Unapprove</Button
+                                >
+                            </form>
+                        {/if}
+
+                        {#if deletingCommentId === comment.id}
+                            <form
+                                method="POST"
+                                action="?/delete"
+                                use:enhance
+                                class="flex gap-2"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="comment_id"
+                                    value={comment.id}
+                                />
+                                <span
+                                    class="self-center text-sm text-muted-foreground"
+                                    >Are you sure?</span
+                                >
+                                <Button
+                                    type="submit"
+                                    size="sm"
+                                    variant="destructive">Yes, Delete</Button
+                                >
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onclick={() => (deletingCommentId = null)}
+                                >
+                                    Cancel
+                                </Button>
+                            </form>
+                        {:else}
+                            <Button
+                                size="sm"
+                                variant="destructive"
+                                onclick={() => (deletingCommentId = comment.id)}
+                            >
+                                Delete
+                            </Button>
+                        {/if}
+                    </Card.Footer>
+                </Card.Root>
+            {/each}
+
+            <!-- Pagination -->
+            <PaginationControls
+                count={data.pagination?.total || 0}
+                perPage={data.pagination?.per_page || 10}
+                onPageChange={(page) => goto(`?page=${page}`)}
+            />
+        {:else}
+            <Card.Root>
+                <Card.Content class="pt-12 pb-12 text-center">
+                    <p class="text-muted-foreground">No comments found</p>
+                    <p class="mt-2 text-sm text-muted-foreground">
+                        Comments will appear here when users interact with your
+                        content
+                    </p>
+                </Card.Content>
+            </Card.Root>
+        {/if}
+    </div>
+</div>

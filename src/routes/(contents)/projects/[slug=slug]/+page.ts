@@ -1,8 +1,11 @@
-import type { PageLoad } from './$types';
+import type { EntryGenerator, PageLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { deliveryShowByType } from '$lib/sdk/cms';
 import { CMS_TENANT_SLUG } from '$lib/constants';
 import { processMarkdown } from '$lib/markdown';
+import { PUBLIC_API_BASE_URL } from '$env/static/public';
+
+export const prerender = true;
 
 export const load: PageLoad = async ({ params, fetch }) => {
 
@@ -36,3 +39,17 @@ export const load: PageLoad = async ({ params, fetch }) => {
         }
     };
 };
+
+export const entries: EntryGenerator = async () => {
+    try {
+        const url = `${PUBLIC_API_BASE_URL}/cms/delivery/${CMS_TENANT_SLUG}/projects?per_page=100`;
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        const json = await res.json();
+        const items = json?.data || [];
+        return items.map((it) => ({ slug: it.slug }));
+    } catch (err) {
+        console.warn('entries(): failed to fetch projects for prerendering', err);
+        return [];
+    }
+}

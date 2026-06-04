@@ -125,26 +125,54 @@
     @apply max-w-none;
 
     & img,
-    & video {
-        @apply mx-auto block;        /* Centers the image horizontally */
-        @apply max-h-150;        /* Limits height to prevent huge images */
-        @apply w-auto;               /* Maintains aspect ratio */
-        @apply max-w-full;           /* Ensures it never overflows the container */
-        @apply object-contain;       /* Ensures the whole image is visible */
-        @apply rounded-lg;           /* Optional: Adds subtle rounding */
-        @apply my-8;                 /* Adds vertical breathing room */
+    & video,
+    & iframe {
+        @apply mx-auto block;
+        @apply max-h-150;
+        @apply w-auto h-auto;
+        @apply max-w-full;
+        @apply object-contain;
+        @apply rounded-lg;
+        @apply my-8;
+    }
+
+    & iframe {
+        @apply w-full;
+    }
+
+
+    .prose-gallery {
+        @apply flex flex-wrap justify-center gap-6 my-2;
+
+        & img,
+        & video,
+        & iframe {
+            @apply w-auto h-auto;
+            @apply max-h-120;
+            @apply my-0;
+        }
+
+        & img,
+        & video {
+            @apply flex-initial;
+            @apply min-w-0;
+        }
+
+        & iframe {
+            @apply flex-1;
+            @apply h-175;
+        }
+
+        & figure {
+            @apply flex-initial;
+            @apply mx-auto my-0;
+        }
     }
 
     /* Target any link to youtube/youtu.be that contains an image */
     & a[href*="youtube.com"]:has(img),
     & a[href*="youtu.be"]:has(img) {
-        @apply relative block w-fit mx-auto; /* Center the link container itself */
-        @apply my-8; /* Apply vertical spacing to the container */
-
-        /* Remove margin from the inner image so the Play button centers correctly */
-        & img {
-            @apply my-0;
-        }
+        @apply relative block w-fit mx-auto h-fit;
 
         /* The Play Button Overlay */
         &::after {
@@ -174,10 +202,14 @@
 
     /* Handle long equations that exceed page width */
     & .katex-display {
-        @apply overflow-x-auto;      /* Enable horizontal scrolling */
-        @apply overflow-y-hidden;    /* Prevent vertical scrolling */
-        @apply max-w-full;           /* Don't exceed container width */
-        @apply py-2;                 /* Add vertical padding for better UX */
+        @apply overflow-x-auto;
+        /* Enable horizontal scrolling */
+        @apply overflow-y-hidden;
+        /* Prevent vertical scrolling */
+        @apply max-w-full;
+        /* Don't exceed container width */
+        @apply py-2;
+        /* Add vertical padding for better UX */
 
         /* Improve scrollbar appearance on webkit browsers */
         &::-webkit-scrollbar {

@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    {#if project.meta.headerImages && project.meta.headerImages.length > 0}
+    {#if project.meta && project.meta.headerImages && project.meta.headerImages.length > 0}
         <header class="mb-10">
             <Carousel.Root class="w-full">
                 <Carousel.Content>
@@ -90,7 +90,7 @@
         </header>
     {/if}
 
-    {#if (project.tags && project.tags.length > 0) || (project.meta.externalLinks && project.meta.externalLinks.length > 0)}
+    {#if (project.tags && project.tags.length > 0) || (project.meta && project.meta.externalLinks && project.meta.externalLinks.length > 0)}
         <div class="mb-12 flex flex-col items-center gap-6 border-b pb-12">
             {#if project.tags && project.tags.length > 0}
                 <div class="flex flex-wrap justify-center gap-2">
@@ -104,7 +104,7 @@
                 </div>
             {/if}
 
-            {#if project.meta.externalLinks && project.meta.externalLinks.length > 0}
+            {#if project.meta && project.meta.externalLinks && project.meta.externalLinks.length > 0}
                 <div class="flex flex-wrap justify-center gap-3">
                     {#each project.meta.externalLinks as link}
                         <Button

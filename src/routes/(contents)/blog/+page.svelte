@@ -2,7 +2,7 @@
     import AtomicCard from "$components/cards/card.svelte";
     import PaginationControls from "$components/pagination/pagination-controls.svelte";
     import { goto, pushState } from "$app/navigation";
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
 
     import type { PageData } from "./$types";
 
@@ -10,33 +10,36 @@
     const posts = $derived(data.pagination?.data || []);
     let expandedSlug: string | null = $state(null);
 
-    // Check URL hash on mount and expand corresponding post
-    onMount(() => {
-        const hash = window.location.hash.substring(1); // Remove the '#'
+    function scrollToHash() {
+        const hash = window.location.hash.substring(1);
         if (hash) {
-            expandedSlug = hash;
-            // Scroll to the post after a brief delay to ensure it's rendered
-            setTimeout(() => {
-                const element = document.getElementById(hash);
-                if (element) {
-                    element.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                    });
-                }
-            }, 100);
+            const element = document.getElementById(hash);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }
         }
-    });
+    }
 
-    function toggleExpand(slug: string) {
+    async function toggleExpand(slug: string) {
         if (expandedSlug === slug) {
-            expandedSlug = null;
-            pushState("/blog", {});
+            // collapse logic here if needed
         } else {
             expandedSlug = slug;
             pushState(`/blog#${slug}`, {});
+            await tick(); // wait for DOM to update with expanded card
+            scrollToHash();
         }
     }
+
+    onMount(() => {
+        expandedSlug = window.location.hash
+            ? window.location.hash.substring(1)
+            : null;
+        tick().then(() => scrollToHash());
+    });
 </script>
 
 <svelte:head>
@@ -49,7 +52,9 @@
 
 <div class="grid gap-6">
     {#each posts as post}
+        {@const isExpanded = expandedSlug === post.slug}
         <AtomicCard
+            id={post.slug}
             data={{
                 title: post.title,
                 content: post.body,
@@ -62,9 +67,9 @@
                     : undefined,
                 tag: post.tags?.[0] ? { name: post.tags[0].name } : undefined,
             }}
-            class="cursor-pointer"
-            preview={expandedSlug !== post.slug}
-            clickable={true}
+            class={`scroll-mt-17 sm:scroll-mt-22 ${!isExpanded ? "cursor-pointer" : ""}`}
+            preview={!isExpanded}
+            clickable={!isExpanded}
             onclick={() => toggleExpand(post.slug)}
         />
     {/each}

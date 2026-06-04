@@ -13,8 +13,8 @@ export function getPortalLink(service: { slug: string } | undefined, tenant: { i
     if (!service) return null;
 
     switch (service.slug) {
-        case "cms": return `/portals/cms/${tenant.id}`;
-        case "ptm": return `/portals/ptm/${tenant.id}`;
+        case "cms": return `/apps/cms/${tenant.id}`;
+        case "ptm": return `/apps/ptm/${tenant.id}`;
         default: return null;
     }
 }
