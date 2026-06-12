@@ -69,8 +69,7 @@
     <CardContent>
         <div
             class={cn(
-                "prose-custom text-sm [&>p:first-child]:mt-0",
-                preview ? "line-clamp-1" : "",
+                "prose-custom text-sm text-muted-foreground [&>p:first-child]:mt-0",
             )}
         >
             {@html data.content}

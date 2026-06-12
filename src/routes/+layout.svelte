@@ -1,6 +1,7 @@
 <script lang="ts">
     import "../app.css";
     import { dev } from "$app/environment";
+    import { page } from "$app/state";
     import { ModeWatcher } from "mode-watcher";
     import Footer from "$components/footer/footer.svelte";
 
@@ -9,10 +10,15 @@
     }
 
     let { children }: Props = $props();
+    const isProduction = $derived(
+        !dev &&
+            (page.url.hostname === "bocchio.dev" ||
+                page.url.hostname === "www.bocchio.dev"),
+    );
 </script>
 
 <svelte:head>
-    {#if !dev}
+    {#if isProduction}
         <link
             rel="preconnect"
             href="https://analytics.bocchio.dev"

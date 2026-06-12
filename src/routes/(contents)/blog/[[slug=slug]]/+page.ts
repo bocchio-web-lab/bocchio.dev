@@ -8,16 +8,6 @@ import { getOptimizedOgImage } from '$lib/utils/app';
 
 export const prerender = true;
 
-function stripHtml(input: string) {
-    return input.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-function makeExcerpt(input: string, length = 200) {
-    const text = stripHtml(input);
-    const excerpt = text.slice(0, Math.min(text.length, length)).trimEnd() + '...';
-    return `<p>${excerpt}</p>`;
-}
-
 export const load: PageLoad = async ({ params, fetch }) => {
     const { data, error: err } = await deliveryListByType({
         path: {
@@ -43,7 +33,6 @@ export const load: PageLoad = async ({ params, fetch }) => {
             return {
                 ...post,
                 body,
-                excerpt: post.excerpt?.trim() || makeExcerpt(body)
             };
         })
     );
@@ -65,8 +54,8 @@ export const load: PageLoad = async ({ params, fetch }) => {
         activeSlug,
         title: activePost?.title || 'Blog',
         description:
-            stripHtml(activePost?.excerpt ||
-                'Personal adventures and life experiences, shared through my blog.'),
+            activePost?.excerpt ||
+            'Personal adventures and life experiences, shared through my blog.',
         keywords: activePost
             ? (activePost.tags || []).map((tag) => tag.name).join(', ')
             : 'blog, personal, adventures, life experiences, mechatronics, robotics',

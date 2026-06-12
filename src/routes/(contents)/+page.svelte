@@ -3,7 +3,7 @@
     import { preloadData } from "$app/navigation";
     import { Button } from "$components/ui/button/index.js";
     import { MailIcon, GithubIcon, LinkedinIcon } from "@lucide/svelte";
-    import { CldImage } from "svelte-cloudinary";
+    // import { CldImage } from "svelte-cloudinary";
 
     onMount(() => {
         preloadData("/projects");
@@ -79,29 +79,26 @@
 
     <!-- Right image -->
     <div class="image-wrapper mt-10 shrink-0 md:mt-0">
-        <CldImage
+        <!-- <CldImage
             src="profile_photo_tommaso_bocchietti_piz_lucendro"
             alt="Profile picture of Tommaso Bocchietti"
             width="320"
             height="320"
             fetchpriority="high"
+            loading="eager"
+            sizes="(min-width: 768px) 320px, 240px"
             decoding="async"
             class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80"
-        />
-        <!-- <CldImage
-            src="profile_photo_tommaso_bocchietti_no_background"
-            alt="Profile picture of Tommaso Bocchietti"
+        /> -->
+        <img
+            src="https://res.cloudinary.com/bocchio/image/upload/c_fill,w_320,h_320,g_center/c_limit,w_320/f_auto/q_auto/v1/profile_photo_tommaso_bocchietti_piz_lucendro?_a=E"
+            alt="Tommaso Bocchietti"
             width="320"
             height="320"
             fetchpriority="high"
-            decoding="async"
-            class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80 scale-x-[-1]"
-        /> -->
-        <!-- <img
-            src="https://res.cloudinary.com/bocchio/image/upload/v1781261377/profile_photo_tommaso_bocchietti_piz_lucendro.png"
-            alt="Profile picture of Tommaso Bocchietti"
+            sizes="(min-width: 768px) 320px, 240px"
             class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80"
-        /> -->
+        />
     </div>
 </section>
 
