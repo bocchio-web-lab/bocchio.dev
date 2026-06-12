@@ -1,6 +1,8 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import Seo from "sk-seo";
     import Header from "$components/header/header.svelte";
+
     interface Props {
         children?: import("svelte").Snippet;
     }
@@ -9,6 +11,8 @@
 
     let isHome = $derived(page.url.pathname === "/");
 </script>
+
+<Seo />
 
 <Header />
 

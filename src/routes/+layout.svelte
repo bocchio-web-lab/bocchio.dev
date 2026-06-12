@@ -1,23 +1,18 @@
 <script lang="ts">
     import "../app.css";
-    import { page } from "$app/state";
-    import Footer from "$components/footer/footer.svelte";
+    import { dev } from "$app/environment";
     import { ModeWatcher } from "mode-watcher";
+    import Footer from "$components/footer/footer.svelte";
 
     interface Props {
         children?: import("svelte").Snippet;
     }
 
     let { children }: Props = $props();
-
-    let analyticsEnabled = $derived(
-        page.url.hostname === "bocchio.dev" ||
-            page.url.hostname === "www.bocchio.dev",
-    );
 </script>
 
 <svelte:head>
-    {#if analyticsEnabled}
+    {#if !dev}
         <link
             rel="preconnect"
             href="https://analytics.bocchio.dev"

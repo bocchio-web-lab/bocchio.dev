@@ -7,16 +7,9 @@
 
     onMount(() => {
         preloadData("/projects");
+        preloadData("/blog");
     });
 </script>
-
-<svelte:head>
-    <title>Bocchio</title>
-    <meta
-        name="description"
-        content="Welcome to the personal website of Tommaso Bocchietti, a Mechatronics & Robotics Engineer."
-    />
-</svelte:head>
 
 <section
     class="intro--banner flex flex-col items-center justify-center px-6 py-16 md:flex-row md:justify-between md:px-12 lg:px-24"
@@ -87,7 +80,7 @@
     <!-- Right image -->
     <div class="image-wrapper mt-10 shrink-0 md:mt-0">
         <CldImage
-            src="2026-05-23_color_corrected_2_resized"
+            src="profile_photo_tommaso_bocchietti_piz_lucendro"
             alt="Profile picture of Tommaso Bocchietti"
             width="320"
             height="320"
@@ -105,7 +98,7 @@
             class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80 scale-x-[-1]"
         /> -->
         <!-- <img
-            src="https://res.cloudinary.com/bocchio/image/upload/v1780143576/2026-05-23.png"
+            src="https://res.cloudinary.com/bocchio/image/upload/v1781261377/profile_photo_tommaso_bocchietti_piz_lucendro.png"
             alt="Profile picture of Tommaso Bocchietti"
             class="h-60 w-60 rounded-full object-cover md:h-80 md:w-80"
         /> -->

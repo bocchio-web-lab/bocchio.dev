@@ -27,6 +27,9 @@ const config = {
         alias: {
             $components: 'src/components',
         },
+        prerender: {
+            origin: 'https://bocchio.dev',
+        }
     },
     extensions: ['.svelte', '.svx']
 };

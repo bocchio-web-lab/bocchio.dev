@@ -4,6 +4,7 @@ import { deliveryShowByType } from '$lib/sdk/cms';
 import { CMS_TENANT_SLUG } from '$lib/constants';
 import { processMarkdown } from '$lib/markdown';
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { getOptimizedOgImage } from '$lib/utils/app';
 
 export const prerender = true;
 
@@ -36,7 +37,11 @@ export const load: PageLoad = async ({ params, fetch }) => {
         project: {
             ...project,
             body: processedBody
-        }
+        },
+        title: project.title,
+        description: project.excerpt || '',
+        keywords: (project.tags || []).join(', '),
+        imageURL: getOptimizedOgImage(project.meta.headerImages?.[0])
     };
 };
 

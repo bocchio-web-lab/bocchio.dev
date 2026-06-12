@@ -25,6 +25,7 @@
         "mdsvex": "^0.12.6",
         "rehype-katex": "^7.0.1",
         "remark-math": "^3.0.1",
+        "sk-seo": "^0.5.4",
         "svelte": "^5.48.0",
         "svelte-check": "^4.3.5",
         "svelte-cloudinary": "^2.3.1",

@@ -18,14 +18,6 @@
     let { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-    <title>Projects</title>
-    <meta
-        name="description"
-        content="A showcase of my mechatronics and robotics projects."
-    />
-</svelte:head>
-
 {#if data.pagination != null}
     <Timeline position="right">
         {#each data.pagination.data as project, index}

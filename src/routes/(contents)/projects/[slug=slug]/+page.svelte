@@ -20,14 +20,6 @@
     );
 </script>
 
-<svelte:head>
-    <title>{project.title}</title>
-    <meta name="description" content={project.excerpt ?? "Project details"} />
-    <meta property="og:title" content={project.title} />
-    <meta property="og:description" content={project.excerpt ?? ""} />
-    <meta property="og:image" content={project.meta.headerImages?.[0] ?? ""} />
-</svelte:head>
-
 <article class="mx-auto max-w-4xl px-4 py-8">
     <div class="mb-10 text-center">
         <h1

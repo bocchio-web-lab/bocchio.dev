@@ -25,6 +25,9 @@ export const load: PageLoad = async ({ url, fetch }) => {
     }
 
     return {
-        pagination: data
+        pagination: data,
+        title: 'Projects',
+        description: 'A showcase of my mechatronics and robotics projects.',
+        keywords: 'projects, mechatronics, robotics, portfolio',
     };
 };

@@ -2,6 +2,7 @@
     "workbench.editor.labelFormat": "short",
     "explorer.compactFolders": false,
     "files.exclude": {
+        ".netlify": true,
         ".svelte-kit": true,
         "node_modules": true,
     },
