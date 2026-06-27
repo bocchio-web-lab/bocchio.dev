@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Media from "$components/media/media.svelte";
     import { Button } from "$components/ui/button";
     import * as Carousel from "$components/ui/carousel/index.js";
     import type { PageData } from "./$types";
@@ -62,13 +63,14 @@
                             <div
                                 class="aspect-video relative flex w-full items-center justify-center overflow-hidden rounded-lg bg-muted"
                             >
-                                <img
+                                <Media
                                     src={image}
                                     alt={project.title}
                                     loading={index === 0 ? "eager" : "lazy"}
-                                    decoding="async"
                                     fetchpriority={index === 0 ? "high" : "low"}
-                                    class="max-h-full max-w-full object-contain"
+                                    crop="pad"
+                                    height={486}
+                                    width={864}
                                 />
                             </div>
                         </Carousel.Item>

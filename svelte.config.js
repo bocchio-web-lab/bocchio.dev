@@ -29,7 +29,9 @@ const config = {
         },
         prerender: {
             origin: 'https://bocchio.dev',
-        }
+        },
+        // Inline CSS files smaller than 25kb directly into the HTML
+        // inlineStyleThreshold: 25000
     },
     extensions: ['.svelte', '.svx']
 };

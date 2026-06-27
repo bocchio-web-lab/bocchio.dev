@@ -12,5 +12,8 @@ export const handle: Handle = async ({ event, resolve }) => {
         }
     });
 
+    // Prevents other sites from embedding your website in an iframe
+    response.headers.set('X-Frame-Options', 'DENY');
+
     return response;
 };

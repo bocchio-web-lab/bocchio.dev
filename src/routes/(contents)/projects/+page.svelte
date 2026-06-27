@@ -11,9 +11,9 @@
     import { goto } from "$app/navigation";
     import AtomicCard from "$components/cards/card.svelte";
     import PaginationControls from "$components/pagination/pagination-controls.svelte";
-    import { CldImage } from "svelte-cloudinary";
 
     import type { PageData } from "./$types";
+    import Media from "$components/media/media.svelte";
 
     let { data }: { data: PageData } = $props();
 </script>
@@ -38,32 +38,17 @@
                     <TimelineDot>
                         <button
                             onclick={() => goto(`/projects/${project.slug}`)}
+                            class="cursor-pointer transition-transform duration-300 hover:scale-105"
                         >
-                            {#if (project.meta?.headerImages?.[0] || "").includes("res.cloudinary.com")}
-                                <CldImage
-                                    src={project.meta
-                                        ?.headerImages?.[0] as string}
-                                    alt={project.title}
-                                    width="420"
-                                    height="420"
-                                    crop="pad"
-                                    loading={index < 3 ? "eager" : "lazy"}
-                                    decoding="async"
-                                    fetchpriority={index < 3 ? "high" : "low"}
-                                    class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-                                />
-                            {:else}
-                                <img
-                                    src={(project.meta
-                                        ?.headerImages?.[0] as string) ||
-                                        "https://avatars.githubusercontent.com/u/67842431"}
-                                    alt={project.title}
-                                    loading={index < 3 ? "eager" : "lazy"}
-                                    decoding="async"
-                                    fetchpriority={index < 3 ? "high" : "low"}
-                                    class="h-full w-full max-w-sm cursor-pointer rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-                                />
-                            {/if}
+                            <Media
+                                src={(project.meta
+                                    ?.headerImages?.[0] as string) ||
+                                    "https://avatars.githubusercontent.com/u/67842431"}
+                                alt={project.title}
+                                width={420}
+                                height={420}
+                                crop="pad"
+                            />
                         </button>
                         <AtomicCard
                             data={{
