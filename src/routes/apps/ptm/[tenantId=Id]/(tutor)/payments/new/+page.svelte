@@ -20,17 +20,18 @@
 </script>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
+    >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">New Payment</h2>
             <p class="text-muted-foreground">
                 Record a received payment for a student.
             </p>
         </div>
-        <Button
-            href={`/apps/ptm/${data.tenant.id}/payments`}
-            variant="outline">Back</Button
-        >
+        <Button href={`/apps/ptm/${data.tenant.id}/payments`} variant="outline">
+            Back
+        </Button>
     </div>
 
     {#if form?.error}
@@ -62,17 +63,19 @@
                         name="student_id"
                         bind:value={selectedStudent}
                     >
-                        <Select.Trigger class="w-full"
-                            >{selectedStudent ||
-                                "Select a student"}</Select.Trigger
-                        >
+                        <Select.Trigger class="w-full">
+                            {data.students.find(
+                                (s) => String(s.id) === selectedStudent,
+                            )?.name || "Select a student"}
+                        </Select.Trigger>
                         <Select.Content>
-                            {#each data.students as student}
+                            {#each data.students.filter((s) => s.support_status === "active") as student}
                                 <Select.Item
                                     value={String(student.id)}
                                     label={student.name}
-                                    >{student.name}</Select.Item
                                 >
+                                    {student.name}
+                                </Select.Item>
                             {/each}
                         </Select.Content>
                     </Select.Root>
@@ -82,7 +85,8 @@
                         <Label for="received_at">Received at</Label><Input
                             id="received_at"
                             name="received_at"
-                            type="datetime-local"
+                            type="date"
+                            required
                         />
                     </div>
                     <div class="space-y-2">
@@ -100,7 +104,8 @@
                         <Label for="currency">Currency</Label><Input
                             id="currency"
                             name="currency"
-                            value="USD"
+                            value="EUR"
+                            required
                         />
                     </div>
                     <div class="space-y-2">
@@ -110,17 +115,25 @@
                             name="method"
                             bind:value={selectedMethod}
                         >
-                            <Select.Trigger class="w-full"
-                                >{selectedMethod}</Select.Trigger
-                            >
+                            <Select.Trigger class="w-full">
+                                {#if selectedMethod === "cash"}
+                                    Cash
+                                {:else if selectedMethod === "electronic"}
+                                    Electronic
+                                {:else}
+                                    Select a method
+                                {/if}
+                            </Select.Trigger>
                             <Select.Content>
-                                <Select.Item value="cash" label="Cash"
-                                    >Cash</Select.Item
-                                >
+                                <Select.Item value="cash" label="Cash">
+                                    Cash
+                                </Select.Item>
                                 <Select.Item
                                     value="electronic"
-                                    label="Electronic">Electronic</Select.Item
+                                    label="Electronic"
                                 >
+                                    Electronic
+                                </Select.Item>
                             </Select.Content>
                         </Select.Root>
                     </div>

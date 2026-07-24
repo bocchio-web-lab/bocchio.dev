@@ -7,6 +7,7 @@
     import { Textarea } from "$components/ui/textarea/index.js";
     import * as Select from "$components/ui/select/index.js";
     import type { PageData, ActionData } from "./$types";
+    import { formatDateTime } from "$lib/utils/ptm";
 
     interface Props {
         data: PageData;
@@ -15,23 +16,20 @@
 
     let { data, form }: Props = $props();
     let isSubmitting = $state(false);
-    let student = $state("");
-    let method = $state("cash");
-    let tenant = $derived(data.tenant as any);
-
-    $effect(() => {
-        student = String(data.payment.student_id);
-        method = data.payment.method ?? "cash";
-    });
+    let student = $derived(String(data.payment.student_id));
+    let method = $derived(String(data.payment.method));
+    let showDeleteConfirm = $state(false);
 </script>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
+    >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">Edit Payment</h2>
             <p class="text-muted-foreground">Payment #{data.payment.id}</p>
         </div>
-        <Button href={`/apps/ptm/${tenant.id}/payments`} variant="outline"
+        <Button href={`/apps/ptm/${data.tenant.id}/payments`} variant="outline"
             >Back</Button
         >
     </div>
@@ -45,42 +43,37 @@
     {/if}
 
     <div class="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <form
-            method="POST"
-            action="?/update"
-            use:enhance={() => {
-                isSubmitting = true;
-                return async ({ update }) => {
-                    await update();
-                    isSubmitting = false;
-                };
-            }}
-            class="space-y-6"
-        >
-            <Card.Root>
-                <Card.Content class="space-y-4 pt-6">
+        <Card.Root>
+            <Card.Content class="pt-6">
+                <form
+                    method="POST"
+                    action="?/update"
+                    id="edit-payment-form"
+                    use:enhance={() => {
+                        isSubmitting = true;
+                        return async ({ update }) => {
+                            await update();
+                            isSubmitting = false;
+                        };
+                    }}
+                    class="space-y-4"
+                >
                     <div class="space-y-2">
                         <Label>Student</Label>
                         <Select.Root
                             type="single"
-                            name="student_id"
+                            disabled
                             bind:value={student}
                         >
-                            <Select.Trigger class="w-full"
-                                >{data.students.find(
-                                    (item) => String(item.id) === student,
-                                )?.name ?? student}</Select.Trigger
-                            >
-                            <Select.Content>
-                                {#each data.students as item}
-                                    <Select.Item
-                                        value={String(item.id)}
-                                        label={item.name}
-                                        >{item.name}</Select.Item
-                                    >
-                                {/each}
-                            </Select.Content>
+                            <Select.Trigger class="w-full">
+                                {data.payment.student.name}
+                            </Select.Trigger>
                         </Select.Root>
+                        <input
+                            type="hidden"
+                            name="student_id"
+                            value={student}
+                        />
                     </div>
                     <input
                         type="hidden"
@@ -92,8 +85,9 @@
                             <Label for="received_at">Received at</Label><Input
                                 id="received_at"
                                 name="received_at"
-                                type="datetime-local"
-                                value={data.payment.received_at ?? ""}
+                                type="date"
+                                value={data.payment.received_at.split("T")[0] ??
+                                    ""}
                             />
                         </div>
                         <div class="space-y-2">
@@ -122,18 +116,23 @@
                                 name="method"
                                 bind:value={method}
                             >
-                                <Select.Trigger class="w-full"
-                                    >{method}</Select.Trigger
-                                >
+                                <Select.Trigger class="w-full">
+                                    {method === "cash"
+                                        ? "Cash"
+                                        : method === "electronic"
+                                          ? "Electronic"
+                                          : method}
+                                </Select.Trigger>
                                 <Select.Content>
-                                    <Select.Item value="cash" label="Cash"
-                                        >Cash</Select.Item
-                                    >
+                                    <Select.Item value="cash" label="Cash">
+                                        Cash
+                                    </Select.Item>
                                     <Select.Item
                                         value="electronic"
                                         label="Electronic"
-                                        >Electronic</Select.Item
                                     >
+                                        Electronic
+                                    </Select.Item>
                                 </Select.Content>
                             </Select.Root>
                         </div>
@@ -146,37 +145,88 @@
                             value={data.payment.notes ?? ""}
                         />
                     </div>
-                </Card.Content>
-            </Card.Root>
-
-            <div class="flex justify-between gap-2">
-                <Button
-                    type="submit"
-                    variant="destructive"
-                    formaction="?/delete">Delete Payment</Button
-                >
-                <Button type="submit" disabled={isSubmitting}
-                    >{isSubmitting ? "Saving..." : "Save changes"}</Button
-                >
-            </div>
-        </form>
-
-        <Card.Root>
-            <Card.Header><Card.Title>Payment summary</Card.Title></Card.Header>
-            <Card.Content class="space-y-3 text-sm">
-                <p>
-                    <span class="text-muted-foreground">Created:</span>
-                    {data.payment.created_at ?? "Unknown"}
-                </p>
-                <p>
-                    <span class="text-muted-foreground">Updated:</span>
-                    {data.payment.updated_at ?? "Unknown"}
-                </p>
-                <p>
-                    <span class="text-muted-foreground">Tutor:</span>
-                    {data.payment.tutor ?? "Unknown"}
-                </p>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="space-y-2">
+                            <Label for="created_at">Created at</Label>
+                            <Input
+                                id="created_at"
+                                name="created_at"
+                                value={formatDateTime(
+                                    data.payment.created_at,
+                                ) ?? ""}
+                                readonly
+                                disabled
+                            />
+                        </div>
+                        <div class="space-y-2">
+                            <Label for="updated_at">Updated at</Label>
+                            <Input
+                                id="updated_at"
+                                name="updated_at"
+                                value={formatDateTime(
+                                    data.payment.updated_at,
+                                ) ?? ""}
+                                readonly
+                                disabled
+                            />
+                        </div>
+                    </div>
+                </form>
             </Card.Content>
         </Card.Root>
+
+        <div class="flex justify-between gap-2">
+            {#if !showDeleteConfirm}
+                <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    onclick={() => (showDeleteConfirm = true)}
+                >
+                    Delete Payment
+                </Button>
+            {:else}
+                <form
+                    method="POST"
+                    action="?/delete"
+                    use:enhance
+                    class="flex gap-2"
+                >
+                    <input
+                        type="hidden"
+                        name="data_payment_id"
+                        value={data.payment.id}
+                    />
+                    <span class="self-center text-sm text-muted-foreground"
+                        >Are you sure?</span
+                    >
+                    <Button type="submit" size="sm" variant="destructive"
+                        >Yes, Delete</Button
+                    >
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onclick={() => (showDeleteConfirm = false)}
+                    >
+                        Cancel
+                    </Button>
+                </form>
+            {/if}
+
+            <Button
+                type="submit"
+                size="sm"
+                disabled={isSubmitting}
+                onclick={() => {
+                    const form = document.getElementById(
+                        "edit-payment-form",
+                    ) as HTMLFormElement | null;
+                    form?.submit();
+                }}
+            >
+                {isSubmitting ? "Saving..." : "Save changes"}
+            </Button>
+        </div>
     </div>
 </div>

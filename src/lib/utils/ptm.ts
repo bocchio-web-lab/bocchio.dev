@@ -5,10 +5,19 @@ export function formatDuration(minutes: number | string | null | undefined): str
     const numeric = typeof minutes === "string" ? Number(minutes) : minutes;
     if (!Number.isFinite(numeric)) return String(minutes);
 
-    return `${Math.floor(numeric / 60)}h ${numeric % 60}m`;
+    return `${Math.floor(numeric / 60)}h ${(numeric % 60).toString().padStart(2, "0")}m`;
 }
 
-
+export function currencySymbol(currency: string) {
+    switch (currency) {
+        case "EUR":
+            return "€";
+        case "USD":
+            return "$";
+        default:
+            return currency;
+    }
+}
 
 
 export function buildTenantHeaders(tenantId: number | string) {

@@ -3,15 +3,14 @@ import { error } from '@sveltejs/kit';
 import { createPtmSdk } from '$lib/sdk.server';
 import { buildTenantHeaders } from '$lib/utils/ptm';
 
-export const load: PageServerLoad = async ({ parent, cookies }) => {
+export const load: PageServerLoad = async ({ parent, cookies, url }) => {
     const { tenant } = await parent();
     const sdk = createPtmSdk(cookies);
     const headers = buildTenantHeaders(tenant.id);
 
-    const [paymentsResult, studentsResult] = await Promise.all([
-        sdk.paymentsIndex({ query: { tutor_id: tenant.owner_id, per_page: 50 }, headers } as any),
-        sdk.studentsIndex({ query: { per_page: 50 }, headers } as any),
-    ]);
+    const page = url.searchParams.get('page') ?? '1';
+
+    const paymentsResult = await sdk.paymentsIndex({ query: { tutor_id: tenant.owner_id, page: page }, headers } as any);
 
     if (paymentsResult.error) {
         throw error(500, 'Failed to load payments');
@@ -19,6 +18,6 @@ export const load: PageServerLoad = async ({ parent, cookies }) => {
 
     return {
         payments: paymentsResult.data?.data ?? [],
-        students: studentsResult.data?.data ?? [],
+        pagination: paymentsResult.data ?? null,
     };
 };

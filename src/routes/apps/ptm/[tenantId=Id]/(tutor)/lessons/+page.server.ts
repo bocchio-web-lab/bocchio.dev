@@ -10,10 +10,7 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
 
     const page = url.searchParams.get('page') ?? '1';
 
-    const [lessonsResult, studentsResult] = await Promise.all([
-        sdk.lessonsIndex({ query: { tutor_id: tenant.owner_id, per_page: 50, page: page }, headers } as any),
-        sdk.studentsIndex({ query: { per_page: 50 }, headers } as any),
-    ]);
+    const lessonsResult = await sdk.lessonsIndex({ query: { tutor_id: tenant.owner_id, page: page }, headers } as any);
 
     if (lessonsResult.error) {
         throw error(500, 'Failed to load lessons');
@@ -21,7 +18,6 @@ export const load: PageServerLoad = async ({ parent, cookies, url }) => {
 
     return {
         lessons: lessonsResult.data?.data ?? [],
-        students: studentsResult.data?.data ?? [],
         pagination: lessonsResult.data ?? null,
     };
 };

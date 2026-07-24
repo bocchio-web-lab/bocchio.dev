@@ -25,24 +25,29 @@ export const actions: Actions = {
         const formData = await request.formData();
         const tenantId = params.tenantId;
 
-        const response = await sdk.lessonsStore({
-            body: {
-                student_id: parseRequiredNumber(formData.get('student_id')),
-                tutor_id: parseRequiredNumber(formData.get('tutor_id')),
-                duration_minutes: parseRequiredNumber(formData.get('duration_minutes')),
-                topics: formData.get('topics')?.toString().trim() || null,
-                hourly_rate: parseOptionalNumber(formData.get('hourly_rate')),
-                extra_amount: parseOptionalNumber(formData.get('extra_amount')) ?? undefined,
-                notes: formData.get('notes')?.toString().trim() || null,
-                subject_ids: parseIdList(formData.get('subject_ids')),
-            },
-            headers: buildTenantHeaders(tenantId),
-        } as any);
+        const studentIds = formData.getAll('student_ids');
 
-        if (response.error) {
-            return fail(response.response?.status || 400, {
-                error: response.error.message || 'Failed to create lesson',
-            });
+        for (const studentId of studentIds) {
+            const response = await sdk.lessonsStore({
+                body: {
+                    student_id: studentId?.toString().trim() || null,
+                    tutor_id: parseRequiredNumber(formData.get('tutor_id')),
+                    lesson_date: formData.get('lesson_date')?.toString().trim() || null,
+                    duration_minutes: parseRequiredNumber(formData.get('duration_minutes')),
+                    topics: formData.get('topics')?.toString().trim() || null,
+                    hourly_rate: parseOptionalNumber(formData.get('hourly_rate')),
+                    extra_amount: parseOptionalNumber(formData.get('extra_amount')) ?? undefined,
+                    notes: formData.get('notes')?.toString().trim() || null,
+                    subject_ids: formData.getAll('subject_ids'),
+                },
+                headers: buildTenantHeaders(tenantId),
+            } as any);
+
+            if (response.error) {
+                return fail(response.response?.status || 400, {
+                    error: response.error.message || 'Failed to create lesson',
+                });
+            }
         }
 
         return { success: true };

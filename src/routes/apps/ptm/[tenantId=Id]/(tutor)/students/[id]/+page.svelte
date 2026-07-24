@@ -15,19 +15,20 @@
 
     let { data, form }: Props = $props();
     let isSubmitting = $state(false);
-    let status = $state(data.student.support_status ?? "active");
+    let status = $derived(data.student.support_status ?? "active");
 </script>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
+    >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">Edit Student</h2>
             <p class="text-muted-foreground">{data.student.name}</p>
         </div>
-        <Button
-            href={`/apps/ptm/${data.tenant.id}/students`}
-            variant="outline">Back</Button
-        >
+        <Button href={`/apps/ptm/${data.tenant.id}/students`} variant="outline">
+            Back
+        </Button>
     </div>
 
     {#if form?.error}
@@ -90,18 +91,20 @@
                             />
                         </div>
                         <div class="space-y-2">
-                            <Label for="currency">Currency</Label><Input
-                                id="currency"
-                                name="currency"
-                                value={data.student.currency}
+                            <Label for="extra">Extra</Label><Input
+                                id="extra"
+                                name="extra"
+                                type="number"
+                                step="0.01"
+                                value={data.student.extra ?? ""}
                             />
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <Label for="dashboard_key">Dashboard key</Label><Input
-                            id="dashboard_key"
-                            name="dashboard_key"
-                            placeholder="Leave empty to keep current or generate later"
+                        <Label for="currency">Currency</Label><Input
+                            id="currency"
+                            name="currency"
+                            value={data.student.currency}
                         />
                     </div>
                     <div class="space-y-2">
@@ -147,13 +150,13 @@
             </Card.Root>
 
             <div class="flex justify-between gap-2">
-                <Button
+                <!-- <Button
                     type="submit"
                     variant="destructive"
                     formaction="?/delete">Delete Student</Button
-                >
-                <div class="flex gap-2">
-                    <Button
+                > -->
+                <div>
+                    <!-- <Button
                         type="submit"
                         variant="outline"
                         formaction="?/issueDashboardKey"
@@ -166,7 +169,10 @@
                         formaction="?/reissueDashboardKey"
                         name="tenant_id"
                         value={data.tenant.id}>Reissue key</Button
-                    >
+                    > -->
+                </div>
+
+                <div>
                     <Button type="submit" disabled={isSubmitting}
                         >{isSubmitting ? "Saving..." : "Save changes"}</Button
                     >
@@ -174,7 +180,7 @@
             </div>
         </form>
 
-        <Card.Root>
+        <!-- <Card.Root>
             <Card.Header><Card.Title>Public dashboard</Card.Title></Card.Header>
             <Card.Content class="space-y-3">
                 <p class="text-sm text-muted-foreground">
@@ -188,6 +194,6 @@
                     Use the issued key to replace the placeholder above.
                 </p>
             </Card.Content>
-        </Card.Root>
+        </Card.Root> -->
     </div>
 </div>

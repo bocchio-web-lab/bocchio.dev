@@ -30,8 +30,9 @@ export const actions: Actions = {
             body: {
                 name: formData.get('name')?.toString().trim() || undefined,
                 hourly_rate: formData.get('hourly_rate')?.toString() ? Number(formData.get('hourly_rate')?.toString()) : null,
+                extra: formData.get('extra')?.toString() ? Number(formData.get('extra')?.toString()) : null,
                 currency: formData.get('currency')?.toString() || undefined,
-                dashboard_key: formData.get('dashboard_key')?.toString().trim() || null,
+                // dashboard_key: formData.get('dashboard_key')?.toString().trim() || null,
                 support_status: (formData.get('support_status')?.toString() || undefined) as 'active' | 'on_hold' | 'ended' | undefined,
                 support_ended_at: formData.get('support_ended_at')?.toString().trim() || null,
                 notes: formData.get('notes')?.toString().trim() || null,

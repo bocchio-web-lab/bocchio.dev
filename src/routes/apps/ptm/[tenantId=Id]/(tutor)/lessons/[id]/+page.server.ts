@@ -36,12 +36,13 @@ export const actions: Actions = {
             body: {
                 student_id: parseRequiredNumber(formData.get('student_id')),
                 tutor_id: parseRequiredNumber(formData.get('tutor_id')),
+                lesson_date: formData.get('lesson_date')?.toString().trim() || null,
                 duration_minutes: parseRequiredNumber(formData.get('duration_minutes')),
                 topics: formData.get('topics')?.toString().trim() || null,
                 hourly_rate: parseOptionalNumber(formData.get('hourly_rate')),
                 extra_amount: parseOptionalNumber(formData.get('extra_amount')) ?? undefined,
                 notes: formData.get('notes')?.toString().trim() || null,
-                subject_ids: parseIdList(formData.get('subject_ids')),
+                subject_ids: formData.getAll('subject_ids'),
             },
             headers: buildTenantHeaders(tenantId),
         } as any);

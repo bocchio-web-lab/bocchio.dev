@@ -14,21 +14,43 @@
     }
 
     let { data, form }: Props = $props();
-    let selectedStudent = $state("");
+
+    let student = $state<string[]>([]);
+    let subject = $state<string[]>([]);
+    let hourly_rate = $state("0");
+    let extra_amount = $state("0");
     let isSubmitting = $state(false);
+
+    $effect(() => {
+        console.log("student", student);
+        if (student.length === 1) {
+            const selectedStudent = data.students.find(
+                (s) => String(s.id) === student[0],
+            );
+
+            if (selectedStudent) {
+                hourly_rate = selectedStudent.hourly_rate;
+                extra_amount = selectedStudent.extra;
+            }
+        } else {
+            hourly_rate = "0";
+            extra_amount = "0";
+        }
+    });
 </script>
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
+    >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">New Lesson</h2>
             <p class="text-muted-foreground">
                 Create a tutoring session and let PTM compute the amount.
             </p>
         </div>
-        <Button
-            href={`/apps/ptm/${data.tenant.id}/lessons`}
-            variant="outline">Back</Button
+        <Button href={`/apps/ptm/${data.tenant.id}/lessons`} variant="outline"
+            >Back</Button
         >
     </div>
 
@@ -56,25 +78,47 @@
             <Card.Content class="space-y-4 pt-6">
                 <div class="space-y-2">
                     <Label>Student</Label>
-                    <Select.Root
-                        type="single"
-                        name="student_id"
-                        bind:value={selectedStudent}
-                    >
-                        <Select.Trigger class="w-full"
-                            >{selectedStudent ||
-                                "Select a student"}</Select.Trigger
-                        >
+                    <Select.Root type="multiple" bind:value={student}>
+                        <Select.Trigger class="w-full">
+                            {#if student.length}
+                                {student
+                                    .map(
+                                        (id) =>
+                                            data.students.find(
+                                                (s) => String(s.id) === id,
+                                            )?.name ?? id,
+                                    )
+                                    .join(", ")}
+                            {:else}
+                                Select a student
+                            {/if}
+                        </Select.Trigger>
                         <Select.Content>
-                            {#each data.students as student}
+                            {#each data.students.filter((s) => s.support_status === "active") as item}
                                 <Select.Item
-                                    value={String(student.id)}
-                                    label={student.name}
-                                    >{student.name}</Select.Item
+                                    value={String(item.id)}
+                                    label={item.name}
                                 >
+                                    {item.name}
+                                </Select.Item>
                             {/each}
                         </Select.Content>
                     </Select.Root>
+
+                    {#each student as id}
+                        <input type="hidden" name="student_ids" value={id} />
+                    {/each}
+                </div>
+                <div class="space-y-2">
+                    <Label for="lesson_date">Lesson date</Label>
+
+                    <Input
+                        id="lesson_date"
+                        name="lesson_date"
+                        type="date"
+                        value={new Date().toISOString().split("T")[0]}
+                        required
+                    />
                 </div>
                 <div class="grid gap-4 md:grid-cols-2">
                     <div class="space-y-2">
@@ -93,6 +137,7 @@
                             name="hourly_rate"
                             type="number"
                             step="0.01"
+                            bind:value={hourly_rate}
                         />
                     </div>
                 </div>
@@ -103,14 +148,46 @@
                             name="extra_amount"
                             type="number"
                             step="0.01"
+                            bind:value={extra_amount}
                         />
                     </div>
                     <div class="space-y-2">
-                        <Label for="subject_ids">Subject IDs</Label><Input
-                            id="subject_ids"
-                            name="subject_ids"
-                            placeholder="1,2,3"
-                        />
+                        <Label for="subject_ids">Subjects</Label>
+                        <Select.Root type="multiple" bind:value={subject}>
+                            <Select.Trigger class="w-full">
+                                {#if subject.length}
+                                    {subject
+                                        .map(
+                                            (id) =>
+                                                data.subjects.find(
+                                                    (s) => String(s.id) === id,
+                                                )?.name ?? id,
+                                        )
+                                        .join(", ")}
+                                {:else}
+                                    Select subjects
+                                {/if}
+                            </Select.Trigger>
+
+                            <Select.Content>
+                                {#each data.subjects as item}
+                                    <Select.Item
+                                        value={String(item.id)}
+                                        label={item.name}
+                                    >
+                                        {item.name}
+                                    </Select.Item>
+                                {/each}
+                            </Select.Content>
+                        </Select.Root>
+
+                        {#each subject as id}
+                            <input
+                                type="hidden"
+                                name="subject_ids"
+                                value={id}
+                            />
+                        {/each}
                     </div>
                 </div>
                 <div class="space-y-2">

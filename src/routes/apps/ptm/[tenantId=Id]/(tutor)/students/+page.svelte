@@ -4,6 +4,9 @@
     import * as Table from "$components/ui/table/index.js";
     import { Badge } from "$components/ui/badge/index.js";
     import type { PageData } from "./$types";
+    import { currencySymbol } from "$lib/utils/ptm";
+    import PaginationControls from "$components/pagination/pagination-controls.svelte";
+    import { goto } from "$app/navigation";
 
     interface Props {
         data: PageData;
@@ -33,7 +36,7 @@
 
 <div class="space-y-6">
     <div
-        class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
     >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">Students</h2>
@@ -47,44 +50,66 @@
     </div>
 
     <Card.Root>
-        <Card.Content class="p-0">
+        <Card.Header>
+            <Card.Title>
+                Student List
+                <span class="text-sm font-normal text-muted-foreground">
+                    ({data.pagination.total} total)
+                </span>
+            </Card.Title>
+        </Card.Header>
+        <Card.Content>
             {#if data.students.length > 0}
                 <div class="overflow-x-auto">
                     <Table.Root>
                         <Table.Header>
                             <Table.Row>
                                 <Table.Head>Name</Table.Head>
+                                <Table.Head>Hourly Rate</Table.Head>
+                                <Table.Head>Extra</Table.Head>
                                 <Table.Head>Status</Table.Head>
-                                <Table.Head>Rate</Table.Head>
-                                <Table.Head>Dashboard</Table.Head>
-                                <Table.Head class="text-right"
-                                    >Actions</Table.Head
-                                >
+                                <Table.Head class="text-right">
+                                    Actions
+                                </Table.Head>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {#each data.students as student}
+                            {#each data.students.sort( (a, b) => a.support_status.localeCompare(b.support_status), ) as student}
                                 <Table.Row>
                                     <Table.Cell class="font-medium"
                                         >{student.name}</Table.Cell
                                     >
-                                    <Table.Cell
-                                        ><Badge
+                                    <Table.Cell>
+                                        <Badge variant="outline">
+                                            {student.hourly_rate}
+                                            <span
+                                                class="text-xs text-muted-foreground"
+                                            >
+                                                {currencySymbol(
+                                                    student.currency,
+                                                )}
+                                            </span>
+                                        </Badge>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Badge variant="outline">
+                                            {student.extra}
+                                            <span
+                                                class="text-xs text-muted-foreground"
+                                            >
+                                                {currencySymbol(
+                                                    student.currency,
+                                                )}
+                                            </span>
+                                        </Badge>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Badge
                                             variant={statusVariant(
                                                 student.support_status,
                                             )}
                                             >{student.support_status ??
                                                 "unknown"}</Badge
-                                        ></Table.Cell
-                                    >
-                                    <Table.Cell
-                                        >{student.currency}
-                                        {student.hourly_rate}</Table.Cell
-                                    >
-                                    <Table.Cell>
-                                        <span
-                                            class="text-sm text-muted-foreground"
-                                            >Create or edit to issue a token</span
                                         >
                                     </Table.Cell>
                                     <Table.Cell class="text-right">
@@ -106,4 +131,10 @@
             {/if}
         </Card.Content>
     </Card.Root>
+
+    <PaginationControls
+        count={data.pagination.total || 0}
+        perPage={data.pagination.per_page || 10}
+        onPageChange={(page) => goto(`?page=${page}`)}
+    />
 </div>

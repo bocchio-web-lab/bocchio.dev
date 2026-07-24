@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Button } from "$components/ui/button/index.js";
     import * as Card from "$components/ui/card/index.js";
     import { Badge } from "$components/ui/badge/index.js";
     import * as Table from "$components/ui/table/index.js";
@@ -13,18 +12,52 @@
     let { data }: Props = $props();
 
     const stats = $derived(data.dashboard.stats);
+    const pendingPayments = $derived(data.dashboard.pending_payments);
+    const plots = $derived(data.dashboard.plots);
+
+    // Client-side filtering: Only show balances for active or on_hold students
+    const activeBalances = $derived(
+        pendingPayments.filter(
+            (s: any) =>
+                s.status === "active" ||
+                s.status === "on_hold" ||
+                s.balance < 0,
+        ),
+    );
+
+    // Helpers to scale chart bars based on maximum values
+    const maxSubjectMinutes = $derived(
+        Math.max(...plots.time_per_subject.map((s: any) => s.total_minutes), 1),
+    );
+    const maxMonthMinutes = $derived(
+        Math.max(...plots.hours_per_month.map((m: any) => m.total_minutes), 1),
+    );
+    const maxTopTime = $derived(
+        Math.max(
+            ...plots.top_students_time.map(
+                (s: any) => s.lessons_sum_duration_minutes,
+            ),
+            1,
+        ),
+    );
+    const maxTopRev = $derived(
+        Math.max(
+            ...plots.top_students_revenue.map(
+                (s: any) => s.lessons_sum_computed_amount,
+            ),
+            1,
+        ),
+    );
 
     function formatNumber(value: number | string | null | undefined): string {
         if (value === null || value === undefined || value === "") return "0";
         const numeric = typeof value === "string" ? Number(value) : value;
         return Number.isFinite(numeric)
-            ? new Intl.NumberFormat().format(numeric)
+            ? new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "EUR",
+              }).format(numeric)
             : String(value);
-    }
-
-    function formatDate(value: string | null | undefined): string {
-        if (!value) return "Unknown";
-        return new Date(value).toLocaleDateString();
     }
 </script>
 
@@ -34,206 +67,237 @@
 
 <div class="space-y-8">
     <section class="space-y-4">
-        <div
-            class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
-        >
-            <div>
-                <h2 class="text-3xl font-bold tracking-tight">
-                    Tutor Dashboard
-                </h2>
-                <p class="text-muted-foreground">
-                    Overview of students, lessons, payments, and subjects for
-                    this PTM tenant.
-                </p>
-            </div>
+        <div>
+            <h2 class="text-3xl font-bold tracking-tight">Tutor Dashboard</h2>
+            <p class="text-muted-foreground">
+                Overview of students, lessons, payments, and balances.
+            </p>
         </div>
     </section>
 
+    <!-- Top Stats -->
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card.Root>
             <Card.Content class="p-6">
-                <p class="text-sm text-muted-foreground">Students</p>
+                <p class="text-sm text-muted-foreground">Active Students</p>
+                <p class="mt-2 text-3xl font-bold">{stats.students_count}</p>
+            </Card.Content>
+        </Card.Root>
+        <Card.Root>
+            <Card.Content class="p-6">
+                <p class="text-sm text-muted-foreground">Total Time</p>
                 <p class="mt-2 text-3xl font-bold">
-                    {formatNumber(stats.students_count)}
+                    {formatDuration(stats.total_minutes)}
                 </p>
                 <p class="text-xs text-muted-foreground">
-                    {formatNumber(stats.students_count)} total students tracked
+                    {stats.lessons_count} total lessons
                 </p>
             </Card.Content>
         </Card.Root>
         <Card.Root>
             <Card.Content class="p-6">
-                <p class="text-sm text-muted-foreground">Lessons</p>
-                <p class="mt-2 text-3xl font-bold">
-                    {formatNumber(stats.lessons_count)}
-                </p>
-                <p class="text-xs text-muted-foreground">
-                    {formatDuration(stats.total_minutes)} total minutes
-                </p>
-            </Card.Content>
-        </Card.Root>
-        <Card.Root>
-            <Card.Content class="p-6">
-                <p class="text-sm text-muted-foreground">Revenue</p>
+                <p class="text-sm text-muted-foreground">Estimated Revenue</p>
                 <p class="mt-2 text-3xl font-bold">
                     {formatNumber(stats.estimated_revenue)}
                 </p>
-                <p class="text-xs text-muted-foreground">
-                    Estimated lesson revenue
-                </p>
             </Card.Content>
         </Card.Root>
         <Card.Root>
             <Card.Content class="p-6">
-                <p class="text-sm text-muted-foreground">Payments</p>
+                <p class="text-sm text-muted-foreground">Payments Received</p>
                 <p class="mt-2 text-3xl font-bold">
                     {formatNumber(stats.payments_total)}
                 </p>
-                <p class="text-xs text-muted-foreground">
-                    {formatNumber(stats.payments_this_month)} this month
-                </p>
             </Card.Content>
         </Card.Root>
     </section>
 
-    <section class="grid gap-6 xl:grid-cols-2">
-        <Card.Root>
-            <Card.Header>
-                <Card.Title>Recent Lessons</Card.Title>
-                <Card.Description
-                    >Most recent lessons in this tenant.</Card.Description
-                >
-            </Card.Header>
-            <Card.Content>
-                {#if data.recentLessons.length > 0}
-                    <div class="overflow-x-auto">
-                        <Table.Root>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.Head>Student</Table.Head>
-                                    <Table.Head>Date</Table.Head>
-                                    <Table.Head>Duration</Table.Head>
-                                    <Table.Head class="text-right"
-                                        >Amount</Table.Head
+    <!-- Pending Payments Table -->
+    <Card.Root>
+        <Card.Header>
+            <Card.Title>Pending Balances</Card.Title>
+            <Card.Description
+                >Client-side filtered for active and on-hold students.</Card.Description
+            >
+        </Card.Header>
+        <Card.Content>
+            <div class="overflow-x-auto">
+                <Table.Root>
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.Head>Student</Table.Head>
+                            <Table.Head class="text-right">Earned</Table.Head>
+                            <Table.Head class="text-right">Paid</Table.Head>
+                            <Table.Head class="text-right">Balance</Table.Head>
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        {#each activeBalances as student}
+                            <Table.Row>
+                                <Table.Cell>
+                                    <div class="font-medium">
+                                        {student.name}
+                                    </div>
+                                    <Badge
+                                        variant="outline"
+                                        class="mt-1 text-[10px]"
+                                        >{student.status}</Badge
                                     >
-                                </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
-                                {#each data.recentLessons as lesson}
-                                    <Table.Row>
-                                        <Table.Cell class="font-medium"
-                                            >{lesson.student?.name ??
-                                                `Student ${lesson.student_id}`}</Table.Cell
-                                        >
-                                        <Table.Cell
-                                            >{formatDate(
-                                                lesson.created_at,
-                                            )}</Table.Cell
-                                        >
-                                        <Table.Cell
-                                            >{formatDuration(
-                                                lesson.duration_minutes,
-                                            )}</Table.Cell
-                                        >
-                                        <Table.Cell class="text-right"
-                                            >{lesson.computed_amount}</Table.Cell
-                                        >
-                                    </Table.Row>
-                                {/each}
-                            </Table.Body>
-                        </Table.Root>
-                    </div>
-                {:else}
-                    <p class="text-sm text-muted-foreground">No lessons yet.</p>
-                {/if}
-            </Card.Content>
-        </Card.Root>
-
-        <Card.Root>
-            <Card.Header>
-                <Card.Title>Recent Payments</Card.Title>
-                <Card.Description>Latest received payments.</Card.Description>
-            </Card.Header>
-            <Card.Content>
-                {#if data.recentPayments.length > 0}
-                    <div class="overflow-x-auto">
-                        <Table.Root>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.Head>Student</Table.Head>
-                                    <Table.Head>Date</Table.Head>
-                                    <Table.Head>Method</Table.Head>
-                                    <Table.Head class="text-right"
-                                        >Amount</Table.Head
-                                    >
-                                </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
-                                {#each data.recentPayments as payment}
-                                    <Table.Row>
-                                        <Table.Cell class="font-medium"
-                                            >{payment.student?.name ??
-                                                `Student ${payment.student_id}`}</Table.Cell
-                                        >
-                                        <Table.Cell
-                                            >{formatDate(
-                                                payment.received_at,
-                                            )}</Table.Cell
-                                        >
-                                        <Table.Cell>
-                                            <Badge variant="outline"
-                                                >{payment.method}</Badge
-                                            >
-                                        </Table.Cell>
-                                        <Table.Cell class="text-right"
-                                            >{payment.amount}</Table.Cell
-                                        >
-                                    </Table.Row>
-                                {/each}
-                            </Table.Body>
-                        </Table.Root>
-                    </div>
-                {:else}
-                    <p class="text-sm text-muted-foreground">
-                        No payments recorded yet.
-                    </p>
-                {/if}
-            </Card.Content>
-        </Card.Root>
-    </section>
-
-    <section class="grid gap-6 xl:grid-cols-2">
-        <Card.Root>
-            <Card.Header>
-                <Card.Title>Top Students</Card.Title>
-                <Card.Description
-                    >Students with the most activity in the tutor dashboard.</Card.Description
-                >
-            </Card.Header>
-            <Card.Content>
-                {#if data.dashboard.top_students.length > 0}
-                    <div class="space-y-3">
-                        {#each data.dashboard.top_students as student}
-                            <div
-                                class="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0"
-                            >
-                                <div>
-                                    <p class="font-medium">{student.name}</p>
-                                    <p class="text-xs text-muted-foreground">
-                                        {student.currency}
-                                        {student.hourly_rate}
-                                    </p>
-                                </div>
-                                <Badge variant="outline">#{student.id}</Badge>
-                            </div>
+                                </Table.Cell>
+                                <Table.Cell
+                                    class="text-right text-muted-foreground"
+                                    >{formatNumber(
+                                        student.total_earned,
+                                    )}</Table.Cell
+                                >
+                                <Table.Cell
+                                    class="text-right text-muted-foreground"
+                                    >{formatNumber(
+                                        student.total_paid,
+                                    )}</Table.Cell
+                                >
+                                <Table.Cell
+                                    class="text-right font-bold text-primary"
+                                >
+                                    {formatNumber(student.balance)}
+                                </Table.Cell>
+                            </Table.Row>
                         {/each}
-                    </div>
-                {:else}
-                    <p class="text-sm text-muted-foreground">
-                        No top students data available yet.
-                    </p>
-                {/if}
+                    </Table.Body>
+                </Table.Root>
+            </div>
+        </Card.Content>
+    </Card.Root>
+
+    <!-- Plots Grid -->
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Plot: Top Students by Revenue -->
+        <Card.Root>
+            <Card.Header>
+                <Card.Title>Top Students (By Revenue)</Card.Title>
+            </Card.Header>
+            <Card.Content>
+                <div class="space-y-6">
+                    {#each plots.top_students_revenue as student}
+                        <div class="space-y-2">
+                            <div
+                                class="flex items-center justify-between text-sm"
+                            >
+                                <span class="font-medium">{student.name}</span>
+                                <span class="text-muted-foreground"
+                                    >{formatNumber(
+                                        student.lessons_sum_computed_amount,
+                                    )}</span
+                                >
+                            </div>
+                            <div
+                                class="h-3 w-full overflow-hidden rounded-full bg-secondary"
+                            >
+                                <div
+                                    class="h-full bg-primary transition-all"
+                                    style="width: {(student.lessons_sum_computed_amount /
+                                        maxTopRev) *
+                                        100}%"
+                                ></div>
+                            </div>
+                        </div>
+                    {/each}
+                </div>
             </Card.Content>
         </Card.Root>
-    </section>
+
+        <!-- Plot: Time per Subject -->
+        <Card.Root>
+            <Card.Header>
+                <Card.Title>Time per Subject</Card.Title>
+            </Card.Header>
+            <Card.Content>
+                <div class="space-y-4">
+                    {#each plots.time_per_subject as subject}
+                        <div class="flex items-center gap-3">
+                            <div class="w-20 truncate text-xs font-medium">
+                                {subject.subject_name}
+                            </div>
+                            <div
+                                class="flex-1 h-2 rounded-full bg-secondary overflow-hidden"
+                            >
+                                <div
+                                    class="h-full bg-primary"
+                                    style="width: {(subject.total_minutes /
+                                        maxSubjectMinutes) *
+                                        100}%"
+                                ></div>
+                            </div>
+                            <div
+                                class="w-16 text-right text-xs text-muted-foreground"
+                            >
+                                {formatDuration(subject.total_minutes)}
+                            </div>
+                        </div>
+                    {/each}
+                </div>
+            </Card.Content>
+        </Card.Root>
+
+        <!-- Plot: Top Students by Time -->
+        <Card.Root>
+            <Card.Header>
+                <Card.Title>Top Students (By Time)</Card.Title>
+            </Card.Header>
+            <Card.Content>
+                <div class="space-y-4">
+                    {#each plots.top_students_time as student}
+                        <div class="flex items-center gap-3">
+                            <div class="w-20 truncate text-xs font-medium">
+                                {student.name}
+                            </div>
+                            <div
+                                class="flex-1 h-2 rounded-full bg-secondary overflow-hidden"
+                            >
+                                <div
+                                    class="h-full bg-primary"
+                                    style="width: {(student.lessons_sum_duration_minutes /
+                                        maxTopTime) *
+                                        100}%"
+                                ></div>
+                            </div>
+                            <div
+                                class="w-16 text-right text-xs text-muted-foreground"
+                            >
+                                {formatDuration(
+                                    student.lessons_sum_duration_minutes,
+                                )}
+                            </div>
+                        </div>
+                    {/each}
+                </div>
+            </Card.Content>
+        </Card.Root>
+    </div>
+    <!-- Plot: Hours per Month -->
+    <Card.Root>
+        <Card.Header>
+            <Card.Title>Time per Month</Card.Title>
+        </Card.Header>
+        <Card.Content>
+            <div class="flex h-[200px] items-end justify-between gap-2 pt-4">
+                {#each plots.hours_per_month as month}
+                    <div
+                        class="group relative flex w-full flex-col items-center gap-2"
+                    >
+                        <div
+                            class="w-full rounded-t-sm bg-primary/20 hover:bg-primary transition-colors"
+                            style="height: {(month.total_minutes /
+                                maxMonthMinutes) *
+                                150}px"
+                        ></div>
+                        <span
+                            class="text-xs text-muted-foreground truncate w-full text-center"
+                            >{month.month.split("-")[1]}</span
+                        >
+                    </div>
+                {/each}
+            </div>
+        </Card.Content>
+    </Card.Root>
 </div>

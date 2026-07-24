@@ -6,20 +6,13 @@
     import type { PageData } from "./$types";
     import PaginationControls from "$components/pagination/pagination-controls.svelte";
     import { goto } from "$app/navigation";
-    import { formatDuration } from "$lib/utils/ptm";
+    import { formatDate, formatDuration, currencySymbol } from "$lib/utils/ptm";
 
     interface Props {
         data: PageData;
     }
 
     let { data }: Props = $props();
-
-    function studentName(studentId: number): string {
-        return (
-            data.students.find((student) => student.id === studentId)?.name ??
-            `Student ${studentId}`
-        );
-    }
 </script>
 
 <svelte:head>
@@ -28,7 +21,7 @@
 
 <div class="space-y-6">
     <div
-        class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
+        class="flex flex-col justify-between gap-4 md:flex-row md:items-center"
     >
         <div>
             <h2 class="text-2xl font-bold tracking-tight">Lessons</h2>
@@ -42,16 +35,26 @@
     </div>
 
     <Card.Root>
-        <Card.Content class="p-0">
+        <Card.Header>
+            <Card.Title>
+                Lessons List
+                <span class="text-sm font-normal text-muted-foreground">
+                    ({data.pagination.total} total)
+                </span>
+            </Card.Title>
+        </Card.Header>
+        <Card.Content>
             {#if data.lessons.length > 0}
                 <div class="overflow-x-auto">
                     <Table.Root>
                         <Table.Header>
                             <Table.Row>
+                                <Table.Head>Date</Table.Head>
                                 <Table.Head>Student</Table.Head>
-                                <Table.Head>Topics</Table.Head>
                                 <Table.Head>Duration</Table.Head>
-                                <Table.Head>Computed</Table.Head>
+                                <Table.Head>Cost</Table.Head>
+                                <Table.Head>Topics</Table.Head>
+                                <Table.Head>Subjects</Table.Head>
                                 <Table.Head class="text-right">
                                     Actions
                                 </Table.Head>
@@ -60,11 +63,11 @@
                         <Table.Body>
                             {#each data.lessons as lesson}
                                 <Table.Row>
-                                    <Table.Cell class="font-medium">
-                                        {studentName(lesson.student_id)}
-                                    </Table.Cell>
                                     <Table.Cell>
-                                        {lesson.topics ?? "/"}
+                                        {formatDate(lesson.lesson_date)}
+                                    </Table.Cell>
+                                    <Table.Cell class="font-medium">
+                                        {lesson.student.name}
                                     </Table.Cell>
                                     <Table.Cell>
                                         {formatDuration(
@@ -74,7 +77,29 @@
                                     <Table.Cell>
                                         <Badge variant="outline">
                                             {lesson.computed_amount}
+                                            <span
+                                                class="text-xs text-muted-foreground"
+                                            >
+                                                {currencySymbol(
+                                                    lesson.student.currency,
+                                                )}
+                                            </span>
                                         </Badge>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {lesson.topics ?? "/"}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {#if lesson.subjects.length === 0}
+                                            /
+                                        {:else}
+                                            {lesson.subjects
+                                                .map(
+                                                    (subject) =>
+                                                        subject.name ?? "/",
+                                                )
+                                                .join(", ")}
+                                        {/if}
                                     </Table.Cell>
                                     <Table.Cell class="text-right">
                                         <Button
