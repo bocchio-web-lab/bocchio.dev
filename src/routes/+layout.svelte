@@ -29,6 +29,11 @@
             src="https://analytics.bocchio.dev/script.js"
             data-website-id="af1fb622-9be9-42f3-b5d6-c25715d7775f"
         ></script>
+        <script
+            defer
+            src="https://analytics.bocchio.dev/recorder.js"
+            data-website-id="af1fb622-9be9-42f3-b5d6-c25715d7775f"
+        ></script>
     {/if}
 </svelte:head>
 
