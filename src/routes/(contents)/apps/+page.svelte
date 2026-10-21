@@ -9,6 +9,7 @@
     const apps = $derived(data.pagination?.data || []);
 
     function handleAppClick(app: (typeof apps)[0]) {
+        console.log("App clicked:", app);
         if (app.meta?.externalLinks?.[0]?.url) {
             window.open(
                 app.meta.externalLinks[0].url,
@@ -19,9 +20,7 @@
     }
 </script>
 
-<div
-    class="grid justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
->
+<div class="grid justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-3">
     {#each apps as app}
         <AtomicCard
             data={{
@@ -31,7 +30,7 @@
             }}
             class="cursor-pointer"
             clickable={true}
-            on:click={() => handleAppClick(app)}
+            onclick={() => handleAppClick(app)}
         />
     {/each}
 </div>
