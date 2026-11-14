@@ -44,6 +44,12 @@ The browser is told where the gateway is by `PUBLIC_CONNECTX_URL` (for instance 
 The land of the globe of [Distance Explorer](https://bocchio.dev/apps/distance-explorer) is `src/lib/apps/distance-explorer/land.ts`, a map made of cells that `scripts/land-mask.mjs` works out from the public domain Natural Earth data: the script is only run to make the map again (how is in its first lines), so the data is not a dependency of the site.
 
 
+## Portals
+
+The private areas of the services of the API, like the content management system (`cms`) and the private tutoring management (`ptm`), are not apps: they live under `/portals/<service>/<tenant id>`, in `src/routes/portals/`, and the dashboard links to them with `getPortalLink` in `src/lib/utils/app.ts`.
+`/apps` is only for the public apps above, so the two can never take the same address.
+
+
 ## Contributing
 
 If you want to contribute to the project, feel free to open a pull request or an issue on GitHub.
