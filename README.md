@@ -37,6 +37,10 @@ The apps listed in `/apps` are managed from the CMS, like projects and blog post
 The entries of the apps are in `AppsSeeder` of the API, which puts them back as many times as it is run (`php artisan db:seed --class='Database\Seeders\Cms\AppsSeeder'`, with `--force` in production).
 The pages are prerendered from the CMS, so the entries have to be there before the site is built.
 
+[ConnectX](https://bocchio.dev/apps/connectx), a game to play against the computer or other people, is the one that needs a server.
+The page is as static as the others, but it opens a WebSocket to the *web gateway* of [connectx-game-suite](https://github.com/Bocchio01/connectx-game-suite), a C++ program that runs next to the game server in the droplet, behind Nginx: Laravel is not involved.
+The browser is told where the gateway is by `PUBLIC_CONNECTX_URL` (for instance `wss://api.bocchio.dev/connectx/ws`); without it, the page looks on the host of `PUBLIC_API_BASE_URL`, and on `ws://127.0.0.1:8081/connectx/ws` if the API is a local one, which is where `connectx-gateway` listens when it is run on a development machine: starting `connectx-server` and `connectx-gateway` is all it takes to play locally.
+
 The land of the globe of [Distance Explorer](https://bocchio.dev/apps/distance-explorer) is `src/lib/apps/distance-explorer/land.ts`, a map made of cells that `scripts/land-mask.mjs` works out from the public domain Natural Earth data: the script is only run to make the map again (how is in its first lines), so the data is not a dependency of the site.
 
 
