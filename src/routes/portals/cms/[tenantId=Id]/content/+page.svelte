@@ -24,28 +24,19 @@
         { value: "archived", label: "Archived" },
     ];
 
-    const type_options = $derived(
-        (() => {
-            const items = data.content ?? [];
-            const uniqueTypes = Array.from(
-                new Set(items.map((i: any) => i.type).filter(Boolean)),
-            );
+    // All the types of the content, not only the ones of the items that are listed now: the list is filtered (and
+    // paginated), so the options made from it would disappear as soon as the filter is used
+    const type_options = $derived([
+        { value: "", label: "All Types" },
+        ...data.types.map((t: string) => ({
+            value: t,
+            label: t.charAt(0).toUpperCase() + t.slice(1),
+        })),
+    ]);
 
-            return [
-                { value: "", label: "All Types" },
-                ...uniqueTypes.map((t) => ({
-                    value: t,
-                    label:
-                        (t as string).charAt(0).toUpperCase() +
-                        (t as string).slice(1),
-                })),
-            ] as { value: string; label: string }[];
-        })(),
-    );
-
-    let status = $state("");
-    let type = $state("");
-    let title = $state("");
+    // What the filters show is what the address says (also after a reload, or when the page is reached with a link)
+    const status = $derived(data.filters.status);
+    const type = $derived(data.filters.type);
 
     function getStatusBadgeVariant(status: string) {
         const status_badge_variants: Record<
@@ -68,6 +59,13 @@
             url.searchParams.delete(param);
         }
         url.searchParams.delete("page"); // Reset to first page on filter change
+        goto(url.toString());
+    }
+
+    // Another page of the same list: the filters stay
+    function goToPage(number: number) {
+        const url = new URL(page.url);
+        url.searchParams.set("page", String(number));
         goto(url.toString());
     }
 </script>
@@ -111,7 +109,7 @@
                 <Select.Root
                     type="single"
                     name="type"
-                    bind:value={type}
+                    value={type}
                     onValueChange={(val) => updateFilter("type", val)}
                 >
                     <Select.Trigger class="w-full">
@@ -135,7 +133,7 @@
                 <Select.Root
                     type="single"
                     name="status"
-                    bind:value={status}
+                    value={status}
                     onValueChange={(val) => updateFilter("status", val)}
                 >
                     <Select.Trigger class="w-full">
@@ -157,12 +155,7 @@
 
             <Button
                 variant="outline"
-                onclick={() => {
-                    goto(`/portals/cms/${data.tenant.id}/content`);
-                    status = "";
-                    type = "";
-                    title = "";
-                }}
+                onclick={() => goto(`/portals/cms/${data.tenant.id}/content`)}
                 class="w-full md:w-1/3"
                 disabled={!data.filters.type &&
                     !data.filters.status &&
@@ -256,7 +249,7 @@
                 <PaginationControls
                     count={data.pagination?.total || 0}
                     perPage={data.pagination?.perPage || 10}
-                    onPageChange={(page) => goto(`?page=${page}`)}
+                    onPageChange={goToPage}
                 />
             {:else}
                 <div class="py-12 text-center">
