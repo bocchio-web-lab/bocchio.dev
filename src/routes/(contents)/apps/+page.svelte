@@ -7,21 +7,10 @@
 
     let { data }: { data: PageData } = $props();
     const apps = $derived(data.pagination?.data || []);
-
-    function handleAppClick(app: (typeof apps)[0]) {
-        console.log("App clicked:", app);
-        if (app.meta?.externalLinks?.[0]?.url) {
-            window.open(
-                app.meta.externalLinks[0].url,
-                "_blank",
-                "noopener,noreferrer",
-            );
-        }
-    }
 </script>
 
 <div class="grid justify-items-center gap-8 sm:grid-cols-2 lg:grid-cols-3">
-    {#each apps as app}
+    {#each apps as app (app.id)}
         <AtomicCard
             data={{
                 title: app.title,
@@ -30,7 +19,7 @@
             }}
             class="cursor-pointer"
             clickable={true}
-            onclick={() => handleAppClick(app)}
+            onclick={() => goto(`/apps/${app.slug}`)}
         />
     {/each}
 </div>

@@ -17,6 +17,27 @@ The two parts are connected through a classic `REST API`.
 As for the hosting, the frontend is hosted on `Netlify`, while the backend is hosted in a `DigitalOcean Droplet` running `Ubuntu 22.04 LTS`, with `Nginx` as the web server and `MySQL` as the database.
 
 
+## Apps
+
+The public section is also home to small apps, like [Fourier Drawing](https://bocchio.dev/apps/fourier-drawing) and [Chladni Plates](https://bocchio.dev/apps/chladni-plates), that run entirely in the browser: they don't use the API, they don't store anything on the server, and the few external services they may need (for example to download a picture) are called directly from the client.
+Each app lives in three places, all named after the app:
+
+- `src/routes/(contents)/apps/<app>/`: the page, prerendered like the rest of the public section;
+- `src/components/apps/<app>/`: the user interface, made of Shadcn components;
+- `src/lib/apps/<app>/`: the logic, which avoids depending on the DOM unless it has to, together with its tests (run them with `npx vitest`).
+
+What two apps need is in `src/components/apps/`, next to their folders (the labelled slider and `app-page.svelte`, the title and the text around every app, for instance).
+
+The apps listed in `/apps` are managed from the CMS, like projects and blog posts, so a new app needs its entry there too (type *app*):
+
+- the **slug** of the entry is the name of the folder of the app in `src/routes/(contents)/apps/`: the card in `/apps`, the page and the sitemap find each other that way, and the `+page.ts` of the app asks the CMS for that slug (`loadApp` in `src/lib/utils/cms.ts`);
+- the **title** and the **excerpt** are the title and the subtitle, on the card and on top of the page; the **body**, in markdown, is the text under the app, so nothing is written in the page itself;
+- the pictures are files of the site, `static/images/apps/<slug>.gif` (the animation of the card) and `static/images/apps/<slug>.jpg` (still, for the social networks), listed in `meta.headerImages` of the entry.
+
+The entries of the apps are in `AppsSeeder` of the API, which puts them back as many times as it is run (`php artisan db:seed --class='Database\Seeders\Cms\AppsSeeder'`, with `--force` in production).
+The pages are prerendered from the CMS, so the entries have to be there before the site is built.
+
+
 ## Contributing
 
 If you want to contribute to the project, feel free to open a pull request or an issue on GitHub.

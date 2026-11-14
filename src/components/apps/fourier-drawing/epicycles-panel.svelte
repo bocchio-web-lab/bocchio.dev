@@ -5,7 +5,7 @@
     import * as Select from "$components/ui/select/index.js";
     import type { FourierStudio } from "$lib/apps/fourier-drawing/studio.svelte";
     import type { EpicycleOrder } from "$lib/apps/fourier-drawing/spectrum";
-    import SliderField from "./slider-field.svelte";
+    import SliderField from "$components/apps/slider-field.svelte";
 
     interface Props {
         studio: FourierStudio;

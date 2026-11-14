@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { entries as getProjectEntries } from '../projects/[slug=slug]/+page';
 import { entries as getBlogEntries } from '../blog/[[slug=slug]]/+page';
+import { listSlugs } from '$lib/utils/cms';
 
 export const prerender = true;
 
@@ -9,6 +10,7 @@ export const GET: RequestHandler = async () => {
 
     const projectParams = await getProjectEntries();
     const blogParams = await getBlogEntries();
+    const appSlugs = await listSlugs('apps');
     const staticPages = ['', '/projects', '/apps', '/blog'];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -21,6 +23,11 @@ export const GET: RequestHandler = async () => {
         ${projectParams.map(param => `
         <url>
             <loc>${siteUrl}/projects/${param.slug}</loc>
+            <priority>0.6</priority>
+        </url>`).join('')}
+        ${appSlugs.map(slug => `
+        <url>
+            <loc>${siteUrl}/apps/${slug}</loc>
             <priority>0.6</priority>
         </url>`).join('')}
         ${blogParams.map(param => `

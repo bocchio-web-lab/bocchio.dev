@@ -19,6 +19,9 @@ export const load: PageLoad = async ({ fetch }) => {
     }
 
     return {
-        pagination: data
+        pagination: data,
+        title: 'Apps',
+        description: 'Small interactive apps that run in the browser: Fourier series, Chladni figures, distances from the Earth to the galaxies, and a Connect 4 to play online.',
+        keywords: 'apps, interactive, simulations, Fourier transform, Chladni figures, distance calculator, Connect 4',
     };
 };

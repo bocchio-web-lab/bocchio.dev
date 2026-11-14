@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as Card from "$components/ui/card/index.js";
     import type { FourierStudio } from "$lib/apps/fourier-drawing/studio.svelte";
-    import SliderField from "./slider-field.svelte";
+    import SliderField from "$components/apps/slider-field.svelte";
 
     interface Props {
         studio: FourierStudio;
