@@ -37,6 +37,8 @@ The apps listed in `/apps` are managed from the CMS, like projects and blog post
 The entries of the apps are in `AppsSeeder` of the API, which puts them back as many times as it is run (`php artisan db:seed --class='Database\Seeders\Cms\AppsSeeder'`, with `--force` in production).
 The pages are prerendered from the CMS, so the entries have to be there before the site is built.
 
+The land of the globe of [Distance Explorer](https://bocchio.dev/apps/distance-explorer) is `src/lib/apps/distance-explorer/land.ts`, a map made of cells that `scripts/land-mask.mjs` works out from the public domain Natural Earth data: the script is only run to make the map again (how is in its first lines), so the data is not a dependency of the site.
+
 
 ## Contributing
 
